@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces.Employee;
-using Infrastructure.Repositories.EmployeeRepo;
+using Infrastructure.Repositories.Employee;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Extensions

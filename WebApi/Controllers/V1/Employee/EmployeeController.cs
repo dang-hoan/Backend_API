@@ -1,13 +1,14 @@
-﻿using Application.Features.Employee.Querries.GetAll;
-using Domain.Wrappers;
+using Application.Features.Employee.Command.DeleteEmployee;
 using Application.Features.Employee.Command.AddEmployee;
-using MediatR;
+using Application.Features.Employee.Querries.GetAll;
+using Domain.Wrappers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.V1.Employee
 {
-    [Route("api/v{version:apiVersion}/employee")]
     [ApiController]
+
+    [Route("api/v{version:apiVersion}/employee")]
     public class EmployeeController : BaseApiController<EmployeeController>
     {
         /// <summary>
@@ -40,6 +41,21 @@ namespace WebApi.Controllers.V1.Employee
         public async Task<IActionResult> AddEmployee(AddEmployeeCommand command)
         {
             return Ok(await Mediator.Send(command));
+        }
+        
+        /// <summary>
+        /// Delete Employee by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpDelete]
+        public async Task<IActionResult> DeleteEmployee(short id)
+        {
+            return Ok(await Mediator.Send(new DeleteEmployeeCommand
+            {
+                Id = id
+            }));
         }
     }
 }

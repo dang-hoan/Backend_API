@@ -18,7 +18,7 @@ namespace Infrastructure.Contexts
 {
     public class ApplicationDbContext : AudtableContext
     {
-        private readonly Application.Interfaces.ICurrentUserService _currentUserService;
+        private readonly ICurrentUserService _currentUserService;
         private readonly IDateTimeService _dateTimeService;
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ICurrentUserService currentUserService, IDateTimeService dateTimeService) : base(options)

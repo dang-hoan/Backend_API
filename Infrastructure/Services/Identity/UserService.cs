@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.Text.Encodings.Web;
 using IResult = Domain.Wrappers.IResult;
@@ -75,6 +76,26 @@ namespace Infrastructure.Services.Identity
 
             var token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
             var result = await _userManager.ResetPasswordAsync(user, token, request.Password);
+            if (result.Succeeded)
+            {
+                return await Result.SuccessAsync();
+            }
+            return await Result.FailAsync("Lỗi hệ thống");
+        }
+
+        public async Task<IResult> DeleteUser(DeleteUserRequest request)
+        {
+            var user = _userManager.Users.Where(user => user.UserId == request.Id && user.TypeFlag == request.TypeFlag).FirstOrDefault();
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                return await Result.FailAsync("Lỗi hệ thống");
+            }
+
+            user.IsActive = false;
+            user.IsDeleted = true;
+
+            var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
                 return await Result.SuccessAsync();

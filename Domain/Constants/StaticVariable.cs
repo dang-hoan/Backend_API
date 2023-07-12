@@ -13,5 +13,7 @@
 
         // url of page to Authorization
         public const string EMPLOYEE_LIST = "/employee-management";
+
+        public const string NOT_FOUND_MSG = "Not found match data!";
     }
 }
