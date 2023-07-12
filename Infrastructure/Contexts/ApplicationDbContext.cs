@@ -30,7 +30,6 @@ namespace Infrastructure.Contexts
         private DbSet<AppUser> AppUsers { get; set; } = default!;
         private DbSet<AppRole> AppRoles { get; set; } = default!;
         private DbSet<AppRoleClaim> AppRoleClaims { get; set; } = default!;
-
         public virtual DbSet<Booking> Bookings { get; set; }
         public virtual DbSet<BookingDetail> BookingDetails { get; set; }
         public virtual DbSet<Customer> Customers { get; set; }

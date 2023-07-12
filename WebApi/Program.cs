@@ -28,6 +28,8 @@ try
 
     builder.Services.AddCorsExtensions();
 
+    builder.Services.AddRepositories();
+
     builder.Services.AddIdentityServices();
 
     builder.Services.AddJwtAuthentication(builder.Services.GetApplicationSettings(builder.Configuration));

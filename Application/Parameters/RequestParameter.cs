@@ -2,11 +2,12 @@
 {
     public class RequestParameter
     {
+        public string? Keyword { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
         public bool IsExport { get; set; }
         public string SortBy { get; set; }
-        public string Order { get; set; }
+        public string OrderBy { get; set; }
 
         public RequestParameter()
         {
@@ -14,7 +15,7 @@
             this.PageSize = 10;
             this.IsExport = false;
             this.SortBy = string.Empty;
-            this.Order = "desc";
+            this.OrderBy = "CreatedOn desc";
         }
 
         public RequestParameter(int pageNumber, int pageSize)
