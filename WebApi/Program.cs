@@ -14,6 +14,8 @@ try
 {
     builder.Host.AddAppConfigurations();
 
+    builder.Services.AddRepositories();
+
     builder.Services.AddApplicationExtensions();
 
     builder.Services.AddPersistenceInfrastructure(builder.Configuration);
@@ -25,6 +27,8 @@ try
     builder.Services.AddApiversioningExtension();
 
     builder.Services.AddCorsExtensions();
+
+    builder.Services.AddRepositories();
 
     builder.Services.AddIdentityServices();
 

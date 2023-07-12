@@ -43,5 +43,9 @@ namespace Infrastructure.Extensions
             services.AddScoped<IUploadService, UploadService>();
 
         }
+        public static void AddRepositories(this IServiceCollection services)
+        {
+            services.AddEmployeeRepository();
+        }
     }
 }

@@ -270,7 +270,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("booking");
+                    b.ToTable("booking", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.BookingDetail.BookingDetail", b =>
@@ -310,7 +310,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("booking_detail");
+                    b.ToTable("booking_detail", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Customer.Customer", b =>
@@ -360,7 +360,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("customer");
+                    b.ToTable("customer", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Employee.Employee", b =>
@@ -423,7 +423,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("employee");
+                    b.ToTable("employee", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.EmployeeService.EmployeeService", b =>
@@ -463,7 +463,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("employee_service");
+                    b.ToTable("employee_service", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Feedback.Feedback", b =>
@@ -521,7 +521,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("feedback");
+                    b.ToTable("feedback", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Reply.Reply", b =>
@@ -561,7 +561,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("reply");
+                    b.ToTable("reply", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Service.Service", b =>
@@ -606,7 +606,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("service");
+                    b.ToTable("service", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ServiceImage.ServiceImage", b =>
@@ -643,7 +643,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("service_image");
+                    b.ToTable("service_image", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.WorkShift.WorkShift", b =>
@@ -692,7 +692,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("work_shift");
+                    b.ToTable("work_shift", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.Models.Audit.Audit", b =>
@@ -730,7 +730,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AuditTrails");
+                    b.ToTable("AuditTrails", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
