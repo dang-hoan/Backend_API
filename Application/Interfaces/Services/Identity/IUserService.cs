@@ -8,5 +8,7 @@ namespace Application.Interfaces.Services.Identity
         Task<IResult> ForgotPasswordAsync(ForgotPasswordRequest request, string origin);
 
         Task<IResult> ResetPasswordAsync(ResetPasswordRequest request);
+
+        Task<IResult> DeleteUser(DeleteUserRequest request);
     }
 }
