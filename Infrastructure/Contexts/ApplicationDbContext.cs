@@ -1,6 +1,16 @@
 ﻿using Application.Interfaces;
 using Domain.Contracts;
 using Domain.Entities;
+using Domain.Entities.Booking;
+using Domain.Entities.BookingDetail;
+using Domain.Entities.Customer;
+using Domain.Entities.Employee;
+using Domain.Entities.EmployeeService;
+using Domain.Entities.Feedback;
+using Domain.Entities.Reply;
+using Domain.Entities.Service;
+using Domain.Entities.ServiceImage;
+using Domain.Entities.WorkShift;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +30,17 @@ namespace Infrastructure.Contexts
         private DbSet<AppUser> AppUsers { get; set; } = default!;
         private DbSet<AppRole> AppRoles { get; set; } = default!;
         private DbSet<AppRoleClaim> AppRoleClaims { get; set; } = default!;
+
+        public virtual DbSet<Booking> Bookings { get; set; }
+        public virtual DbSet<BookingDetail> BookingDetails { get; set; }
+        public virtual DbSet<Customer> Customers { get; set; }
+        public virtual DbSet<Employee> Employees { get; set; }
+        public virtual DbSet<EmployeeService> EmployeeServices { get; set; }
+        public virtual DbSet<Feedback> Feedbacks { get; set; }
+        public virtual DbSet<Reply> Replies { get; set; }
+        public virtual DbSet<Service> Services { get; set; }
+        public virtual DbSet<ServiceImage> ServiceImages { get; set; }
+        public virtual DbSet<WorkShift> WorkShifts { get; set; }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
         {
