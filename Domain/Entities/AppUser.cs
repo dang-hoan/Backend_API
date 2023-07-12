@@ -1,4 +1,5 @@
-﻿using Domain.Contracts;
+﻿using Domain.Constants.Enum;
+using Domain.Contracts;
 using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Entities
@@ -9,7 +10,7 @@ namespace Domain.Entities
         public string? AvatarUrl { get; set; }
         public bool IsActive { get; set; }
         public long UserId { get; set; }
-        public short TypeFlag { get; set; }
+        public TypeFlagEnum TypeFlag { get; set; }
         public string? RefreshToken { get; set; }
         public DateTime RefreshTokenExpiryTime { get; set; }
         public string? CreatedBy { get; set; }
