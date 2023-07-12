@@ -1,5 +1,4 @@
 ﻿using Application.Interfaces.Repositories;
-using Domain.Entities.Employee;
 
 namespace Application.Interfaces.Employee
 {
