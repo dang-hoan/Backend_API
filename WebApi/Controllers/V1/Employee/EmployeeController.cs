@@ -5,6 +5,7 @@ using Application.Features.Employee.Command.AddEmployee;
 using Application.Features.Employee.Command.DeleteEmployee;
 using Application.Features.Employee.Queries.GetAll;
 using Microsoft.AspNetCore.Mvc;
+using Application.Features.Employee.Command.EditEmployee;
 
 namespace WebApi.Controllers.V1.Employee
 {
@@ -56,7 +57,12 @@ namespace WebApi.Controllers.V1.Employee
         [HttpPost]
         public async Task<IActionResult> AddEmployee(AddEmployeeCommand command)
         {
-            return Ok(await Mediator.Send(command));
+            var result = await Mediator.Send(command);
+            if (result.Succeeded == false)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
 
         
@@ -73,6 +79,23 @@ namespace WebApi.Controllers.V1.Employee
             {
                 Id = id
             }));
+        }
+
+        /// <summary>
+        /// Add/Edit Employee
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpPut]
+        public async Task<IActionResult> EditEmployee(EditEmployeeCommand command)
+        {
+            var result = await Mediator.Send(command);
+            if (result.Succeeded == false)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

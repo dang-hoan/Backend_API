@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.Text.Encodings.Web;
 using IResult = Domain.Wrappers.IResult;
@@ -101,6 +100,24 @@ namespace Infrastructure.Services.Identity
                 return await Result.SuccessAsync();
             }
             return await Result.FailAsync("Lỗi hệ thống");
+        }
+
+        public async Task<IResult> EditUser(EditUserRequest request)
+        {
+            var user = _userManager.Users.Where(user => user.UserId == request.Id && user.TypeFlag == request.TypeFlag).FirstOrDefault();
+            if (user == null)
+            {
+                return await Result.FailAsync("This user does not exist in the database");
+            }
+            user.FullName = request.FullName;
+            user.Email = request.Email;
+            user.PhoneNumber = request.Phone;
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return await Result.SuccessAsync();
+            }
+            return await Result.FailAsync("System Error");
         }
     }
 }
