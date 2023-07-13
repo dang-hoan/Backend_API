@@ -5,12 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Features.Employee.Querries.GetAll
+namespace Application.Features.Employee.Queries.GetAll
 {
     public class GetAllEmployeeParameter : RequestParameter
     {
-        public DateTime? MaxBirthDay { get; set; }
-        public DateTime? MinBirthDay { get; set; }
+        public long? WorkShiftId { get; set; }
         public bool? Gender { get; set; }
 
     }

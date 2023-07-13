@@ -10,7 +10,7 @@ using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Features.Employee.Querries.GetAll
+namespace Application.Features.Employee.Queries.GetAll
 {
     public class GetAllEmployeeQuery : GetAllEmployeeParameter, IRequest<PaginatedResult<GetAllEmployeeResponse>>
     {
@@ -25,18 +25,18 @@ namespace Application.Features.Employee.Querries.GetAll
         public async Task<PaginatedResult<GetAllEmployeeResponse>> Handle(GetAllEmployeeQuery request, CancellationToken cancellationToken)
         {
             var query = _employeeRepository.Entities.Where(x => !x.IsDeleted
-                                                                && (string.IsNullOrEmpty(request.Keyword) || x.Name.Contains(request.Keyword))
+                                                                && (string.IsNullOrEmpty(request.Keyword) || x.Name.Contains(request.Keyword) || x.Id.ToString().Contains(request.Keyword))
                                                                 && (!request.Gender.HasValue || x.Gender == request.Gender)
-                                                                && (!request.MaxBirthDay.HasValue || x.Birthday.Value.Date <= request.MaxBirthDay.Value.Date)
-                                                                && (!request.MinBirthDay.HasValue || x.Birthday.Value.Date >= request.MinBirthDay.Value.Date))
+                                                                && (!request.WorkShiftId.HasValue || x.WorkShiftId == request.WorkShiftId))
                                            .Select(x => new GetAllEmployeeResponse
                                            {
                                                Id = x.Id,
                                                Name = x.Name,
                                                Gender = x.Gender,
                                                PhoneNumber = x.PhoneNumber,
-                                               Birthday = x.Birthday,
-                                               CreatedOn = x.CreatedOn
+                                               CreatedOn = x.CreatedOn,
+                                               LastModifiedOn = x.LastModifiedOn,
+                                               WorkShiftId = x.WorkShiftId,
                                            });
             var data = query.OrderBy(request.OrderBy);
             var totalRecord = data.Count();
