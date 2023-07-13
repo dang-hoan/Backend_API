@@ -6,6 +6,7 @@ using Domain.Wrappers;
 using MediatR;
 using Application.Interfaces.Employee;
 using Domain.Constants.Enum;
+using System.ComponentModel.DataAnnotations;
 
 namespace Application.Features.Employee.Command.AddEmployee
 {
@@ -15,6 +16,7 @@ namespace Application.Features.Employee.Command.AddEmployee
         public string Name { get; set; } = default!;
         public string? Address { get; set; }
         public DateTime? Birthday { get; set; }
+        [EmailAddress(ErrorMessage = "Invalid email address")]
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public bool Gender { get; set; }
