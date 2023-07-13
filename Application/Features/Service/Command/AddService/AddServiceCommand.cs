@@ -53,6 +53,8 @@ namespace Application.Features.Service.Command.AddService
             var addService = _mapper.Map<Domain.Entities.Service.Service>(request);
             await _serviceRepository.AddAsync(addService);
 
+            await _unitOfWork.Commit(cancellationToken);
+            request.Id = addService.Id;
 
             foreach (IFormFile file in request.ListImages)
             {
@@ -67,6 +69,7 @@ namespace Application.Features.Service.Command.AddService
                 {
                     var obj = new Domain.Entities.ServiceImage.ServiceImage
                     {
+                        ServiceId = addService.Id,
                         NameFile = filePath
                     };
                     await _serviceImageRepository.AddAsync(obj);
@@ -78,7 +81,6 @@ namespace Application.Features.Service.Command.AddService
             }
 
             await _unitOfWork.Commit(cancellationToken);
-            request.Id = addService.Id;
 
             return await Result<AddServiceCommand>.SuccessAsync(request);
         }
