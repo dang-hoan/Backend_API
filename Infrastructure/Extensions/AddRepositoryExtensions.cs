@@ -1,7 +1,9 @@
 ﻿using Application.Interfaces.Employee;
 using Application.Interfaces.Service;
+using Application.Interfaces.ServiceImage;
 using Infrastructure.Repositories.Employee;
 using Infrastructure.Repositories.Service;
+using Infrastructure.Repositories.ServiceImage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Extensions
@@ -15,6 +17,10 @@ namespace Infrastructure.Extensions
         public static void AddServiceRepository(this IServiceCollection services)
         {
             services.AddScoped<IServiceRepository, ServiceRepository>();
+        }
+        public static void AddServiceImageRepository(this IServiceCollection services)
+        {
+            services.AddScoped<IServiceImageRepository, ServiceImageRepository>();
         }
     }
 }
