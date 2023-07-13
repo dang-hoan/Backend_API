@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using Infrastructure.Extensions;
 
 namespace Infrastructure.Extensions
 {
@@ -20,11 +21,10 @@ namespace Infrastructure.Extensions
         {
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), hius =>
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), o =>
                 {
-                    hius.EnableRetryOnFailure();
-                    hius.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
-
+                    o.EnableRetryOnFailure();
+                    o.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
                 });
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
@@ -41,11 +41,12 @@ namespace Infrastructure.Extensions
             services.AddScoped<IAuditService, AuditService>();
             services.AddScoped<IExcelService, ExcelService>();
             services.AddScoped<IUploadService, UploadService>();
-
         }
+
         public static void AddRepositories(this IServiceCollection services)
         {
             services.AddEmployeeRepository();
         }
+
     }
 }
