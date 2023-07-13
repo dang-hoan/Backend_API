@@ -2,11 +2,8 @@ using Application.Features.Employee.Queries.GetById;
 using Domain.Wrappers;
 using Microsoft.AspNetCore.Authorization;
 using Application.Features.Employee.Command.AddEmployee;
-using MediatR;
 using Application.Features.Employee.Command.DeleteEmployee;
-using Application.Features.Employee.Command.AddEmployee;
-using Application.Features.Employee.Querries.GetAll;
-using Domain.Wrappers;
+using Application.Features.Employee.Queries.GetAll;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.V1.Employee
@@ -47,8 +44,7 @@ namespace WebApi.Controllers.V1.Employee
                 PageNumber = parameter.PageNumber,
                 PageSize = parameter.PageSize,
                 Gender = parameter.Gender,
-                MaxBirthDay = parameter.MaxBirthDay,
-                MinBirthDay = parameter.MinBirthDay
+                WorkShiftId = parameter.WorkShiftId,
             }));
         }
         /// <summary>
