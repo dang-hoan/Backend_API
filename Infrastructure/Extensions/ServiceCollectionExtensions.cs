@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using Infrastructure.Extensions;
 
 namespace Infrastructure.Extensions
 {
@@ -47,6 +46,7 @@ namespace Infrastructure.Extensions
         {
             services.AddEmployeeRepository();
             services.AddServiceRepository();
+            services.AddServiceImageRepository();
         }
 
     }
