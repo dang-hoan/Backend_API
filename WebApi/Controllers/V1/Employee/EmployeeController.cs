@@ -6,6 +6,7 @@ using Application.Features.Employee.Command.DeleteEmployee;
 using Application.Features.Employee.Queries.GetAll;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Employee.Command.EditEmployee;
+using Application.Features.Employee.Command.ResetPasswordEmployee;
 
 namespace WebApi.Controllers.V1.Employee
 {
@@ -34,7 +35,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        //[Authorize("Superadmin")]
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllEmployeeResponse>>> GetAllEmployee([FromQuery] GetAllEmployeeParameter parameter)
         {
@@ -65,7 +66,7 @@ namespace WebApi.Controllers.V1.Employee
             return Ok(result);
         }
 
-        
+
         /// <summary>
         /// Delete Employee by Id
         /// </summary>
@@ -91,6 +92,25 @@ namespace WebApi.Controllers.V1.Employee
         public async Task<IActionResult> EditEmployee(EditEmployeeCommand command)
         {
             var result = await Mediator.Send(command);
+            if (result.Succeeded == false)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        /// <summary>
+        /// Reset employee password to default
+        /// </summary>
+        /// <param name="Username"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpPatch("{Username}/reset-password")]
+        public async Task<IActionResult> ResetPasswordEmployee(string Username)
+        {
+            var result = await Mediator.Send(new ResetPasswordEmployeeCommand
+            {
+                Username = Username
+            });
             if (result.Succeeded == false)
             {
                 return BadRequest(result);
