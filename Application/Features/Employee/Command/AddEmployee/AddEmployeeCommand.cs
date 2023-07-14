@@ -7,6 +7,7 @@ using MediatR;
 using Application.Interfaces.Employee;
 using Domain.Constants.Enum;
 using System.ComponentModel.DataAnnotations;
+using Domain.Constants;
 
 namespace Application.Features.Employee.Command.AddEmployee
 {
@@ -76,7 +77,7 @@ namespace Application.Features.Employee.Command.AddEmployee
                 TypeFlag = TypeFlagEnum.Employee,
                 UserId = request.Id,
             };
-            bool result = await _accountService.AddAcount(user, request.Password);
+            bool result = await _accountService.AddAcount(user, request.Password,RoleConstants.EmployeeRole);
             if (result == false)
             {
                 return await Result<AddEmployeeCommand>.FailAsync("There was an error during the account creation process.");

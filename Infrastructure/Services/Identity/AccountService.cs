@@ -38,10 +38,10 @@ namespace Infrastructure.Services.Identity
             var user = await _userManager.FindByNameAsync(userName);
             return user != null;
         }
-        public async Task<bool> AddAcount(AppUser user, string password)
+        public async Task<bool> AddAcount(AppUser user, string password,string role)
         {
             await _userManager.CreateAsync(user, password);
-            var result = await _userManager.AddToRoleAsync(user, RoleConstants.EmployeeRole);
+            var result = await _userManager.AddToRoleAsync(user, role);
             return result.Succeeded;
         }
     }

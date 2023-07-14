@@ -47,6 +47,7 @@ namespace Infrastructure.Extensions
             services.AddEmployeeRepository();
             services.AddServiceRepository();
             services.AddServiceImageRepository();
+            services.AddCustomerRepository();
         }
 
     }
