@@ -40,6 +40,8 @@ namespace Infrastructure.Extensions
             services.AddScoped<IAuditService, AuditService>();
             services.AddScoped<IExcelService, ExcelService>();
             services.AddScoped<IUploadService, UploadService>();
+            services.AddScoped<IRemoveImageService, RemoveImageService>();
+            services.AddScoped<ICheckFileType, CheckFileType>();
         }
 
         public static void AddRepositories(this IServiceCollection services)

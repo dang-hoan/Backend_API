@@ -2,7 +2,7 @@ using Application.Features.Service.Command.AddService;
 using Application.Features.Service.Queries.GetById;
 using Domain.Wrappers;
 using Microsoft.AspNetCore.Mvc;
-
+using Application.Features.Service.Command.EditService;
 
 namespace WebApi.Controllers.V1.Service
 {
@@ -23,6 +23,14 @@ namespace WebApi.Controllers.V1.Service
             return Ok(await Mediator.Send(command));
         }
 
+        //[Authorize]
+        [HttpPut]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> EditService([FromForm] EditServiceCommand command)
+        {
+            return Ok(await Mediator.Send(command));
+        }
+        
         /// <summary>
         /// Get Service detail by Id
         /// </summary>

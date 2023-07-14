@@ -34,22 +34,32 @@ namespace Application.Features.Service.Command.AddService
         private readonly IMapper _mapper;
         private readonly IServiceRepository _serviceRepository;
         private readonly IServiceImageRepository _serviceImageRepository;
+        private readonly ICheckFileType _checkFileType;
         private readonly IUploadService _uploadService;
         private readonly IUnitOfWork<long> _unitOfWork;
 
 
         public AddServiceCommandHandler(IMapper mapper, IServiceRepository serviceRepository, 
-            IServiceImageRepository serviceImageRepository, IUnitOfWork<long> unitOfWork, IUploadService uploadService)
+            IServiceImageRepository serviceImageRepository, IUnitOfWork<long> unitOfWork, IUploadService uploadService, ICheckFileType checkFileType)
         {
             _mapper = mapper;
             _serviceRepository = serviceRepository;
             _serviceImageRepository = serviceImageRepository;
+            _checkFileType = checkFileType;
             _uploadService = uploadService;
             _unitOfWork = unitOfWork;
         }
 
         public async Task<Result<AddServiceCommand>> Handle(AddServiceCommand request, CancellationToken cancellationToken)
         {
+            var result = _checkFileType.CheckFilesIsImage(new Dtos.Requests.CheckImagesTypeRequest
+            {
+                Files = request.ListImages
+            });
+
+            if (result != "")
+                return await Result<AddServiceCommand>.FailAsync(result);
+
             var addService = _mapper.Map<Domain.Entities.Service.Service>(request);
             await _serviceRepository.AddAsync(addService);
 
@@ -62,7 +72,7 @@ namespace Application.Features.Service.Command.AddService
                 {
                     FileName = file.FileName,
                     Extension = Path.GetExtension(file.FileName),
-                    Data = await IFormFileToByteArray(file)
+                    Data = _mapper.Map<byte[]>(file)
                 });
 
                 if (filePath != "")
@@ -76,8 +86,8 @@ namespace Application.Features.Service.Command.AddService
                 }
                 else
                 {
-                    return await Result<AddServiceCommand>.FailAsync($"File {file.FileName} isn't not upload!");
-                }
+                    return await Result<AddServiceCommand>.FailAsync($"File {file.FileName} isn't uploaded!");
+                }                  
             }
 
             await _unitOfWork.Commit(cancellationToken);
@@ -85,13 +95,5 @@ namespace Application.Features.Service.Command.AddService
             return await Result<AddServiceCommand>.SuccessAsync(request);
         }
 
-        public async Task<byte[]> IFormFileToByteArray(IFormFile file)
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                await file.CopyToAsync(memoryStream);
-                return memoryStream.ToArray();
-            }
-        }
     }
 }
