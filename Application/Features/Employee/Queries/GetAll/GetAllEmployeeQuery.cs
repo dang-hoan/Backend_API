@@ -37,6 +37,7 @@ namespace Application.Features.Employee.Queries.GetAll
                                                CreatedOn = x.CreatedOn,
                                                LastModifiedOn = x.LastModifiedOn,
                                                WorkShiftId = x.WorkShiftId,
+                                               Email = x.Email
                                            });
             var data = query.OrderBy(request.OrderBy);
             var totalRecord = data.Count();
