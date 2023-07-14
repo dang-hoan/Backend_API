@@ -20,9 +20,9 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize]
+        //[Authorize]
         [HttpGet("{id}")]
-        public async Task<ActionResult<Result<GetEmployeeByIdResponse>>> GetEmployeeById(short id)
+        public async Task<ActionResult<Result<GetEmployeeByIdResponse>>> GetEmployeeById(long id)
         {
             return Ok(await Mediator.Send(new GetEmployeeByIdQuery()
             {
@@ -35,7 +35,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllEmployeeResponse>>> GetAllEmployee([FromQuery] GetAllEmployeeParameter parameter)
         {
@@ -56,7 +56,8 @@ namespace WebApi.Controllers.V1.Employee
         /// <returns></returns>
         //[Authorize]
         [HttpPost]
-        public async Task<IActionResult> AddEmployee(AddEmployeeCommand command)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> AddEmployee([FromForm] AddEmployeeCommand command)
         {
             var result = await Mediator.Send(command);
             if (result.Succeeded == false)
@@ -89,7 +90,8 @@ namespace WebApi.Controllers.V1.Employee
         /// <returns></returns>
         //[Authorize]
         [HttpPut]
-        public async Task<IActionResult> EditEmployee(EditEmployeeCommand command)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> EditEmployee([FromForm] EditEmployeeCommand command)
         {
             var result = await Mediator.Send(command);
             if (result.Succeeded == false)

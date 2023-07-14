@@ -387,3 +387,6 @@ FodyWeavers.xsd
 *.sln.iml
 *.xml
 *.bak
+
+#Files save
+WebApi/Files

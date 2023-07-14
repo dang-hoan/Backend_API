@@ -12,7 +12,9 @@ namespace Application.Mappings.Employee
             
             CreateMap<Domain.Entities.Employee.Employee, GetEmployeeByIdQuery>().ReverseMap();
             CreateMap<AddEmployeeCommand, Domain.Entities.Employee.Employee>().ReverseMap();
-            CreateMap<EditEmployeeCommand, Domain.Entities.Employee.Employee>().ReverseMap();
+            CreateMap<EditEmployeeCommand, Domain.Entities.Employee.Employee>()
+                .ForMember(dest => dest.Image, opt => opt.Condition(src => src.ImageFile != null))
+                .ReverseMap();
         }
     }
 }

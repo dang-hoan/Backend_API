@@ -8,20 +8,23 @@ using Application.Interfaces.Employee;
 using Domain.Constants.Enum;
 using System.ComponentModel.DataAnnotations;
 using Domain.Constants;
+using Microsoft.AspNetCore.Http;
+using Application.Interfaces;
+using Application.Features.Service.Command.AddService;
 
 namespace Application.Features.Employee.Command.AddEmployee
 {
     public class AddEmployeeCommand : IRequest<Result<AddEmployeeCommand>>
     {
-        public long Id { get; set; }
+        public long? Id { get; set; }
         public string Name { get; set; } = default!;
         public string? Address { get; set; }
         public DateTime? Birthday { get; set; }
         [EmailAddress(ErrorMessage = "Invalid email address")]
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
-        public bool Gender { get; set; }
-        public string? Image { get; set; }
+        public bool? Gender { get; set; }
+        public IFormFile? ImageFile { get; set; }
         public string Password { get; set; }
         public string Username { get; set; }
         public long WorkShiftId { get; set; }
@@ -34,33 +37,69 @@ namespace Application.Features.Employee.Command.AddEmployee
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly IAccountService _accountService;
+        private readonly IUploadService _uploadService;
+        private readonly ICheckFileType _checkFileType;
 
 
-        public AddEmployeeCommandHandler(IMapper mapper, IEmployeeRepository employeeRepository, IUnitOfWork<long> unitOfWork, IAccountService accountService)
+        public AddEmployeeCommandHandler(IMapper mapper, IEmployeeRepository employeeRepository, IUnitOfWork<long> unitOfWork, IAccountService accountService,
+                                                IUploadService uploadService, ICheckFileType checkFileType)
         {
             _mapper = mapper;
             _employeeRepository = employeeRepository;
             _unitOfWork = unitOfWork;
             _accountService = accountService;
+            _uploadService = uploadService;
+            _checkFileType = checkFileType;
         }
 
         public async Task<Result<AddEmployeeCommand>> Handle(AddEmployeeCommand request, CancellationToken cancellationToken)
         {
+            request.Id = null;
             bool isUsernameExists = await _accountService.IsExistUsername(request.Username);
             if (isUsernameExists)
             {
-                return await Result<AddEmployeeCommand>.FailAsync("This username already exists in the database.");
+                return await Result<AddEmployeeCommand>.FailAsync(StaticVariable.USERNAME_EXISTS_MSG);
             }
             var existEmail = _employeeRepository.Entities.FirstOrDefault(_ => _.Email == request.Email && _.IsDeleted == false);
             if (existEmail != null)
             {
-                return await Result<AddEmployeeCommand>.FailAsync("This email already exists in the database.");
+                return await Result<AddEmployeeCommand>.FailAsync(StaticVariable.EMAIL_EXISTS_MSG);
             }
             if (request.Password.Length < 8)
             {
-                return await Result<AddEmployeeCommand>.FailAsync("Password must be at least 8 characters");
+                return await Result<AddEmployeeCommand>.FailAsync(StaticVariable.INVALID_PASSWORD);
+            }
+            if (request.PhoneNumber.Length < 8 || request.PhoneNumber.Length > 10)
+            {
+                return await Result<AddEmployeeCommand>.FailAsync(StaticVariable.PHONE_ERROR_MSG);
             }
             var addEmployee = _mapper.Map<Domain.Entities.Employee.Employee>(request);
+
+            if (request.ImageFile != null)
+            {
+                List<IFormFile> listImages = new List<IFormFile>();
+                listImages.Add(request.ImageFile);
+                var msgCheck = _checkFileType.CheckFilesIsImage(new Dtos.Requests.CheckImagesTypeRequest
+                {
+                    Files = listImages
+                });
+
+                if (msgCheck != "")
+                    return await Result<AddEmployeeCommand>.FailAsync(msgCheck);
+                var filePath = _uploadService.UploadAsync(new Dtos.Requests.UploadRequest
+                {
+                    FileName = request.ImageFile.FileName,
+                    Extension = Path.GetExtension(request.ImageFile.FileName),
+                    Data = await IFormFileToByteArray(request.ImageFile)
+                });
+
+                if (string.IsNullOrEmpty(filePath))
+                {
+                    return await Result<AddEmployeeCommand>.FailAsync($"File {request.ImageFile.FileName} isn't not upload!");
+                }
+                addEmployee.Image = filePath;
+            }
+
             await _employeeRepository.AddAsync(addEmployee);
             await _unitOfWork.Commit(cancellationToken);
             request.Id = addEmployee.Id;
@@ -75,14 +114,22 @@ namespace Application.Features.Employee.Command.AddEmployee
                 CreatedOn = DateTime.Now,
                 IsActive = true,
                 TypeFlag = TypeFlagEnum.Employee,
-                UserId = request.Id,
+                UserId = (long)request.Id,
             };
             bool result = await _accountService.AddAcount(user, request.Password,RoleConstants.EmployeeRole);
             if (result == false)
             {
-                return await Result<AddEmployeeCommand>.FailAsync("There was an error during the account creation process.");
+                return await Result<AddEmployeeCommand>.FailAsync(StaticVariable.ERROR_ADD_USER);
             }
             return await Result<AddEmployeeCommand>.SuccessAsync(request);
+        }
+        public async Task<byte[]> IFormFileToByteArray(IFormFile file)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                await file.CopyToAsync(memoryStream);
+                return memoryStream.ToArray();
+            }
         }
     }
 }
