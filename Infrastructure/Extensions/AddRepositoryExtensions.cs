@@ -1,6 +1,8 @@
-﻿using Application.Interfaces.Employee;
+﻿using Application.Interfaces.Customer;
+using Application.Interfaces.Employee;
 using Application.Interfaces.Service;
 using Application.Interfaces.ServiceImage;
+using Infrastructure.Repositories.Customer;
 using Infrastructure.Repositories.Employee;
 using Infrastructure.Repositories.Service;
 using Infrastructure.Repositories.ServiceImage;
@@ -21,6 +23,10 @@ namespace Infrastructure.Extensions
         public static void AddServiceImageRepository(this IServiceCollection services)
         {
             services.AddScoped<IServiceImageRepository, ServiceImageRepository>();
+        }
+        public static void AddCustomerRepository(this IServiceCollection services)
+        {
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
         }
     }
 }

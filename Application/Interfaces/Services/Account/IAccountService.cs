@@ -8,6 +8,6 @@ namespace Application.Interfaces.Services.Account
     {
         Task<IResult> ChangePasswordAsync(ChangePasswordRequest model, string userId);
         Task<bool> IsExistUsername(string username);
-        Task<bool> AddAcount(AppUser emplyee, string password);
+        Task<bool> AddAcount(AppUser emplyee, string password,string role);
     }
 }
