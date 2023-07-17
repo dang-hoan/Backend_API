@@ -1,4 +1,8 @@
-﻿using Application.Features.Customer.Command.AddCustomer;
+﻿using Application.Features.Cusomter.Queries.GetAll;
+using Application.Features.Customer.Command.AddCustomer;
+using Application.Features.Customer.Queries.GetAll;
+using Domain.Wrappers;
+using Microsoft.AspNetCore.Authorization;
 using Application.Features.Customer.Command.EditCustomer;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,6 +28,25 @@ namespace WebApi.Controllers.V1.Customer
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        /// Get all customers pagination, filter
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        // [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<PaginatedResult<GetAllCustomerResponse>>> GetAllCustomer([FromQuery] GetAllCustomerQuery query)
+        {
+            return Ok(await Mediator.Send(new GetAllCustomerQuery()
+            {
+                IsExport = query.IsExport,
+                Keyword = query.Keyword,
+                SortBy = query.SortBy,
+                OrderBy = query.OrderBy,
+                PageNumber = query.PageNumber,
+                PageSize = query.PageSize
+            }));
         }
 
         /// <summary>
