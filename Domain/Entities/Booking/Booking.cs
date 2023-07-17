@@ -9,13 +9,8 @@ namespace Domain.Entities.Booking
     [Table("booking")]
     public class Booking : AuditableBaseEntity<long>
     {
-        [Required]
-        [Column("customer_name", TypeName = "nvarchar(100)")]
-        public string CustomerName { get; set; }
-
-        [Required]
-        [Column("phone_number", TypeName = "varchar(10)")]
-        public string PhoneNumber { get; set; }
+        [Column("customer_id",TypeName = "bigint")]
+        public long? CustomerId { get; set; }
 
         [Required]
         [Column("booking_date", TypeName = "datetime")]

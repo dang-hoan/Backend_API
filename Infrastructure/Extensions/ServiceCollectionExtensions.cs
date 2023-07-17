@@ -50,6 +50,9 @@ namespace Infrastructure.Extensions
             services.AddServiceRepository();
             services.AddServiceImageRepository();
             services.AddCustomerRepository();
+            services.AddBookingRepository();
+            services.AddBookingDetailRepository();
+            services.AddViewCustomerBookingHistoryRepository();
             services.AddFeedbackRepository();
         }
 

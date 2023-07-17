@@ -10,9 +10,11 @@ using Domain.Entities.Feedback;
 using Domain.Entities.Reply;
 using Domain.Entities.Service;
 using Domain.Entities.ServiceImage;
+using Domain.Entities.ViewBookingHistory;
 using Domain.Entities.WorkShift;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace Infrastructure.Contexts
 {
@@ -40,6 +42,7 @@ namespace Infrastructure.Contexts
         public virtual DbSet<Service> Services { get; set; }
         public virtual DbSet<ServiceImage> ServiceImages { get; set; }
         public virtual DbSet<WorkShift> WorkShifts { get; set; }
+        public virtual DbSet<ViewCustomerBookingHistory> ViewCustomerBookingHistories { get; set; }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
         {
@@ -112,6 +115,9 @@ namespace Infrastructure.Contexts
             {
                 entity.ToTable("UserTokens", "Identity");
             });
+            builder.Entity<ViewCustomerBookingHistory>()
+                .ToView("View_CustomerBookingHistory")
+                .HasNoKey();
         }
     }
 }

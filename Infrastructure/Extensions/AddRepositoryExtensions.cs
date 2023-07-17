@@ -1,13 +1,19 @@
-﻿using Application.Interfaces.Customer;
+﻿using Application.Interfaces.Booking;
+using Application.Interfaces.BookingDetail;
+using Application.Interfaces.Customer;
 using Application.Interfaces.Employee;
 using Application.Interfaces.Feedback;
 using Application.Interfaces.Service;
 using Application.Interfaces.ServiceImage;
+using Application.Interfaces.ViewCustomerBookingHistory;
+using Infrastructure.Repositories.Booking;
+using Infrastructure.Repositories.BookingDetail;
 using Infrastructure.Repositories.Customer;
 using Infrastructure.Repositories.Employee;
 using Infrastructure.Repositories.Feedback;
 using Infrastructure.Repositories.Service;
 using Infrastructure.Repositories.ServiceImage;
+using Infrastructure.Repositories.ViewCustomerBookingHistory;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Extensions
@@ -29,6 +35,18 @@ namespace Infrastructure.Extensions
         public static void AddCustomerRepository(this IServiceCollection services)
         {
             services.AddScoped<ICustomerRepository, CustomerRepository>();
+        }
+        public static void AddBookingRepository(this IServiceCollection services)
+        {
+            services.AddScoped<IBookingRepository,BookingRepository>();
+        }
+        public static void AddBookingDetailRepository(this IServiceCollection services)
+        {
+            services.AddScoped<IBookingDetailRepository, BookingDetailRepository>();
+        }
+        public static void AddViewCustomerBookingHistoryRepository(this IServiceCollection services)
+        {
+            services.AddScoped<IViewCustomerBookingHistoryRepository,ViewCustomerBookingHistoryRepository>();
         }
         public static void AddFeedbackRepository(this IServiceCollection services)
         {
