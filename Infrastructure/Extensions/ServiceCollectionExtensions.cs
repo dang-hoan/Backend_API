@@ -50,6 +50,7 @@ namespace Infrastructure.Extensions
             services.AddServiceRepository();
             services.AddServiceImageRepository();
             services.AddCustomerRepository();
+            services.AddFeedbackRepository();
         }
 
     }

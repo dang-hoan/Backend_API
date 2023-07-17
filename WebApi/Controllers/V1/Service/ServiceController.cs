@@ -1,15 +1,37 @@
+using Application.Features.Service.Queries.GetAll;
 using Application.Features.Service.Command.AddService;
 using Application.Features.Service.Queries.GetById;
 using Domain.Wrappers;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Service.Command.EditService;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApi.Controllers.V1.Service
 {
     [ApiController]
     [Route("api/v{version:apiVersion}/service")]
     public class ServiceController : BaseApiController<ServiceController>
-    {       
+    {
+        /// Get all Serivce pagination, filter
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        // [Authorize(Roles = "SUPERADMIN")]
+        [HttpGet]
+        public async Task<ActionResult<PaginatedResult<GetAllServiceResponse>>> GetAllService([FromQuery] GetAllServiceParameter parameter)
+        {
+            return Ok(await Mediator.Send(new GetAllServiceQuery()
+            {
+                IsExport = parameter.IsExport,
+                Keyword = parameter.Keyword,
+                OrderBy = parameter.OrderBy,
+                PageNumber = parameter.PageNumber,
+                PageSize = parameter.PageSize,
+                Time = parameter.Time,
+                Review = parameter.Review,
+            }));
+        }
+
         /// <summary>
         /// Add/Edit Service
         /// </summary>
@@ -30,7 +52,7 @@ namespace WebApi.Controllers.V1.Service
         {
             return Ok(await Mediator.Send(command));
         }
-        
+
         /// <summary>
         /// Get Service detail by Id
         /// </summary>
