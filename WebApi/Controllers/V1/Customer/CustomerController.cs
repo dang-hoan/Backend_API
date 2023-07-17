@@ -1,7 +1,8 @@
-﻿using Application.Features.Cusomter.Queries.GetAll;
-using Application.Features.Customer.Command.AddCustomer;
-using Application.Features.Customer.Queries.GetAll;
+﻿using Application.Features.Customer.Command.AddCustomer;
+using Application.Features.Customer.Queries.GetById;
 using Domain.Wrappers;
+﻿using Application.Features.Cusomter.Queries.GetAll;
+using Application.Features.Customer.Queries.GetAll;
 using Microsoft.AspNetCore.Authorization;
 using Application.Features.Customer.Command.EditCustomer;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,21 @@ namespace WebApi.Controllers.V1.Customer
     [Route("api/v{version:apiVersion}/customer")]
     public class CustomerController : BaseApiController<CustomerController>
     {
+        /// <summary>
+        /// Get Customer detail by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Result<GetCustomerByIdResponse>>> GetCustomerById(long id)
+        {
+            return Ok(await Mediator.Send(new GetCustomerByIdQuery()
+            {
+                Id = id
+            }));
+        }
+
         /// <summary>
         /// Add/Edit Employee
         /// </summary>
