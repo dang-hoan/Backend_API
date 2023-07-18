@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using Domain.Constants.Enum;
 using Domain.Contracts;
@@ -10,7 +9,7 @@ namespace Domain.Entities.Booking
     public class Booking : AuditableBaseEntity<long>
     {
         [Column("customer_id",TypeName = "bigint")]
-        public long? CustomerId { get; set; }
+        public long CustomerId { get; set; }
 
         [Required]
         [Column("booking_date", TypeName = "datetime")]
