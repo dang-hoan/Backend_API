@@ -1,4 +1,5 @@
 ﻿using Application.Features.Booking.Command.AddBooking;
+using Application.Features.Booking.Queries.GetById;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.V1.Booking
@@ -21,6 +22,21 @@ namespace WebApi.Controllers.V1.Booking
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+        /// <summary>
+        /// Get Booking Detail
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpGet("{Id}")]
+        public async Task<IActionResult> BookingDetail(long Id)
+        {
+            var result = await Mediator.Send(new GetBookingByIdQuery
+            {
+                Id = Id
+            });
             return Ok(result);
         }
     }
