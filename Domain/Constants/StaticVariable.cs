@@ -32,6 +32,7 @@
         public const string PHONE_ERROR_MSG = "The number of digits in a phone number must be between 8 and 10.";
         public const string NOT_FOUND_SERVICE = "This service does not exist in the database.";
         public const string NOT_FOUND_CUSTOMER = "This customer does not exist in the database.";
+        public const string NOT_FOUND_BOOKING = "This booking does not exist in the database.";
 
     }
 }

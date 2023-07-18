@@ -1,6 +1,7 @@
+using Application.Features.Booking.Command.AddBooking;
+using Application.Features.Booking.Command.EditBooking;
 using Application.Features.Booking.Queries.GetAll;
 using Domain.Wrappers;
-﻿using Application.Features.Booking.Command.AddBooking;
 using Application.Features.Booking.Command.DeleteBooking;
 using Application.Features.Booking.Queries.GetById;
 using Microsoft.AspNetCore.Mvc;
@@ -79,6 +80,23 @@ namespace WebApi.Controllers.V1.Booking
             {
                 Id = id
             }));
+        }
+
+        /// <summary>
+        /// Edit Booking
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpPut]
+        public async Task<IActionResult> EditBooking(EditBookingCommand command)
+        {
+            var result = await Mediator.Send(command);
+            if (result.Succeeded == false)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }
