@@ -2,7 +2,7 @@
 
 namespace Application.Interfaces.Booking
 {
-    public interface IBookingRepository : IRepositoryAsync<Domain.Entities.Booking.Booking,long>
+    public interface IBookingRepository : IRepositoryAsync<Domain.Entities.Booking.Booking, long>
     {
     }
 }
