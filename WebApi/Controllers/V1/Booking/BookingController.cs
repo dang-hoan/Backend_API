@@ -1,3 +1,5 @@
+using Application.Features.Booking.Queries.GetAll;
+using Domain.Wrappers;
 ﻿using Application.Features.Booking.Command.AddBooking;
 using Application.Features.Booking.Queries.GetById;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +10,29 @@ namespace WebApi.Controllers.V1.Booking
     [Route("api/v{version:apiVersion}/booking")]
     public class BookingController : BaseApiController<BookingController>
     {
+        /// Get all bookings pagination, filter
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        // [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<PaginatedResult<GetAllBookingResponse>>> GetAllBookings([FromQuery] GetAllBookingQuery query)
+        {
+            return Ok(await Mediator.Send(new GetAllBookingQuery()
+            {
+                IsExport = query.IsExport,
+                Keyword = query.Keyword,
+                SortBy = query.SortBy,
+                OrderBy = query.OrderBy,
+                PageNumber = query.PageNumber,
+                PageSize = query.PageSize,
+                BookingDate = query.BookingDate,
+                FromTime = query.FromTime,
+                Totime = query.Totime,
+                Status = query.Status
+            }));
+        }
+        
         /// <summary>
         /// Add Booking
         /// </summary>
