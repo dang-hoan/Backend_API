@@ -1,4 +1,5 @@
 ﻿using Application.Features.Booking.Command.AddBooking;
+using Application.Features.Booking.Command.DeleteBooking;
 using Application.Features.Booking.Queries.GetById;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,6 +39,21 @@ namespace WebApi.Controllers.V1.Booking
                 Id = Id
             });
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Delete Booking by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpDelete]
+        public async Task<IActionResult> DeleteService(short id)
+        {
+            return Ok(await Mediator.Send(new DeleteBookingCommand
+            {
+                Id = id
+            }));
         }
     }
 }
