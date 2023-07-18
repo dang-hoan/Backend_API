@@ -16,7 +16,8 @@ namespace Infrastructure.Migrations
                 " FROM booking INNER JOIN booking_detail" +
                 " ON booking.id = booking_detail.booking_id" +
                 " INNER JOIN service" +
-                " ON booking_detail.service_id = service.Id");
+                " ON booking_detail.service_id = service.Id"+
+                " WHERE booking.IsDeleted = 0 AND booking_detail.IsDeleted = 0");
         }
 
         /// <inheritdoc />

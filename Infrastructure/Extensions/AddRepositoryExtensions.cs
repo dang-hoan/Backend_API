@@ -3,6 +3,7 @@ using Application.Interfaces.BookingDetail;
 using Application.Interfaces.Customer;
 using Application.Interfaces.Employee;
 using Application.Interfaces.Feedback;
+using Application.Interfaces.Reply;
 using Application.Interfaces.Service;
 using Application.Interfaces.ServiceImage;
 using Application.Interfaces.ViewCustomerBookingHistory;
@@ -11,6 +12,7 @@ using Infrastructure.Repositories.BookingDetail;
 using Infrastructure.Repositories.Customer;
 using Infrastructure.Repositories.Employee;
 using Infrastructure.Repositories.Feedback;
+using Infrastructure.Repositories.Reply;
 using Infrastructure.Repositories.Service;
 using Infrastructure.Repositories.ServiceImage;
 using Infrastructure.Repositories.ViewCustomerBookingHistory;
@@ -51,6 +53,10 @@ namespace Infrastructure.Extensions
         public static void AddFeedbackRepository(this IServiceCollection services)
         {
             services.AddScoped<IFeedbackRepository, FeedbackRepository>();
+        }
+        public static void AddReplyRepository(this IServiceCollection services)
+        {
+            services.AddScoped<IReplyRepository,ReplyRepository>();
         }
     }
 }

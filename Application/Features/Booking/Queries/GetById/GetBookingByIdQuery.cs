@@ -39,7 +39,7 @@ namespace Application.Features.Booking.Queries.GetById
         public async Task<Result<GetBookingByIdResponse>> Handle(GetBookingByIdQuery request, CancellationToken cancellationToken)
         {
             var Booking = await _bookingRepository.Entities
-                .Where(_ => _.Id == request.Id)
+                .Where(_ => _.Id == request.Id && !_.IsDeleted)
                 .Select(s => new Domain.Entities.Booking.Booking
                 {
                     Id = s.Id,
@@ -70,7 +70,7 @@ namespace Application.Features.Booking.Queries.GetById
             BookingDetailResponse.CutomerName = CustomerBooking.CustomerName;
             BookingDetailResponse.PhoneNumber = CustomerBooking.PhoneNumber;
             var BookingDetails = await _bookingDetailRepository.Entities
-                .Where(_ => _.BookingId == Booking.Id)
+                .Where(_ => _.BookingId == Booking.Id && !_.IsDeleted)
                 .Select(s => new Domain.Entities.BookingDetail.BookingDetail
                 {
                     ServiceId = s.ServiceId,
