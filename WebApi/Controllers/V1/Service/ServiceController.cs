@@ -5,6 +5,7 @@ using Domain.Wrappers;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Service.Command.EditService;
 using Microsoft.AspNetCore.Authorization;
+using Application.Features.Service.Command.DeleteService;
 
 namespace WebApi.Controllers.V1.Service
 {
@@ -53,6 +54,20 @@ namespace WebApi.Controllers.V1.Service
             return Ok(await Mediator.Send(command));
         }
 
+        /// <summary>
+        /// Delete Service by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpDelete]
+        public async Task<IActionResult> DeleteService(short id)
+        {
+            return Ok(await Mediator.Send(new DeleteServiceCommand
+            {
+                Id = id
+            }));
+        }
         /// <summary>
         /// Get Service detail by Id
         /// </summary>
