@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Application.Features.Customer.Command.EditCustomer;
 using Application.Features.Customer.Queries.GetCustomerBookingHistory;
 using Microsoft.AspNetCore.Mvc;
+using Application.Features.Customer.Command.DeleteCustomer;
 
 namespace WebApi.Controllers.V1.Customer
 {
@@ -94,6 +95,20 @@ namespace WebApi.Controllers.V1.Customer
             return Ok(await Mediator.Send(new GetCustomerBookingHistoryQuery
             {
                 CustomerId = CustomerId
+            }));
+        }
+        /// <summary>
+        /// Delete customer
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpDelete]
+        public async Task<IActionResult> DeleteCustomer(long Id)
+        {
+            return Ok(await Mediator.Send(new DeleteCustomerCommand
+            {
+                Id = Id
             }));
         }
     }
