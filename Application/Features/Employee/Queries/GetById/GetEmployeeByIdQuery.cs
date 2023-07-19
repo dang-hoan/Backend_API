@@ -1,5 +1,4 @@
-﻿using System;
-using Application.Interfaces.Employee;
+﻿using Application.Interfaces.Employee;
 using Domain.Wrappers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

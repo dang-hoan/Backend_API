@@ -7,6 +7,7 @@ using Application.Features.Employee.Queries.GetAll;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Employee.Command.EditEmployee;
 using Application.Features.Employee.Command.ResetPasswordEmployee;
+using Application.Features.Employee.Command.EditWorkShiftEmployee;
 
 namespace WebApi.Controllers.V1.Employee
 {
@@ -113,6 +114,23 @@ namespace WebApi.Controllers.V1.Employee
             {
                 Username = Username
             });
+            if (result.Succeeded == false)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Edit WorkShift's Employee 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpPatch("EditWorkShiftEmployee")]
+        public async Task<IActionResult> EditWorkShiftEmployee(EditWorkShiftEmployeeCommand command)
+        {
+            var result = await Mediator.Send(command);
             if (result.Succeeded == false)
             {
                 return BadRequest(result);

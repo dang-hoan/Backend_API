@@ -1,15 +1,10 @@
 ﻿using Domain.Constants.Enum;
 using Domain.Contracts;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Domain.Entities.ViewBookingHistory
+namespace Domain.Entities.View.ViewCustomerBookingHistory
 {
 
     [Keyless]
@@ -18,12 +13,12 @@ namespace Domain.Entities.ViewBookingHistory
         [Column("customer_id", TypeName = "bigint")]
         public long CustomerId { get; set; }
         [Column("booking_id", TypeName = "bigint")]
-        public long BookingId  { get; set; }
-        [Column("booking_date",TypeName = "datetime")]
-        public DateTime BookingDate{ get; set; }
-        [Column("from_time",TypeName = "datetime")]
+        public long BookingId { get; set; }
+        [Column("booking_date", TypeName = "datetime")]
+        public DateTime BookingDate { get; set; }
+        [Column("from_time", TypeName = "datetime")]
         public DateTime FromTime { get; set; }
-        [Column("to_time",TypeName = "datetime")]
+        [Column("to_time", TypeName = "datetime")]
         public DateTime ToTime { get; set; }
         [Column("status", TypeName = "smallInt")]
         public BookingStatus? Status { get; set; }

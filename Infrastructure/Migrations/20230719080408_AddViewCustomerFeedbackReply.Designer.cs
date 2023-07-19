@@ -4,6 +4,7 @@ using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230719080408_AddViewCustomerFeedbackReply")]
+    partial class AddViewCustomerFeedbackReply
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -264,7 +267,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("booking", (string)null);
+                    b.ToTable("booking");
                 });
 
             modelBuilder.Entity("Domain.Entities.BookingDetail.BookingDetail", b =>
@@ -304,7 +307,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("booking_detail", (string)null);
+                    b.ToTable("booking_detail");
                 });
 
             modelBuilder.Entity("Domain.Entities.Customer.Customer", b =>
@@ -354,7 +357,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("customer", (string)null);
+                    b.ToTable("customer");
                 });
 
             modelBuilder.Entity("Domain.Entities.Employee.Employee", b =>
@@ -417,7 +420,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("employee", (string)null);
+                    b.ToTable("employee");
                 });
 
             modelBuilder.Entity("Domain.Entities.EmployeeService.EmployeeService", b =>
@@ -457,7 +460,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("employee_service", (string)null);
+                    b.ToTable("employee_service");
                 });
 
             modelBuilder.Entity("Domain.Entities.Feedback.Feedback", b =>
@@ -509,7 +512,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("feedback", (string)null);
+                    b.ToTable("feedback");
                 });
 
             modelBuilder.Entity("Domain.Entities.Reply.Reply", b =>
@@ -549,7 +552,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("reply", (string)null);
+                    b.ToTable("reply");
                 });
 
             modelBuilder.Entity("Domain.Entities.Service.Service", b =>
@@ -594,7 +597,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("service", (string)null);
+                    b.ToTable("service");
                 });
 
             modelBuilder.Entity("Domain.Entities.ServiceImage.ServiceImage", b =>
@@ -631,7 +634,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("service_image", (string)null);
+                    b.ToTable("service_image");
                 });
 
             modelBuilder.Entity("Domain.Entities.ViewCustomerBookingHistory.ViewCustomerBookingHistory", b =>
@@ -818,7 +821,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("work_shift", (string)null);
+                    b.ToTable("work_shift");
                 });
 
             modelBuilder.Entity("Infrastructure.Models.Audit.Audit", b =>
@@ -856,7 +859,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AuditTrails", (string)null);
+                    b.ToTable("AuditTrails");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>

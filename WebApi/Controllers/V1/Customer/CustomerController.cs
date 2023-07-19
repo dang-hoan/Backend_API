@@ -5,7 +5,6 @@ using Domain.Wrappers;
 using Application.Features.Customer.Queries.GetAll;
 using Microsoft.AspNetCore.Authorization;
 using Application.Features.Customer.Command.EditCustomer;
-using Application.Features.Customer.Queries.GetCustomerBookingHistory;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Customer.Command.DeleteCustomer;
 
@@ -82,20 +81,6 @@ namespace WebApi.Controllers.V1.Customer
                 return BadRequest(result);
             }
             return Ok(result);
-        }
-        /// <summary>
-        /// Get customer booking history
-        /// </summary>
-        /// <param name="CustomerId"></param>
-        /// <returns></returns>
-        //[Authorize]
-        [HttpGet("{CustomerId}/get-booking-history")]
-        public async Task<IActionResult> GetCustomerBookingHistory(long CustomerId)
-        {
-            return Ok(await Mediator.Send(new GetCustomerBookingHistoryQuery
-            {
-                CustomerId = CustomerId
-            }));
         }
         /// <summary>
         /// Delete customer
