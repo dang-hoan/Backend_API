@@ -55,6 +55,7 @@ namespace Infrastructure.Extensions
             services.AddViewCustomerBookingHistoryRepository();
             services.AddFeedbackRepository();
             services.AddReplyRepository();
+            services.AddWorkShiftRepository();
         }
 
     }
