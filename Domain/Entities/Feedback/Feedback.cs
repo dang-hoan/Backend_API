@@ -10,12 +10,8 @@ namespace Domain.Entities.Feedback
     public class Feedback : AuditableBaseEntity<long>
     {
         [Required]
-        [Column("name", TypeName = "nvarchar(100)")]
-        public string Name { get; set; }
-
-        [Required]
-        [Column("email", TypeName = "varchar(50)")]
-        public string Email { get; set; }
+        [Column("customer_id", TypeName = "bigInt")]
+        public long CustomerId { get; set; }
 
         [Required]
         [Column("service_id", TypeName = "bigInt")]
