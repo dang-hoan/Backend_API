@@ -33,6 +33,8 @@
         public const string NOT_FOUND_SERVICE = "This service does not exist in the database.";
         public const string NOT_FOUND_CUSTOMER = "This customer does not exist in the database.";
         public const string NOT_FOUND_BOOKING = "This booking does not exist in the database.";
+        public const string NOT_FOUND_WORK_SHIFT = "This work shift does not exist in the database.";
+        public const string SUCCESS = "Success";
 
     }
 }
