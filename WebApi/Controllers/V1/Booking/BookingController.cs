@@ -5,6 +5,7 @@ using Domain.Wrappers;
 using Application.Features.Booking.Command.DeleteBooking;
 using Application.Features.Booking.Queries.GetById;
 using Microsoft.AspNetCore.Mvc;
+using Application.Features.Booking.Queries.GetCustomerBookingHistory;
 
 namespace WebApi.Controllers.V1.Booking
 {
@@ -97,6 +98,20 @@ namespace WebApi.Controllers.V1.Booking
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+        /// <summary>
+        /// Get customer booking history
+        /// </summary>
+        /// <param name="idCustomer"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpGet("customer/{idCustomer}")]
+        public async Task<IActionResult> GetCustomerBookingHistory(long idCustomer)
+        {
+            return Ok(await Mediator.Send(new GetCustomerBookingHistoryQuery
+            {
+                CustomerId = idCustomer
+            }));
         }
     }
 }

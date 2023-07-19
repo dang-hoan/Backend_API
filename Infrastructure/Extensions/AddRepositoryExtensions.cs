@@ -6,7 +6,8 @@ using Application.Interfaces.Feedback;
 using Application.Interfaces.Reply;
 using Application.Interfaces.Service;
 using Application.Interfaces.ServiceImage;
-using Application.Interfaces.ViewCustomerBookingHistory;
+using Application.Interfaces.View.ViewCustomerBookingHistory;
+using Application.Interfaces.View.ViewCustomerFeedbackReply;
 using Application.Interfaces.WorkShift;
 using Infrastructure.Repositories.Booking;
 using Infrastructure.Repositories.BookingDetail;
@@ -16,7 +17,8 @@ using Infrastructure.Repositories.Feedback;
 using Infrastructure.Repositories.Reply;
 using Infrastructure.Repositories.Service;
 using Infrastructure.Repositories.ServiceImage;
-using Infrastructure.Repositories.ViewCustomerBookingHistory;
+using Infrastructure.Repositories.View.ViewCustomerBookingHistory;
+using Infrastructure.Repositories.View.ViewCustomerFeedbackReply;
 using Infrastructure.Repositories.WorkShift;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -63,6 +65,10 @@ namespace Infrastructure.Extensions
         public static void AddWorkShiftRepository(this IServiceCollection services)
         {
             services.AddScoped<IWorkShiftRepository, WorkShiftRepository>();
+        }
+        public static void AddViewCustomerFeedbackReplyRepository(this IServiceCollection services)
+        {
+            services.AddScoped<IViewCustomerFeedbackReplyRepository,ViewCustomerFeedbackReplyRepostiory>();
         }
     }
 }

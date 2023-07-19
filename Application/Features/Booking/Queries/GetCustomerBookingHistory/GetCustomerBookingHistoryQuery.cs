@@ -1,15 +1,15 @@
 ﻿using Application.Features.Employee.Queries.GetById;
 using Application.Interfaces.Booking;
-using Application.Interfaces.ViewCustomerBookingHistory;
+using Application.Interfaces.View.ViewCustomerBookingHistory;
 using AutoMapper;
-using Domain.Entities.ViewBookingHistory;
+using Domain.Entities.View.ViewCustomerBookingHistory;
 using Domain.Wrappers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.util;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Application.Features.Customer.Queries.GetCustomerBookingHistory
+namespace Application.Features.Booking.Queries.GetCustomerBookingHistory
 {
     public class GetCustomerBookingHistoryQuery : IRequest<Result<GetCustomerBookingHistoryResponse>>
     {
@@ -27,7 +27,7 @@ namespace Application.Features.Customer.Queries.GetCustomerBookingHistory
 
         public async Task<Result<GetCustomerBookingHistoryResponse>> Handle(GetCustomerBookingHistoryQuery request, CancellationToken cancellationToken)
         {
-            var history = await  _viewCustomerBookingHistoryRepository.Entities
+            var history = await _viewCustomerBookingHistoryRepository.Entities
                 .Where(_ => _.CustomerId == request.CustomerId)
                 .Select(s => new ViewCustomerBookingHistory
                 {
