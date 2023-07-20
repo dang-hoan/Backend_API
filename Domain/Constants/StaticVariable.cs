@@ -36,6 +36,7 @@
         public const string NOT_FOUND_WORK_SHIFT = "This work shift does not exist in the database.";
         public const string SUCCESS = "Success";
 
+        public const string WORK_SHIFT_ASSIGNED = "This work shift has assigned to employees! Please change employee's work shift before delete this work shift!";
         public const string NOT_LOGIC_WORKING_TIME = "Working time must not be empty if work shift isn't default!!";
         public const string NOT_LOGIC_WORKING_TIME_FORMAT = "Working time format must be 'HH:mm'!";
         public const string NOT_LOGIC_DATE_ORDER = "ToTime must be greater than FromTime";
