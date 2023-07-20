@@ -127,7 +127,7 @@ namespace WebApi.Controllers.V1.Employee
         /// <param name="command"></param>
         /// <returns></returns>
         //[Authorize]
-        [HttpPatch("EditWorkShiftEmployee")]
+        [HttpPatch("change-workshift")]
         public async Task<IActionResult> EditWorkShiftEmployee(EditWorkShiftEmployeeCommand command)
         {
             var result = await Mediator.Send(command);
