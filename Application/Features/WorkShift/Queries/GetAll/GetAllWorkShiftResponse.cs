@@ -9,6 +9,8 @@
         public double TimeWord { get; set; }
         public int NumberEmployee { get; set; }
         public bool? IsDefault { get; set; }
+        public string? Description { get; set; }
+        //public List<int> WorkDays { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? LastModifiedOn { get; set; }
     }

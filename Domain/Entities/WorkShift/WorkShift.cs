@@ -12,12 +12,12 @@ namespace Domain.Entities.WorkShift
         public string Name { get; set; }
 
         [Required]
-        [Column("working_from_time", TypeName = "datetime")]
-        public DateTime WorkingFromTime { get; set; }
+        [Column("working_from_time", TypeName = "time")]
+        public TimeSpan WorkingFromTime { get; set; }
 
         [Required]
-        [Column("working_to_time", TypeName = "datetime")]
-        public DateTime WorkingToTime { get; set; }
+        [Column("working_to_time", TypeName = "time")]
+        public TimeSpan WorkingToTime { get; set; }
 
         [Column("is_default", TypeName = "bit")]
         public bool? IsDefault { get; set; }
@@ -25,5 +25,7 @@ namespace Domain.Entities.WorkShift
         [Column("description", TypeName = "nvarchar(500)")]
         public string? Description { get; set; }
 
+        [Column("work_days", TypeName = "varchar(30)")]
+        public string WorkDays { get; set; }
     }
 }

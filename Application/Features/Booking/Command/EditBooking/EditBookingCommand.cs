@@ -45,7 +45,7 @@ namespace Application.Features.Booking.Command.EditBooking
         {
             if (request.Totime.CompareTo(request.FromTime) < 0)
             {
-                return await Result<EditBookingCommand>.FailAsync("ToTime must be greater than FromTime");
+                return await Result<EditBookingCommand>.FailAsync(StaticVariable.NOT_LOGIC_DATE_ORDER);
             }
             var isExistBooking = await _bookingRepository.FindAsync(_ => _.Id == request.Id && _.IsDeleted == false) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_BOOKING);
             _mapper.Map(request, isExistBooking);

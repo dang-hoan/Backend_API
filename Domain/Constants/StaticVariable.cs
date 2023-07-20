@@ -36,5 +36,10 @@
         public const string NOT_FOUND_WORK_SHIFT = "This work shift does not exist in the database.";
         public const string SUCCESS = "Success";
 
+        public const string NOT_LOGIC_WORKING_TIME = "Working time must not be empty if work shift isn't default!!";
+        public const string NOT_LOGIC_WORKING_TIME_FORMAT = "Working time format must be 'HH:mm'!";
+        public const string NOT_LOGIC_DATE_ORDER = "ToTime must be greater than FromTime";
+        public const string NOT_LOGIC_WORKDAY_VALUE = "Workdays must be between 2 and 8!";
+
     }
 }

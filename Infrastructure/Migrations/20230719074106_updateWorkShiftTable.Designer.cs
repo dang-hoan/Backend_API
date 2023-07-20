@@ -4,6 +4,7 @@ using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230719074106_updateWorkShiftTable")]
+    partial class updateWorkShiftTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -264,7 +267,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("booking", (string)null);
+                    b.ToTable("booking");
                 });
 
             modelBuilder.Entity("Domain.Entities.BookingDetail.BookingDetail", b =>
@@ -304,7 +307,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("booking_detail", (string)null);
+                    b.ToTable("booking_detail");
                 });
 
             modelBuilder.Entity("Domain.Entities.Customer.Customer", b =>
@@ -354,7 +357,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("customer", (string)null);
+                    b.ToTable("customer");
                 });
 
             modelBuilder.Entity("Domain.Entities.Employee.Employee", b =>
@@ -417,7 +420,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("employee", (string)null);
+                    b.ToTable("employee");
                 });
 
             modelBuilder.Entity("Domain.Entities.EmployeeService.EmployeeService", b =>
@@ -457,7 +460,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("employee_service", (string)null);
+                    b.ToTable("employee_service");
                 });
 
             modelBuilder.Entity("Domain.Entities.Feedback.Feedback", b =>
@@ -478,9 +481,10 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("CustomerId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("customer_id");
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("email");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -490,6 +494,11 @@ namespace Infrastructure.Migrations
 
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("name");
 
                     b.Property<short?>("Rating")
                         .HasColumnType("smallInt")
@@ -509,7 +518,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("feedback", (string)null);
+                    b.ToTable("feedback");
                 });
 
             modelBuilder.Entity("Domain.Entities.Reply.Reply", b =>
@@ -549,7 +558,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("reply", (string)null);
+                    b.ToTable("reply");
                 });
 
             modelBuilder.Entity("Domain.Entities.Service.Service", b =>
@@ -594,7 +603,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("service", (string)null);
+                    b.ToTable("service");
                 });
 
             modelBuilder.Entity("Domain.Entities.ServiceImage.ServiceImage", b =>
@@ -631,10 +640,10 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("service_image", (string)null);
+                    b.ToTable("service_image");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ViewCustomerBookingHistory.ViewCustomerBookingHistory", b =>
+            modelBuilder.Entity("Domain.Entities.ViewBookingHistory.ViewCustomerBookingHistory", b =>
                 {
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("datetime")
@@ -696,82 +705,6 @@ namespace Infrastructure.Migrations
                     b.ToView("View_CustomerBookingHistory", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.ViewCustomerFeedbackReply.ViewCustomerFeedbackReply", b =>
-                {
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("CustomerId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("customer_id");
-
-                    b.Property<string>("CustomerName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("customer_name");
-
-                    b.Property<string>("FeedbackContent")
-                        .HasColumnType("nvarchar")
-                        .HasColumnName("feedback_content");
-
-                    b.Property<long>("FeedbackId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("feedback_id");
-
-                    b.Property<string>("FeedbackTitle")
-                        .HasColumnType("nvarchar")
-                        .HasColumnName("feedback_title");
-
-                    b.Property<long>("Id")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)")
-                        .HasColumnName("phone_number");
-
-                    b.Property<short?>("Rating")
-                        .HasColumnType("smallint")
-                        .HasColumnName("rating");
-
-                    b.Property<string>("ReplyContent")
-                        .HasColumnType("nvarchar")
-                        .HasColumnName("reply_content");
-
-                    b.Property<long?>("ReplyId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("reply_id");
-
-                    b.Property<string>("ReplyTitle")
-                        .HasColumnType("nvarchar")
-                        .HasColumnName("reply_title");
-
-                    b.Property<long>("ServiceId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("service_id");
-
-                    b.Property<string>("ServiceName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("service_name");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("View_CustomerFeedbackReply", (string)null);
-                });
-
             modelBuilder.Entity("Domain.Entities.WorkShift.WorkShift", b =>
                 {
                     b.Property<long>("Id")
@@ -823,7 +756,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("work_shift", (string)null);
+                    b.ToTable("work_shift");
                 });
 
             modelBuilder.Entity("Infrastructure.Models.Audit.Audit", b =>
@@ -861,7 +794,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AuditTrails", (string)null);
+                    b.ToTable("AuditTrails");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
