@@ -59,7 +59,7 @@ namespace Application.Features.Service.Queries.GetAll
 
             //Pagination
             if (!request.IsExport)
-                result = await query.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToListAsync(cancellationToken: cancellationToken);
+                result = await data.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToListAsync(cancellationToken: cancellationToken);
             else
                 result = await data.ToListAsync(cancellationToken);
             return PaginatedResult<GetAllServiceResponse>.Success(result, totalRecord, request.PageNumber, request.PageSize);
