@@ -58,7 +58,7 @@ namespace Infrastructure.Contexts
 
                     case EntityState.Modified:
                         entry.Entity.LastModifiedOn = _dateTimeService.NowUtc;
-                        entry.Entity.LastModifiedBy = entry.Entity.CreatedBy = string.IsNullOrEmpty(_currentUserService.Username) ? "System" : _currentUserService.Username;
+                        entry.Entity.LastModifiedBy = string.IsNullOrEmpty(_currentUserService.Username) ? "System" : _currentUserService.Username;
                         break;
                 }
             }

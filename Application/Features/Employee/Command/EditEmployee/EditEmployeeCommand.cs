@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Application.Interfaces.Employee;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services.Identity;
+using Application.Interfaces.WorkShift;
 using AutoMapper;
 using Domain.Constants;
 using Domain.Constants.Enum;
@@ -36,10 +37,11 @@ namespace Application.Features.Employee.Command.EditEmployee
         private readonly IUserService _userService;
         private readonly IUploadService _uploadService;
         private readonly ICheckFileType _checkFileType;
+        private readonly IWorkShiftRepository _workshiftRepository;
 
 
         public EditEmployeeCommandHandler(IMapper mapper, IEmployeeRepository employeeRepository, IUnitOfWork<long> unitOfWork, IUserService userService,
-                                        IUploadService uploadService, ICheckFileType checkFileType)
+                                        IUploadService uploadService, ICheckFileType checkFileType, IWorkShiftRepository workshiftRepository)
         {
             _mapper = mapper;
             _employeeRepository = employeeRepository;
@@ -47,6 +49,7 @@ namespace Application.Features.Employee.Command.EditEmployee
             _userService = userService;
             _uploadService = uploadService;
             _checkFileType = checkFileType;
+            _workshiftRepository = workshiftRepository;
         }
 
         public async Task<Result<EditEmployeeCommand>> Handle(EditEmployeeCommand request, CancellationToken cancellationToken)
@@ -68,6 +71,7 @@ namespace Application.Features.Employee.Command.EditEmployee
             {
                 return await Result<EditEmployeeCommand>.FailAsync(StaticVariable.PHONE_ERROR_MSG);
             }
+            var isExistedWorkshift = await _workshiftRepository.FindAsync(_ => _.IsDeleted == false && _.Id == request.WorkShiftId) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_WORK_SHIFT);
             _mapper.Map(request, editEmployee);
 
 

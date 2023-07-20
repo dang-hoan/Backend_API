@@ -11,6 +11,7 @@ using Domain.Constants;
 using Microsoft.AspNetCore.Http;
 using Application.Interfaces;
 using Application.Features.Service.Command.AddService;
+using Application.Interfaces.WorkShift;
 
 namespace Application.Features.Employee.Command.AddEmployee
 {
@@ -39,10 +40,11 @@ namespace Application.Features.Employee.Command.AddEmployee
         private readonly IAccountService _accountService;
         private readonly IUploadService _uploadService;
         private readonly ICheckFileType _checkFileType;
+        private readonly IWorkShiftRepository _workshiftRepository;
 
 
         public AddEmployeeCommandHandler(IMapper mapper, IEmployeeRepository employeeRepository, IUnitOfWork<long> unitOfWork, IAccountService accountService,
-                                                IUploadService uploadService, ICheckFileType checkFileType)
+                                                IUploadService uploadService, ICheckFileType checkFileType, IWorkShiftRepository workshiftRepository)
         {
             _mapper = mapper;
             _employeeRepository = employeeRepository;
@@ -50,6 +52,7 @@ namespace Application.Features.Employee.Command.AddEmployee
             _accountService = accountService;
             _uploadService = uploadService;
             _checkFileType = checkFileType;
+            _workshiftRepository = workshiftRepository;
         }
 
         public async Task<Result<AddEmployeeCommand>> Handle(AddEmployeeCommand request, CancellationToken cancellationToken)
@@ -73,6 +76,7 @@ namespace Application.Features.Employee.Command.AddEmployee
             {
                 return await Result<AddEmployeeCommand>.FailAsync(StaticVariable.PHONE_ERROR_MSG);
             }
+            var isExistedWorkshift = await _workshiftRepository.FindAsync(_ => _.IsDeleted == false && _.Id == request.WorkShiftId) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_WORK_SHIFT);
             var addEmployee = _mapper.Map<Domain.Entities.Employee.Employee>(request);
 
             if (request.ImageFile != null)
