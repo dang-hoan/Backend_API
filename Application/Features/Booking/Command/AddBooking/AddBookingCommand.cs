@@ -46,7 +46,7 @@ namespace Application.Features.Booking.Command.AddBooking
             var isExistCustomer = await _customerRepository.FindAsync(_ => _.Id == request.CustomerId && _.IsDeleted == false) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_CUSTOMER);
             if(request.Totime.CompareTo(request.FromTime) < 0)
             {
-                return await Result<AddBookingCommand>.FailAsync("ToTime must be greater than FromTime");
+                return await Result<AddBookingCommand>.FailAsync(StaticVariable.NOT_LOGIC_DATE_ORDER);
             }
             foreach (long i in request.ServiceId)
             {

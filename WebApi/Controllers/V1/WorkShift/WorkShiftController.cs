@@ -1,14 +1,13 @@
-﻿using Application.Features.Employee.Queries.GetAll;
+using Application.Features.WorkShift.Command.AddWorkShift;
+using Application.Features.Employee.Queries.GetAll;
 using Application.Features.WorkShift.Queries.GetAll;
 using Application.Parameters;
 using Domain.Wrappers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.V1.WorkShift
 {
     [ApiController]
-
     [Route("api/v{version:apiVersion}/workshift")]
     public class WorkShiftController : BaseApiController<WorkShiftController>
     {
@@ -28,6 +27,23 @@ namespace WebApi.Controllers.V1.WorkShift
                 PageNumber = parameter.PageNumber,
                 PageSize = parameter.PageSize,
             }));
+        }
+
+        /// <summary>
+        /// Add WorkShift
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpPost]
+        public async Task<IActionResult> AddWorkShift(AddWorkShiftCommand command)
+        {
+            var result = await Mediator.Send(command);
+            if (result.Succeeded == false)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }
