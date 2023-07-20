@@ -3,6 +3,8 @@ using Domain.Wrappers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Domain.Constants;
+using Microsoft.AspNetCore.Identity;
+using Domain.Entities;
 
 namespace Application.Features.Employee.Queries.GetById
 {
@@ -13,10 +15,12 @@ namespace Application.Features.Employee.Queries.GetById
     internal class GetEmployeeByIdQueryHandler : IRequestHandler<GetEmployeeByIdQuery, Result<GetEmployeeByIdResponse>>
     {
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly UserManager<AppUser> _userManager;
 
-        public GetEmployeeByIdQueryHandler(IEmployeeRepository employeeRepository)
+        public GetEmployeeByIdQueryHandler(IEmployeeRepository employeeRepository, UserManager<AppUser> userManager)
         {
             _employeeRepository = employeeRepository;
+            _userManager = userManager;
         }
 
         public async Task<Result<GetEmployeeByIdResponse>> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
@@ -33,7 +37,9 @@ namespace Application.Features.Employee.Queries.GetById
                                       PhoneNumber = e.PhoneNumber,
                                       Address = e.Address,
                                       Image = e.Image,
-                                      WorkShiftId = e.WorkShiftId
+                                      WorkShiftId = e.WorkShiftId,
+                                      UserName = _userManager.Users.Where(e => e.UserId == request.Id && !e.IsDeleted).Select(e => e.UserName).FirstOrDefault(),
+                                      Password = _userManager.Users.Where(e => e.UserId == request.Id && !e.IsDeleted).Select(e => e.PasswordHash).FirstOrDefault()
                                   }).FirstOrDefaultAsync(cancellationToken: cancellationToken);
             if (employee == null) throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
             return await Result<GetEmployeeByIdResponse>.SuccessAsync(employee);
