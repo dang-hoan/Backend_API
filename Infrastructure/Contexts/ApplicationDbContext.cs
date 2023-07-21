@@ -6,12 +6,14 @@ using Domain.Entities.BookingDetail;
 using Domain.Entities.Customer;
 using Domain.Entities.Employee;
 using Domain.Entities.EmployeeService;
+using Domain.Entities.FeebackFileUpload;
 using Domain.Entities.Feedback;
 using Domain.Entities.Reply;
 using Domain.Entities.Service;
 using Domain.Entities.ServiceImage;
 using Domain.Entities.View.ViewCustomerBookingHistory;
 using Domain.Entities.View.ViewCustomerFeedbackReply;
+using Domain.Entities.View.ViewCustomerReviewHistory;
 using Domain.Entities.WorkShift;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -38,13 +40,14 @@ namespace Infrastructure.Contexts
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<EmployeeService> EmployeeServices { get; set; }
         public virtual DbSet<Feedback> Feedbacks { get; set; }
+        public virtual DbSet<FeedbackFileUpload> FeedbackFileUploads { get; set; }
         public virtual DbSet<Reply> Replies { get; set; }
         public virtual DbSet<Service> Services { get; set; }
         public virtual DbSet<ServiceImage> ServiceImages { get; set; }
         public virtual DbSet<WorkShift> WorkShifts { get; set; }
         public virtual DbSet<ViewCustomerBookingHistory> ViewCustomerBookingHistories { get; set; }
         public virtual DbSet<ViewCustomerFeedbackReply> ViewCustomerFeedbackReplies { get; set; }
-
+        public virtual DbSet<ViewCustomerReviewHistory> ViewCustomerReviewHistories { get; set; }
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
         {
             foreach (var entry in ChangeTracker.Entries<IAuditableEntity>().ToList())
@@ -127,7 +130,12 @@ namespace Infrastructure.Contexts
                 entity.ToView("View_CustomerFeedbackReply");
                 entity.HasNoKey();
             });
-                
+
+            builder.Entity<ViewCustomerReviewHistory>(entity =>
+            {
+                entity.ToView("View_CustomerReviewHistory");
+                entity.HasNoKey();
+            });
         }
     }
 }

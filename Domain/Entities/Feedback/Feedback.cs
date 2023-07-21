@@ -20,14 +20,18 @@ namespace Domain.Entities.Feedback
         [Column("title", TypeName = "nvarchar(max)")]
         public string? Title { get; set; }
 
-        [Column("content", TypeName = "nvarchar(max)")]
-        public string? Content { get; set; }
+        [Column("staff_content", TypeName = "nvarchar(max)")]
+        public string? StaffContent { get; set; }
+
+        [Column("service_content", TypeName = "nvarchar(max)")]
+        public string? ServiceContent { get; set; }
 
         [Column("reply_id", TypeName = "bigInt")]
         public long? ReplyId { get; set; }
 
         [Column("rating", TypeName = "smallInt")]
         public Rating? Rating { get; set; }
-
+        [Column("booking_detail_id", TypeName = "bigInt")]
+        public long BookingDetailId { get; set; }
     }
 }

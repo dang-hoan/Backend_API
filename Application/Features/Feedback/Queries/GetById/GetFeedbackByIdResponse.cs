@@ -18,7 +18,8 @@ namespace Application.Features.Feedback.Queries.GetById
         public long ServiceId { get; set; }
         public string ServiceName { get; set; }
         public string? FeedbackTitle { get; set; }
-        public string? FeedbackContent { get; set; }
+        public string? FeedbackServiceContent { get; set; }
+        public string? FeedbackStaffContent { get; set; }
         public long? ReplyId { get; set; }
         public string? ReplyTitle { get; set; }
         public string? ReplyContent { get; set; }

@@ -22,8 +22,10 @@ namespace Domain.Entities.View.ViewCustomerFeedbackReply
         public string ServiceName { get; set; }
         [Column("feedback_title", TypeName = "nvarchar")]
         public string? FeedbackTitle { get; set; }
-        [Column("feedback_content", TypeName = "nvarchar")]
-        public string? FeedbackContent { get; set; }
+        [Column("feedback_service_content", TypeName = "nvarchar")]
+        public string? FeedbackServiceContent { get; set; }
+        [Column("feedback_staff_content", TypeName = "nvarchar")]
+        public string? FeedbackStaffContent { get; set; }
         [Column("reply_id", TypeName = "bigint")]
         public long? ReplyId { get; set; }
         [Column("reply_title", TypeName = "nvarchar")]

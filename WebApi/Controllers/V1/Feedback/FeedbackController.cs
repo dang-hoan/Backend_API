@@ -8,6 +8,7 @@ using Application.Features.Reply.Command.EditReply;
 using Microsoft.AspNetCore.Mvc;
 using Domain.Wrappers;
 using Microsoft.AspNetCore.Mvc;
+using Application.Features.Feedback.Queries.GetHistoryFeedback;
 
 namespace WebApi.Controllers.V1.Feeback
 {
@@ -95,6 +96,20 @@ namespace WebApi.Controllers.V1.Feeback
             return Ok(await Mediator.Send(new GetFeedbackByIdQuery
             {
                 Id = id
+            }));
+        }
+        /// <summary>
+        /// Get feedback history 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpGet("customer/booking/{id}")]
+        public async Task<IActionResult> GetFeedbackHistory(long id)
+        {
+            return Ok(await Mediator.Send(new GetFeedbackHistoryQuery
+            {
+                BookingId = id
             }));
         }
     }
