@@ -4,6 +4,7 @@ using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230721064741_AddFieldBookingDetailIdTableFeedback")]
+    partial class AddFieldBookingDetailIdTableFeedback
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -460,48 +463,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("employee_service");
                 });
 
-            modelBuilder.Entity("Domain.Entities.FeebackFileUpload.FeedbackFileUpload", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("FeedbackId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("feedback_id");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("NameFile")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(MAX)")
-                        .HasColumnName("name_file");
-
-                    b.Property<string>("TypeFile")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(MAX)")
-                        .HasColumnName("type_file");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("feedback_file_upload");
-                });
-
             modelBuilder.Entity("Domain.Entities.Feedback.Feedback", b =>
                 {
                     b.Property<long>("Id")
@@ -513,6 +474,10 @@ namespace Infrastructure.Migrations
                     b.Property<long>("BookingDetailId")
                         .HasColumnType("bigInt")
                         .HasColumnName("booking_detail_id");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("content");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -541,17 +506,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("bigInt")
                         .HasColumnName("reply_id");
 
-                    b.Property<string>("ServiceContent")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("service_content");
-
                     b.Property<long>("ServiceId")
                         .HasColumnType("bigInt")
                         .HasColumnName("service_id");
-
-                    b.Property<string>("StaffContent")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("staff_content");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)")
@@ -763,17 +720,13 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("customer_name");
 
+                    b.Property<string>("FeedbackContent")
+                        .HasColumnType("nvarchar")
+                        .HasColumnName("feedback_content");
+
                     b.Property<long>("FeedbackId")
                         .HasColumnType("bigint")
                         .HasColumnName("feedback_id");
-
-                    b.Property<string>("FeedbackServiceContent")
-                        .HasColumnType("nvarchar")
-                        .HasColumnName("feedback_service_content");
-
-                    b.Property<string>("FeedbackStaffContent")
-                        .HasColumnType("nvarchar")
-                        .HasColumnName("feedback_staff_content");
 
                     b.Property<string>("FeedbackTitle")
                         .HasColumnType("nvarchar")
@@ -824,84 +777,6 @@ namespace Infrastructure.Migrations
                     b.ToTable((string)null);
 
                     b.ToView("View_CustomerFeedbackReply", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.View.ViewCustomerReviewHistory.ViewCustomerReviewHistory", b =>
-                {
-                    b.Property<long>("BookingId")
-                        .HasColumnType("bigInt")
-                        .HasColumnName("booking_id");
-
-                    b.Property<DateTime>("CreateOnFeedback")
-                        .HasColumnType("datetime")
-                        .HasColumnName("create_on_feedback");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("CustomerId")
-                        .HasColumnType("bigInt")
-                        .HasColumnName("customer_id");
-
-                    b.Property<string>("CustomerName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("customer_name");
-
-                    b.Property<long>("FeedbackId")
-                        .HasColumnType("bigInt")
-                        .HasColumnName("feedback_id");
-
-                    b.Property<string>("FeedbackServiceContent")
-                        .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasColumnName("feedback_service_content");
-
-                    b.Property<string>("FeedbackStaffContent")
-                        .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasColumnName("feedback_staff_content");
-
-                    b.Property<string>("FeedbackTitle")
-                        .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasColumnName("feedback_title");
-
-                    b.Property<long>("Id")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<short?>("Rating")
-                        .HasColumnType("smallInt")
-                        .HasColumnName("rating");
-
-                    b.Property<long>("ReplyId")
-                        .HasColumnType("bigInt")
-                        .HasColumnName("reply_id");
-
-                    b.Property<long>("ServiceId")
-                        .HasColumnType("bigInt")
-                        .HasColumnName("service_id");
-
-                    b.Property<string>("ServiceName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("service_name");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("View_CustomerReviewHistory", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.WorkShift.WorkShift", b =>

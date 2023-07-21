@@ -57,6 +57,8 @@ namespace Infrastructure.Extensions
             services.AddReplyRepository();
             services.AddViewCustomerFeedbackReplyRepository();
             services.AddWorkShiftRepository();
+            services.AddViewCustomerReviewHistoryRepository();
+            services.AddFeedbackFileUploadRepository();
         }
 
     }

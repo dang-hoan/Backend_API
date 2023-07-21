@@ -3,22 +3,26 @@ using Application.Interfaces.BookingDetail;
 using Application.Interfaces.Customer;
 using Application.Interfaces.Employee;
 using Application.Interfaces.Feedback;
+using Application.Interfaces.FeedbackFileUpload;
 using Application.Interfaces.Reply;
 using Application.Interfaces.Service;
 using Application.Interfaces.ServiceImage;
 using Application.Interfaces.View.ViewCustomerBookingHistory;
 using Application.Interfaces.View.ViewCustomerFeedbackReply;
+using Application.Interfaces.View.ViewCustomerReviewHistory;
 using Application.Interfaces.WorkShift;
 using Infrastructure.Repositories.Booking;
 using Infrastructure.Repositories.BookingDetail;
 using Infrastructure.Repositories.Customer;
 using Infrastructure.Repositories.Employee;
 using Infrastructure.Repositories.Feedback;
+using Infrastructure.Repositories.FeedbackFileUpload;
 using Infrastructure.Repositories.Reply;
 using Infrastructure.Repositories.Service;
 using Infrastructure.Repositories.ServiceImage;
 using Infrastructure.Repositories.View.ViewCustomerBookingHistory;
 using Infrastructure.Repositories.View.ViewCustomerFeedbackReply;
+using Infrastructure.Repositories.View.ViewCustomerReviewHistory;
 using Infrastructure.Repositories.WorkShift;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -69,6 +73,14 @@ namespace Infrastructure.Extensions
         public static void AddViewCustomerFeedbackReplyRepository(this IServiceCollection services)
         {
             services.AddScoped<IViewCustomerFeedbackReplyRepository,ViewCustomerFeedbackReplyRepostiory>();
+        }
+        public static void AddViewCustomerReviewHistoryRepository(this IServiceCollection services)
+        {
+            services.AddScoped<IViewCustomerReviewHisotyRepository,ViewCustomerReviewHistoryRepository>();
+        }
+        public static void AddFeedbackFileUploadRepository(this IServiceCollection services)
+        {
+            services.AddScoped<IFeedbackFileUploadRepository, FeedbackFileUploadRepository>();
         }
     }
 }
