@@ -1,3 +1,4 @@
+using Application.Features.WorkShift.Command.DeleteWorkShift;
 using Application.Features.WorkShift.Command.AddWorkShift;
 using Application.Features.Employee.Queries.GetAll;
 using Application.Features.WorkShift.Queries.GetAll;
@@ -11,6 +12,7 @@ namespace WebApi.Controllers.V1.WorkShift
     [Route("api/v{version:apiVersion}/workshift")]
     public class WorkShiftController : BaseApiController<WorkShiftController>
     {
+        /// <summary>
         /// Get all Workshift pagination, filter
         /// </summary>
         /// <param name="parameter"></param>
@@ -44,6 +46,21 @@ namespace WebApi.Controllers.V1.WorkShift
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Delete work shift by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpDelete]
+        public async Task<IActionResult> DeleteWorkShift(long id)
+        {
+            return Ok(await Mediator.Send(new DeleteWorkShiftCommand
+            {
+                Id = id
+            }));
         }
     }
 }
