@@ -4,6 +4,7 @@ using Application.Features.WorkShift.Queries.GetAll;
 using Application.Parameters;
 using Domain.Wrappers;
 using Microsoft.AspNetCore.Mvc;
+using Application.Features.WorkShift.Command.EditWorkShift;
 using Application.Features.WorkShift.Queries.GetById;
 
 namespace WebApi.Controllers.V1.WorkShift
@@ -49,6 +50,23 @@ namespace WebApi.Controllers.V1.WorkShift
         }
 
         /// <summary>
+        /// Edit WorkShift
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpPut]
+        public async Task<IActionResult> EditWorkShift(EditWorkShiftCommand command)
+        {
+            var result = await Mediator.Send(command);
+            if (result.Succeeded == false)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Delete work shift by Id
         /// </summary>
         /// <param name="id"></param>
@@ -69,7 +87,7 @@ namespace WebApi.Controllers.V1.WorkShift
         /// <returns></returns>
         //[Authorize]
         [HttpGet("{id}")]
-        public async Task<ActionResult<Result<GetWorkshiftByIdResponse>>> GetWorkshiftrById(long id)
+        public async Task<ActionResult<Result<GetWorkshiftByIdResponse>>> GetWorkshiftById(long id)
         {
             return Ok(await Mediator.Send(new GetWorkshiftByIdQuery()
             {
