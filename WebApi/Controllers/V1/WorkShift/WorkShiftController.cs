@@ -1,10 +1,10 @@
 using Application.Features.WorkShift.Command.DeleteWorkShift;
 using Application.Features.WorkShift.Command.AddWorkShift;
-using Application.Features.Employee.Queries.GetAll;
 using Application.Features.WorkShift.Queries.GetAll;
 using Application.Parameters;
 using Domain.Wrappers;
 using Microsoft.AspNetCore.Mvc;
+using Application.Features.WorkShift.Queries.GetById;
 
 namespace WebApi.Controllers.V1.WorkShift
 {
@@ -19,7 +19,7 @@ namespace WebApi.Controllers.V1.WorkShift
         /// <returns></returns>
         //[Authorize]
         [HttpGet]
-        public async Task<ActionResult<PaginatedResult<GetAllEmployeeResponse>>> GetAllWorkShift([FromQuery] RequestParameter parameter)
+        public async Task<ActionResult<PaginatedResult<GetAllWorkShiftResponse>>> GetAllWorkShift([FromQuery] RequestParameter parameter)
         {
             return Ok(await Mediator.Send(new GetAllWorkShiftQuery()
             {
@@ -58,6 +58,20 @@ namespace WebApi.Controllers.V1.WorkShift
         public async Task<IActionResult> DeleteWorkShift(long id)
         {
             return Ok(await Mediator.Send(new DeleteWorkShiftCommand
+            {
+                Id = id
+            }));
+        }
+        /// <summary>
+        /// Get Workshfit detail by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Result<GetWorkshiftByIdResponse>>> GetWorkshiftrById(long id)
+        {
+            return Ok(await Mediator.Send(new GetWorkshiftByIdQuery()
             {
                 Id = id
             }));
