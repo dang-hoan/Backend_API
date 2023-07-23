@@ -1,5 +1,4 @@
-﻿using Application.Features.Employee.Command.AddEmployee;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Application.Interfaces.Employee;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services.Identity;
@@ -11,7 +10,6 @@ using Domain.Wrappers;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
-using System.Drawing;
 
 namespace Application.Features.Employee.Command.EditEmployee
 {
@@ -36,18 +34,20 @@ namespace Application.Features.Employee.Command.EditEmployee
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly IUserService _userService;
         private readonly IUploadService _uploadService;
+        private readonly IRemoveImageService _removeImageService;
         private readonly ICheckFileType _checkFileType;
         private readonly IWorkShiftRepository _workshiftRepository;
 
 
         public EditEmployeeCommandHandler(IMapper mapper, IEmployeeRepository employeeRepository, IUnitOfWork<long> unitOfWork, IUserService userService,
-                                        IUploadService uploadService, ICheckFileType checkFileType, IWorkShiftRepository workshiftRepository)
+                                        IUploadService uploadService, IRemoveImageService removeImageService, ICheckFileType checkFileType, IWorkShiftRepository workshiftRepository)
         {
             _mapper = mapper;
             _employeeRepository = employeeRepository;
             _unitOfWork = unitOfWork;
             _userService = userService;
             _uploadService = uploadService;
+            _removeImageService = removeImageService;
             _checkFileType = checkFileType;
             _workshiftRepository = workshiftRepository;
         }
@@ -77,35 +77,25 @@ namespace Application.Features.Employee.Command.EditEmployee
 
             if (request.ImageFile != null)
             {
-                List<IFormFile> listImages = new List<IFormFile>();
-                listImages.Add(request.ImageFile);
                 var msgCheck = _checkFileType.CheckFilesIsImage(new Dtos.Requests.CheckImagesTypeRequest
                 {
-                    Files = listImages
+                    Files = new List<IFormFile>() { request.ImageFile }
                 });
 
                 if (msgCheck != "")
                     return await Result<EditEmployeeCommand>.FailAsync(msgCheck);
-                try
+
+                if (editEmployee.Image != null && !_removeImageService.RemoveImage(new Dtos.Requests.RemoveImageRequest
                 {
-                    if (File.Exists(editEmployee.Image))
-                    {
-                        using (FileStream fileStream = new FileStream(editEmployee.Image, FileMode.Open))
-                        {
-                            fileStream.Close();
-                            File.Delete(editEmployee.Image);
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    return await Result<EditEmployeeCommand>.FailAsync($"Delete file {request.ImageFile.FileName} was unsuccessful");
-                }
+                    FilePath = editEmployee.Image
+                }))
+                    return await Result<EditEmployeeCommand>.FailAsync(StaticVariable.SERVER_ERROR_MSG);
+
                 var filePath = _uploadService.UploadAsync(new Dtos.Requests.UploadRequest
                 {
                     FileName = request.ImageFile.FileName,
                     Extension = Path.GetExtension(request.ImageFile.FileName),
-                    Data = await IFormFileToByteArray(request.ImageFile)
+                    Data = _mapper.Map<byte[]>(request.ImageFile)
                 });
                 if (string.IsNullOrEmpty(filePath))
                 {
@@ -124,14 +114,6 @@ namespace Application.Features.Employee.Command.EditEmployee
                 Phone = request.PhoneNumber
             });
             return await Result<EditEmployeeCommand>.SuccessAsync(request);
-        }
-        public async Task<byte[]> IFormFileToByteArray(IFormFile file)
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                await file.CopyToAsync(memoryStream);
-                return memoryStream.ToArray();
-            }
         }
     }
 }

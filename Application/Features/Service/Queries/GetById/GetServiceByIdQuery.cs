@@ -1,13 +1,12 @@
 ﻿using Application.Dtos.Responses.ServiceImage;
-using Application.Features.Employee.Queries.GetById;
-using Application.Interfaces.Employee;
+using Application.Interfaces;
 using Application.Interfaces.Service;
 using Application.Interfaces.ServiceImage;
 using AutoMapper;
 using Domain.Constants;
 using Domain.Wrappers;
 using MediatR;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Features.Service.Queries.GetById
 {
@@ -20,12 +19,16 @@ namespace Application.Features.Service.Queries.GetById
         private readonly IServiceRepository _serviceRepository;
         private readonly IServiceImageRepository _serviceImageRepository;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUploadService _uploadService;
 
-        public GetServiceByIdQueryHandler(IServiceRepository serviceRepository, IServiceImageRepository serviceImageRepository, IMapper mapper)
+        public GetServiceByIdQueryHandler(IServiceRepository serviceRepository, IServiceImageRepository serviceImageRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IUploadService uploadService)
         {
             _serviceRepository = serviceRepository;
             _serviceImageRepository = serviceImageRepository;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
+            _uploadService = uploadService;
         }
 
         public async Task<Result<GetServiceByIdResponse>> Handle(GetServiceByIdQuery request, CancellationToken cancellationToken)
@@ -41,6 +44,10 @@ namespace Application.Features.Service.Queries.GetById
                     Images = _mapper.Map<List<ServiceImageResponse>>(_serviceImageRepository.Entities.Where(_ => _.ServiceId == s.Id && _.IsDeleted == false ).ToList())
                 }).FirstOrDefault();
             if (service == null) throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            foreach(ServiceImageResponse imageResponse in service.Images)
+            {
+                imageResponse.NameFile = _uploadService.GetImageLink(imageResponse.NameFile, _httpContextAccessor);
+            }
             return await Result<GetServiceByIdResponse>.SuccessAsync(service);
         }
     }

@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Constants;
 using Microsoft.AspNetCore.Identity;
 using Domain.Entities;
+using Microsoft.AspNetCore.Http;
+using Application.Interfaces;
 
 namespace Application.Features.Employee.Queries.GetById
 {
@@ -16,11 +18,15 @@ namespace Application.Features.Employee.Queries.GetById
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly UserManager<AppUser> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUploadService _uploadService;
 
-        public GetEmployeeByIdQueryHandler(IEmployeeRepository employeeRepository, UserManager<AppUser> userManager)
+        public GetEmployeeByIdQueryHandler(IEmployeeRepository employeeRepository, UserManager<AppUser> userManager, IHttpContextAccessor httpContextAccessor, IUploadService uploadService)
         {
             _employeeRepository = employeeRepository;
             _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
+            _uploadService = uploadService;
         }
 
         public async Task<Result<GetEmployeeByIdResponse>> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
@@ -42,6 +48,10 @@ namespace Application.Features.Employee.Queries.GetById
                                       Password = _userManager.Users.Where(e => e.UserId == request.Id && !e.IsDeleted).Select(e => e.PasswordHash).FirstOrDefault()
                                   }).FirstOrDefaultAsync(cancellationToken: cancellationToken);
             if (employee == null) throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+
+            if (employee.Image != null)
+                employee.Image = _uploadService.GetImageLink(employee.Image, _httpContextAccessor);
+
             return await Result<GetEmployeeByIdResponse>.SuccessAsync(employee);
         }
     }

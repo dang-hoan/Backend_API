@@ -94,7 +94,7 @@ namespace Application.Features.Employee.Command.AddEmployee
                 {
                     FileName = request.ImageFile.FileName,
                     Extension = Path.GetExtension(request.ImageFile.FileName),
-                    Data = await IFormFileToByteArray(request.ImageFile)
+                    Data = _mapper.Map<byte[]>(request.ImageFile)
                 });
 
                 if (string.IsNullOrEmpty(filePath))
@@ -126,14 +126,6 @@ namespace Application.Features.Employee.Command.AddEmployee
                 return await Result<AddEmployeeCommand>.FailAsync(StaticVariable.ERROR_ADD_USER);
             }
             return await Result<AddEmployeeCommand>.SuccessAsync(request);
-        }
-        public async Task<byte[]> IFormFileToByteArray(IFormFile file)
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                await file.CopyToAsync(memoryStream);
-                return memoryStream.ToArray();
-            }
         }
     }
 }

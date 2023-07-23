@@ -1,4 +1,5 @@
 using Application.Extensions;
+using Domain.Entities.Service;
 using Infrastructure.Extensions;
 using Serilog;
 using Shared.Extensions;
@@ -47,6 +48,8 @@ try
     app.UseStaticFiles();
 
     app.UseCors("CorsPolicy");
+
+    app.UseFolderAsStatic(app.Services.GetRequiredService<IWebHostEnvironment>());
 
     app.UseSwaggerExtension();
 
