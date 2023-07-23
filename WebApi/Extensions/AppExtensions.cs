@@ -1,5 +1,8 @@
-﻿using Application.Interfaces.Services;
+﻿using Application.Enums;
+using Application.Exceptions;
+using Application.Interfaces.Services;
 using Hangfire;
+using Microsoft.Extensions.FileProviders;
 using WebApi.Filters;
 using WebApi.Middlewares;
 
@@ -7,6 +10,23 @@ namespace WebApi.Extensions
 {
     public static class AppExtensions
     {
+
+        public static void UseFolderAsStatic(this IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            string folderPath = Path.Combine("Files", new UploadType().ToDescriptionString());
+            folderPath = folderPath.Replace('\\', '/');
+
+            app.UseStaticFiles();  // Enables the serving of static files
+
+            // Map the directory where your images are saved
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(env.ContentRootPath, folderPath)),
+                RequestPath = "/" + folderPath
+            });
+        }
+
         public static void UseSwaggerExtension(this IApplicationBuilder app)
         {
             app.UseSwagger();

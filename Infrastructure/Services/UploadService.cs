@@ -1,11 +1,13 @@
 ﻿using Application.Dtos.Requests;
 using Application.Exceptions;
 using Application.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Services
 {
     public class UploadService : IUploadService
     {
+
         public string UploadAsync(UploadRequest request)
         {
             var streamData = new MemoryStream(request.Data);
@@ -80,6 +82,15 @@ namespace Infrastructure.Services
             }
 
             return string.Format(pattern, max);
+        }
+
+        public string GetImageLink(string relativePath, IHttpContextAccessor httpContextAccessor)
+        {
+            HttpContext httpContext = httpContextAccessor.HttpContext;
+            var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
+            var imageUrl = $"{baseUrl}/{relativePath.Replace('\\', '/')}";
+
+            return imageUrl;
         }
     }
 }
