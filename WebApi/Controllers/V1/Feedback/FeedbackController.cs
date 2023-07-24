@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Domain.Wrappers;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Feedback.Queries.GetHistoryFeedback;
+using Application.Features.Client.Command.AddFeedback;
 
 namespace WebApi.Controllers.V1.Feeback
 {
@@ -111,6 +112,25 @@ namespace WebApi.Controllers.V1.Feeback
             {
                 BookingId = id
             }));
+        }
+
+        /// <summary>
+        /// Add feedback from customer
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpPost("mybooking")]
+        [Consumes("multipart/form-data")]
+        [RequestSizeLimit(50 * 1024 * 1024)] //50MB
+        public async Task<IActionResult> AddFeedback([FromForm] AddFeedbackCommand command)
+        {
+            var result = await Mediator.Send(command);
+            if (result.Succeeded == false)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

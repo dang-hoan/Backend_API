@@ -28,5 +28,29 @@ namespace Infrastructure.Services
             }
             return "";
         }
+
+        string ICheckFileType.CheckFilesIsVideo(CheckVideoTypeRequest request)
+        {
+            foreach (IFormFile file in request.Files)
+            {
+                if (file != null)
+                {
+                    string extension = Path.GetExtension(file.FileName).ToLower();
+                    string[] allowedImagesExtensions = { ".mp3", ".mp4", ".mpeg" };
+                    if (!allowedImagesExtensions.Contains(extension))
+                    {
+                        return $"File {file.FileName} has invalid file extension! (Only video extensions: {string.Join(", ", allowedImagesExtensions)} are allowed)";
+                    }
+
+                    string[] allowedMimeTypes = { "video/mp3", "video/mp4", "video/mpeg" };
+                    if (!allowedMimeTypes.Contains(file.ContentType.ToLower()))
+                    {
+                        return "Invalid file type. Only video files are allowed.";
+                    }
+                }
+            }
+            return "";
+        }
+
     }
 }

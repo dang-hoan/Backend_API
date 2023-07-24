@@ -34,6 +34,7 @@
         public const string NOT_FOUND_CUSTOMER = "This customer does not exist in the database.";
         public const string NOT_FOUND_BOOKING = "This booking does not exist in the database.";
         public const string NOT_FOUND_WORK_SHIFT = "This work shift does not exist in the database.";
+        public const string NOT_FOUND_BOOKING_DETAIL = "This booking detail does not exist in the database.";
         public const string SUCCESS = "Success";
 
         public const string WORK_SHIFT_ASSIGNED = "This work shift has assigned to employees! Please change employee's work shift before delete this work shift!";
