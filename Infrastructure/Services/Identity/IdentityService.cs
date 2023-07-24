@@ -66,8 +66,8 @@ namespace Infrastructure.Services.Identity
                 return await Result<TokenResponse>.FailAsync("Token không hợp lệ");
             }
             var userPrincipal = GetPrincipalFromExpiredToken(model.Token);
-            var userEmail = userPrincipal.FindFirstValue(ClaimTypes.Email);
-            var user = await _userManager.FindByEmailAsync(userEmail);
+            var userUsername = userPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByNameAsync(userUsername);
             if (user == null)
                 return await Result<TokenResponse>.FailAsync("Tên người dùng hoặc mật khẩu không đúng.");
             if (user.RefreshToken != model.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
@@ -116,7 +116,7 @@ namespace Infrastructure.Services.Identity
             var claims = new List<Claim>
                 {
                     new(ClaimTypes.NameIdentifier, user.UserName),
-                    new(ClaimTypes.Email, user.Email),
+                    (user.Email != null) ? new(ClaimTypes.Email, user.Email) : null,
                     new(ClaimTypes.Name, user.FullName),
                     new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty)
                 }
