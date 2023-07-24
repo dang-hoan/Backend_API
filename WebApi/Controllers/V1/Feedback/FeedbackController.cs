@@ -105,7 +105,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// <param name="id"></param>
         /// <returns></returns>
         //[Authorize]
-        [HttpGet("customer/booking/{id}")]
+        [HttpGet("customer-booking/{id}")]
         public async Task<IActionResult> GetFeedbackHistory(long id)
         {
             return Ok(await Mediator.Send(new GetFeedbackHistoryQuery

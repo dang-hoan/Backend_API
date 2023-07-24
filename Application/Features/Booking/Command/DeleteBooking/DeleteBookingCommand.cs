@@ -35,29 +35,12 @@ namespace Application.Features.Booking.Command.DeleteBooking
 
         public async Task<Result<long>> Handle(DeleteBookingCommand request, CancellationToken cancellationToken)
         {
-
-            var query = from b in _bookingRepository.Entities
-                        join bd in _bookingDetailRepository.Entities on b.Id equals bd.BookingId
-                        where !b.IsDeleted && b.Id == request.Id
-                        select new
-                        {
-                            Status = b.Status,
-                        };
             var booking = await _bookingRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
 
             try
             {
-                bool canDelete = true;
-                foreach (var q in query)
-                {
-                    if (q.Status == BookingStatus.Inprogress)
-                    {
-                        canDelete = false;
-                        break;
-                    }
-                }
 
-                if (canDelete)
+                if (!(booking.Status == BookingStatus.Inprogress))
                 {
                     var bookingDetail = await _bookingDetailRepository.GetByCondition(x => x.BookingId == request.Id && !x.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
 
@@ -75,7 +58,7 @@ namespace Application.Features.Booking.Command.DeleteBooking
                         await _unitOfWork.Commit(cancellationToken);
                     }
 
-                    return await Result<long>.SuccessAsync(request.Id, $"Delete booking and booking detail by booking id {request.Id}  successfully!");
+                    return await Result<long>.SuccessAsync(request.Id, $"Delete booking and booking detail by booking id {request.Id} successfully!");
                 }
 
                 return await Result<long>.FailAsync("Booking is inprogress");
