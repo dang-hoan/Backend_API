@@ -42,6 +42,7 @@ namespace Infrastructure.Extensions
             services.AddScoped<IUploadService, UploadService>();
             services.AddScoped<IRemoveImageService, RemoveImageService>();
             services.AddScoped<ICheckFileType, CheckFileType>();
+            services.AddScoped<ICheckSizeFile, CheckFileSize>();
         }
 
         public static void AddRepositories(this IServiceCollection services)

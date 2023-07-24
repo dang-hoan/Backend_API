@@ -5,6 +5,8 @@ namespace Application.Enums
     public enum UploadType : byte
     {
         [Description(@"Images/ProfilePictures")]
-        ProfilePicture
+        ProfilePicture,
+        [Description(@"Videos/UploadVideos")]
+        UploadVideo
     }
 }
