@@ -21,8 +21,8 @@ namespace Application.Features.Customer.Command.AddCustomer
         [Required(ErrorMessage = "Phone number is required.")]
         [RegularExpression(@"^[0-9]\d{7,9}$", ErrorMessage = "Phone number must be between 8 and 10 digits.")]
         public string PhoneNumber { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public string? Username { get; set; }
+        public string? Password { get; set; }
         public decimal? TotalMoney { get; set; }
     }
 
@@ -44,36 +44,43 @@ namespace Application.Features.Customer.Command.AddCustomer
 
         public async Task<Result<AddCustomerCommand>> Handle(AddCustomerCommand request, CancellationToken cancellationToken)
         {
-            if (request.Password.Length < 8)
-            {
-                return await Result<AddCustomerCommand>.FailAsync(StaticVariable.INVALID_PASSWORD);
-            }
-            bool isUsernameExists = await _accountService.IsExistUsername(request.Username);
-            if (isUsernameExists)
-            {
-                return await Result<AddCustomerCommand>.FailAsync(StaticVariable.IS_EXISTED_USERNAME);
-            }
             var addCustomer = _mapper.Map<Domain.Entities.Customer.Customer>(request);
+            if((request.Username != null && request.Password != null) && (request.Username != "" && request.Password != ""))
+            {
+                if (request.Password.Length < 8)
+                {
+                    return await Result<AddCustomerCommand>.FailAsync(StaticVariable.INVALID_PASSWORD);
+                }
+                bool isUsernameExists = await _accountService.IsExistUsername(request.Username);
+                if (isUsernameExists)
+                {
+                    return await Result<AddCustomerCommand>.FailAsync(StaticVariable.IS_EXISTED_USERNAME);
+                }
+                await _customnerRepository.AddAsync(addCustomer);
+                await _unitOfWork.Commit(cancellationToken);
+                request.Id = addCustomer.Id;
+                var user = new AppUser()
+                {
+                    FullName = request.CustomerName,
+                    UserName = request.Username,
+                    EmailConfirmed = false,
+                    PhoneNumber = request.PhoneNumber,
+                    PhoneNumberConfirmed = true,
+                    CreatedOn = DateTime.Now,
+                    IsActive = true,
+                    TypeFlag = TypeFlagEnum.Customer,
+                    UserId = request.Id
+                };
+                bool result = await _accountService.AddAcount(user, request.Password,RoleConstants.CustomerRole);
+                if (result == false)
+                {
+                    return await Result<AddCustomerCommand>.FailAsync(StaticVariable.ERROR_ADD_USER);
+                }
+                return await Result<AddCustomerCommand>.SuccessAsync(request);
+            }
             await _customnerRepository.AddAsync(addCustomer);
             await _unitOfWork.Commit(cancellationToken);
             request.Id = addCustomer.Id;
-            var user = new AppUser()
-            {
-                FullName = request.CustomerName,
-                UserName = request.Username,
-                EmailConfirmed = false,
-                PhoneNumber = request.PhoneNumber,
-                PhoneNumberConfirmed = true,
-                CreatedOn = DateTime.Now,
-                IsActive = true,
-                TypeFlag = TypeFlagEnum.Customer,
-                UserId = request.Id
-            };
-            bool result = await _accountService.AddAcount(user, request.Password,RoleConstants.CustomerRole);
-            if (result == false)
-            {
-                return await Result<AddCustomerCommand>.FailAsync(StaticVariable.ERROR_ADD_USER);
-            }
             return await Result<AddCustomerCommand>.SuccessAsync(request);
         }
     }

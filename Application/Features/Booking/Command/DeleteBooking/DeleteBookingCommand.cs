@@ -1,5 +1,6 @@
 using Application.Interfaces.Booking;
 using Application.Interfaces.BookingDetail;
+using Application.Interfaces.Customer;
 using Application.Interfaces.Repositories;
 using Domain.Constants;
 using Domain.Constants.Enum;
@@ -18,15 +19,18 @@ namespace Application.Features.Booking.Command.DeleteBooking
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly IBookingRepository _bookingRepository;
         private readonly IBookingDetailRepository _bookingDetailRepository;
+        private readonly ICustomerRepository _customerRepository;
 
         public DeleteBookingCommandHandler(
             IUnitOfWork<long> unitOfWork,
             IBookingRepository bookingRepository,
+            ICustomerRepository customerRepository,
             IBookingDetailRepository bookingDetailRepository)
         {
             _unitOfWork = unitOfWork;
             _bookingRepository = bookingRepository;
             _bookingDetailRepository = bookingDetailRepository;
+            _customerRepository = customerRepository;
         }
 
         public async Task<Result<long>> Handle(DeleteBookingCommand request, CancellationToken cancellationToken)
@@ -62,6 +66,14 @@ namespace Application.Features.Booking.Command.DeleteBooking
                     await _bookingDetailRepository.DeleteRange(bookingDetail.ToList());
 
                     await _unitOfWork.Commit(cancellationToken);
+
+                    Domain.Entities.Customer.Customer ExistCustomer = await _customerRepository.FindAsync(_ => _.Id == booking.CustomerId && !_.IsDeleted);
+
+                    if(ExistCustomer != null) {
+                        ExistCustomer.TotalMoney = _bookingRepository.GetAllTotalMoneyBookingByCustomerId(ExistCustomer.Id);
+                        await _customerRepository.UpdateAsync(ExistCustomer);
+                        await _unitOfWork.Commit(cancellationToken);
+                    }
 
                     return await Result<long>.SuccessAsync(request.Id, $"Delete booking and booking detail by booking id {request.Id}  successfully!");
                 }

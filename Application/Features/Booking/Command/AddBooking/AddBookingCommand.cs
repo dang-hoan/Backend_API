@@ -43,19 +43,17 @@ namespace Application.Features.Booking.Command.AddBooking
 
         public async Task<Result<AddBookingCommand>> Handle(AddBookingCommand request, CancellationToken cancellationToken)
         {
-            var isExistCustomer = await _customerRepository.FindAsync(_ => _.Id == request.CustomerId && _.IsDeleted == false) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_CUSTOMER);
+            request.ServiceId = request.ServiceId.Distinct().ToList();
+            var ExistCustomer = await _customerRepository.FindAsync(_ => _.Id == request.CustomerId && _.IsDeleted == false) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_CUSTOMER);
             if(request.Totime.CompareTo(request.FromTime) < 0)
             {
                 return await Result<AddBookingCommand>.FailAsync(StaticVariable.NOT_LOGIC_DATE_ORDER);
             }
-            foreach (long i in request.ServiceId)
-            {
-                bool isExistedService = await IsExistedIdService(i);
-                if (!isExistedService)
-                {
-                    throw new KeyNotFoundException(StaticVariable.NOT_FOUND_SERVICE);
-                }
-            }
+
+            // check request.ServiceId exist in db
+            List<long> listExistServiceId = _serviceRepository.Entities.Where(_ => !_.IsDeleted).Select(_ => _.Id).ToList();
+            if (request.ServiceId.Except(listExistServiceId).ToList().Any()) throw new KeyNotFoundException(StaticVariable.NOT_FOUND_SERVICE);
+
             var booking = _mapper.Map<Domain.Entities.Booking.Booking>(request);
             booking.Status = BookingStatus.Waiting;
             await _bookingRepository.AddAsync(booking);
@@ -71,12 +69,10 @@ namespace Application.Features.Booking.Command.AddBooking
                 });
             }
             await _unitOfWork.Commit(cancellationToken);
+            ExistCustomer.TotalMoney = _bookingRepository.GetAllTotalMoneyBookingByCustomerId(ExistCustomer.Id);
+            await _customerRepository.UpdateAsync(ExistCustomer);
+            await _unitOfWork.Commit(cancellationToken);
             return await Result<AddBookingCommand>.SuccessAsync(request);
-        }
-        public async Task<bool> IsExistedIdService(long id)
-        {
-            var isExistedId = await _serviceRepository.FindAsync(_ => _.Id == id && _.IsDeleted == false);
-            return isExistedId != null;
         }
     }
 }
