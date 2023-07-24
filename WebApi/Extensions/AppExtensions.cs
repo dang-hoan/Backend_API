@@ -18,11 +18,17 @@ namespace WebApi.Extensions
 
             app.UseStaticFiles();  // Enables the serving of static files
 
+            // Create directory to save file if not exists
+            string pathToSave = Path.Combine(env.ContentRootPath, folderPath);
+            bool exists = System.IO.Directory.Exists(pathToSave);
+            if (!exists)
+                System.IO.Directory.CreateDirectory(pathToSave);
+
             // Map the directory where your images are saved
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(
-                    Path.Combine(env.ContentRootPath, folderPath)),
+                    pathToSave),
                 RequestPath = "/" + folderPath
             });
         }
