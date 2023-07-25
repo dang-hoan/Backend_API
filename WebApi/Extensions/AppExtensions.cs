@@ -13,16 +13,20 @@ namespace WebApi.Extensions
 
         public static void UseFolderAsStatic(this IApplicationBuilder app, IWebHostEnvironment env)
         {
-            string folderPath = Path.Combine("Files", new UploadType().ToDescriptionString());
-            folderPath = folderPath.Replace('\\', '/');
+            SetFolderAsStatic(UploadType.ProfilePicture, app, env);
+            SetFolderAsStatic(UploadType.UploadVideo, app, env);
+        }
 
-            app.UseStaticFiles();  // Enables the serving of static files
+        private static void SetFolderAsStatic(UploadType uploadType, IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            string folderPath = Path.Combine("Files", uploadType.ToDescriptionString());
+            folderPath = folderPath.Replace('\\', '/');
 
             // Create directory to save file if not exists
             string pathToSave = Path.Combine(env.ContentRootPath, folderPath);
-            bool exists = System.IO.Directory.Exists(pathToSave);
+            bool exists = Directory.Exists(pathToSave);
             if (!exists)
-                System.IO.Directory.CreateDirectory(pathToSave);
+                Directory.CreateDirectory(pathToSave);
 
             // Map the directory where your images are saved
             app.UseStaticFiles(new StaticFileOptions

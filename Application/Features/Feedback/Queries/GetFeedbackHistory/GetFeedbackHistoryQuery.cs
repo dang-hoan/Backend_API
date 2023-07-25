@@ -1,7 +1,6 @@
 ﻿using Application.Dtos.Responses.FeedbackFileUpload;
 using Application.Dtos.Responses.ServiceImage;
-using Application.Interfaces.Customer;
-using Application.Interfaces.Feedback;
+using Application.Interfaces;
 using Application.Interfaces.FeedbackFileUpload;
 using Application.Interfaces.Reply;
 using Application.Interfaces.ServiceImage;
@@ -9,6 +8,7 @@ using Application.Interfaces.View.ViewCustomerReviewHistory;
 using AutoMapper;
 using Domain.Wrappers;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 
@@ -25,16 +25,20 @@ namespace Application.Features.Feedback.Queries.GetHistoryFeedback
         private readonly IReplyRepository _replyRepository;
         private readonly IFeedbackFileUploadRepository _feedbackFileUploadRepository;
         private readonly IServiceImageRepository _serviceImageRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUploadService _uploadService;
 
         public GetFeedbackHistoryQueryHandler(IMapper mapper, IViewCustomerReviewHisotyRepository viewCustomerReviewHisotyRepository,
             IReplyRepository replyRepository, IFeedbackFileUploadRepository feedbackFileUploadRepository,
-            IServiceImageRepository serviceImageRepository)
+            IServiceImageRepository serviceImageRepository, IHttpContextAccessor httpContextAccessor, IUploadService uploadService)
         {
             _mapper = mapper;
             _viewCustomerReviewHisotyRepository = viewCustomerReviewHisotyRepository;
             _replyRepository = replyRepository;
             _feedbackFileUploadRepository = feedbackFileUploadRepository;
             _serviceImageRepository = serviceImageRepository;
+            _httpContextAccessor = httpContextAccessor;
+            _uploadService = uploadService;
         }
         public async Task<Result<GetFeebackHistoryResponse>> Handle(GetFeedbackHistoryQuery request, CancellationToken cancellationToken)
         {
@@ -73,6 +77,16 @@ namespace Application.Features.Feedback.Queries.GetHistoryFeedback
                         ServiceImages = _mapper.Map<List<ServiceImageResponse>>(_serviceImageRepository.Entities.Where(_ => _.ServiceId == history.ServiceId && _.IsDeleted == false).ToList()),
                         FeedbackFileUploads = _mapper.Map<List<FeedbackFileUploadResponse>>(_feedbackFileUploadRepository.Entities.Where(_ => _.FeedbackId == history.FeedbackId && _.IsDeleted == false).ToList())
                     };
+                    foreach(ServiceImageResponse serviceImageResponse in customerHistoryResponse.ServiceImages)
+                    {
+                        serviceImageResponse.NameFile = _uploadService.GetImageLink(serviceImageResponse.NameFile, _httpContextAccessor);
+                    }
+                    foreach(FeedbackFileUploadResponse feedbackFileUploadResponse in customerHistoryResponse.FeedbackFileUploads)
+                    {
+                        feedbackFileUploadResponse.NameFile = _uploadService.GetImageLink(feedbackFileUploadResponse.NameFile, _httpContextAccessor);
+                    }
+
+
                     var reply = _replyRepository.Entities.Where(_ => _.Id == history.ReplyId && !_.IsDeleted)
                         .Select(s => new Domain.Entities.Reply.Reply
                         {

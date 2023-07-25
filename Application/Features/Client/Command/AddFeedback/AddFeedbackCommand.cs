@@ -26,7 +26,7 @@ namespace Application.Features.Client.Command.AddFeedback
         [Required]
         public long CustomerId { get; set; }
         public string? StaffContent { get; set; }
-        public string? ServceContent { get; set; }
+        public string? ServiceContent { get; set; }
         public List<IFormFile>? ListImages { get; set; }
         public List<IFormFile>? ListVideos { get; set; }
 
@@ -69,6 +69,7 @@ namespace Application.Features.Client.Command.AddFeedback
             var isExistInBookingDetail = await _bookingDetailRepository.FindAsync(_ => _.Id == request.BookingDetailId && _.IsDeleted == false) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_BOOKING_DETAIL);
             var addFeedback = _mapper.Map<Domain.Entities.Feedback.Feedback>(request);
             await _feedbackRepository.AddAsync(addFeedback);
+            await _unitOfWork.Commit(cancellationToken);
 
             if (request.ListImages != null)
             {
@@ -142,7 +143,8 @@ namespace Application.Features.Client.Command.AddFeedback
                 var obj = new Domain.Entities.FeebackFileUpload.FeedbackFileUpload
                 {
                     FeedbackId = targetId,
-                    NameFile = filePath
+                    NameFile = filePath,
+                    TypeFile = (uploadTypes == UploadType.ProfilePicture) ? "Image" : "Video"
                 };
                 await _feedbackFileUploadRepository.AddAsync(obj);
             }
