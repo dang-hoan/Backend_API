@@ -3,6 +3,8 @@ using Application.Dtos.Requests.SendEmail;
 using Application.Exceptions;
 using Application.Interfaces.Services;
 using Application.Interfaces.Services.Identity;
+using Azure.Core;
+using Domain.Constants;
 using Domain.Entities;
 using Domain.Wrappers;
 using Hangfire;
@@ -31,13 +33,13 @@ namespace Infrastructure.Services.Identity
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<IResult> ForgotPasswordAsync(ForgotPasswordRequest request, string origin)
+        public async Task<IResult> ForgotPasswordAsync(ForgotPasswordRequest request)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
             {
                 // Don't reveal that the user does not exist or is not confirmed
-                throw new ApiException("SYS002", "Email Not Found.");
+                throw new ApiException(StaticVariable.NOT_FOUND_MSG, "Email Not Found.");
             }
             // For more information on how to enable account confirmation and password reset please
             // visit https://go.microsoft.com/fwlink/?LinkID=532713
@@ -45,27 +47,28 @@ namespace Infrastructure.Services.Identity
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             //send mail
             var route = "auth/reset-password";
-            var endpointUri = new Uri(string.Concat($"{origin}/", route));
-            var filePath = _environment.WebRootPath + "\\templates\\forgot-password-sender.html";
-            var str = new StreamReader(filePath);
-            var mailText = await str.ReadToEndAsync();
-            str.Close();
+            var endpointUri = new Uri(string.Concat($"{request.UrlFE}/", route));
+            //var filePath = _environment.WebRootPath + "\\templates\\forgot-password-sender.html";
+            //var str = new StreamReader(filePath);
+            //var mailText = await str.ReadToEndAsync();
+            //str.Close();
             var passwordResetUrl = QueryHelpers.AddQueryString(endpointUri.ToString(), "Token", code);
 
-            var logo = $"{_httpContextAccessor.HttpContext?.Request.Scheme}://{_httpContextAccessor.HttpContext?.Request.Host.Value}/logo/logo-nineplus.png";
-            var mailBody = mailText.Replace("[EndPointUrl]", HtmlEncoder.Default.Encode(passwordResetUrl)).Replace("[Logo]", logo);
+            //var logo = $"{_httpContextAccessor.HttpContext?.Request.Scheme}://{_httpContextAccessor.HttpContext?.Request.Host.Value}/logo/logo-nineplus.png";
+            //var mailBody = mailText.Replace("[EndPointUrl]", HtmlEncoder.Default.Encode(passwordResetUrl)).Replace("[Logo]", logo);
             var mailRequest = new EmailRequest()
             {
-                Body = mailBody,
+                Body = passwordResetUrl,
                 Subject = "Reset Password - ERP",
                 To = request.Email
             };
             BackgroundJob.Enqueue(() => _mailService.SendAsync(mailRequest));
-            return await Result.SuccessAsync();
+            return await Result.SuccessAsync(); 
         }
 
         public async Task<IResult> ResetPasswordAsync(ResetPasswordRequest request)
         {
+            if (request.Password.Length < 8) return await Result.FailAsync(StaticVariable.INVALID_PASSWORD);
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {

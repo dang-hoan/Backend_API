@@ -45,8 +45,7 @@ namespace WebApi.Controllers.Account
         [AllowAnonymous]
         public async Task<IActionResult> ForgotPasswordAsync(ForgotPasswordRequest request)
         {
-            var origin = Request.Headers["origin"];
-            return Ok(await _userService.ForgotPasswordAsync(request, origin));
+            return Ok(await _userService.ForgotPasswordAsync(request));
         }
 
         /// <summary>
