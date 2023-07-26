@@ -36,11 +36,12 @@ namespace Application.Features.Employee.Command.EditEmployee
         private readonly IUploadService _uploadService;
         private readonly IRemoveImageService _removeImageService;
         private readonly ICheckFileType _checkFileType;
+        private readonly ICheckSizeFile _checkSizeFile;
         private readonly IWorkShiftRepository _workshiftRepository;
 
 
         public EditEmployeeCommandHandler(IMapper mapper, IEmployeeRepository employeeRepository, IUnitOfWork<long> unitOfWork, IUserService userService,
-                                        IUploadService uploadService, IRemoveImageService removeImageService, ICheckFileType checkFileType, IWorkShiftRepository workshiftRepository)
+                                        IUploadService uploadService, IRemoveImageService removeImageService, ICheckFileType checkFileType, ICheckSizeFile checkSizeFile, IWorkShiftRepository workshiftRepository)
         {
             _mapper = mapper;
             _employeeRepository = employeeRepository;
@@ -49,6 +50,7 @@ namespace Application.Features.Employee.Command.EditEmployee
             _uploadService = uploadService;
             _removeImageService = removeImageService;
             _checkFileType = checkFileType;
+            _checkSizeFile = checkSizeFile;
             _workshiftRepository = workshiftRepository;
         }
 
@@ -59,7 +61,7 @@ namespace Application.Features.Employee.Command.EditEmployee
                 return await Result<EditEmployeeCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             }
             var editEmployee = await _employeeRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
-            if(request.Email != editEmployee.Email)
+            if (request.Email != editEmployee.Email)
             {
                 var existEmail = _employeeRepository.Entities.FirstOrDefault(_ => _.Email == request.Email && _.IsDeleted == false);
                 if (existEmail != null)
@@ -81,9 +83,15 @@ namespace Application.Features.Employee.Command.EditEmployee
                 {
                     Files = new List<IFormFile>() { request.ImageFile }
                 });
-
+                var imageCheckMaxSize = _checkSizeFile.CheckImageSize(new Dtos.Requests.CheckImageSizeRequest
+                {
+                    Files = new List<IFormFile>() { request.ImageFile }
+                });
                 if (msgCheck != "")
                     return await Result<EditEmployeeCommand>.FailAsync(msgCheck);
+                    
+                if (imageCheckMaxSize != "")
+                    return await Result<EditEmployeeCommand>.FailAsync(imageCheckMaxSize);
 
                 if (editEmployee.Image != null && !_removeImageService.RemoveImage(new Dtos.Requests.RemoveImageRequest
                 {
