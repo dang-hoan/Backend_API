@@ -18,5 +18,10 @@ namespace Domain.Entities
         public string? LastModifiedBy { get; set; }
         public DateTime? LastModifiedOn { get; set; }
         public bool IsDeleted { get; set; }
+
+        public static implicit operator global::System.String(AppUser v)
+        {
+            throw new global::System.NotImplementedException();
+        }
     }
 }

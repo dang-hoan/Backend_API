@@ -6,6 +6,6 @@ namespace Application.Interfaces
     public interface IUploadService
     {
         string UploadAsync(UploadRequest request);
-        string GetImageLink(string relativePath, IHttpContextAccessor httpContextAccessor);
+        string GetFileLink(string relativePath, IHttpContextAccessor httpContextAccessor);
     }
 }

@@ -46,7 +46,7 @@ namespace Application.Features.Service.Queries.GetById
             if (service == null) throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
             foreach(ServiceImageResponse imageResponse in service.Images)
             {
-                imageResponse.NameFile = _uploadService.GetImageLink(imageResponse.NameFile, _httpContextAccessor);
+                imageResponse.NameFile = _uploadService.GetFileLink(imageResponse.NameFile, _httpContextAccessor);
             }
             return await Result<GetServiceByIdResponse>.SuccessAsync(service);
         }

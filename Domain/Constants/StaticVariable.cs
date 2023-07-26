@@ -43,5 +43,8 @@
         public const string NOT_LOGIC_DATE_ORDER = "ToTime must be greater than FromTime";
         public const string NOT_LOGIC_WORKDAY_VALUE = "Workdays must be between 2 and 8!";
 
+        public const string IS_NOT_LOGIN = "You must login to do this action";
+
+
     }
 }
