@@ -50,7 +50,7 @@ namespace Application.Features.Employee.Queries.GetById
             if (employee == null) throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
 
             if (employee.Image != null)
-                employee.Image = _uploadService.GetImageLink(employee.Image, _httpContextAccessor);
+                employee.Image = _uploadService.GetFileLink(employee.Image, _httpContextAccessor);
 
             return await Result<GetEmployeeByIdResponse>.SuccessAsync(employee);
         }

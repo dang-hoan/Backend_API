@@ -90,7 +90,7 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
                         };
                         foreach (ServiceImageResponse imageResponse in bookingDetailResponse.ServiceImages)
                         {
-                            imageResponse.NameFile = _uploadService.GetImageLink(imageResponse.NameFile, _httpContextAccessor);
+                            imageResponse.NameFile = _uploadService.GetFileLink(imageResponse.NameFile, _httpContextAccessor);
                         }
                         bookingDetailResponses.Add(bookingDetailResponse);
                         if (string.IsNullOrEmpty(request.KeyWord) || service.Name.ToLower().Contains(request.KeyWord.ToLower()) || booking.Id.ToString().Contains(request.KeyWord) || booking.BookingDate.ToString("dd/MM/yyyy").Contains(request.KeyWord) || booking.BookingDate.ToString("dd-MM-yyyy").Contains(request.KeyWord))

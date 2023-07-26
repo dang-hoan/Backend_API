@@ -84,13 +84,13 @@ namespace Infrastructure.Services
             return string.Format(pattern, max);
         }
 
-        public string GetImageLink(string relativePath, IHttpContextAccessor httpContextAccessor)
+        public string GetFileLink(string relativePath, IHttpContextAccessor httpContextAccessor)
         {
             HttpContext httpContext = httpContextAccessor.HttpContext;
             var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
-            var imageUrl = $"{baseUrl}/{relativePath.Replace('\\', '/')}";
+            var fileUrl = $"{baseUrl}/{relativePath.Replace('\\', '/')}";
 
-            return imageUrl;
+            return fileUrl;
         }
     }
 }

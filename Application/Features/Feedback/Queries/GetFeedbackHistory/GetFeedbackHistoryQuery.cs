@@ -79,11 +79,11 @@ namespace Application.Features.Feedback.Queries.GetHistoryFeedback
                     };
                     foreach(ServiceImageResponse serviceImageResponse in customerHistoryResponse.ServiceImages)
                     {
-                        serviceImageResponse.NameFile = _uploadService.GetImageLink(serviceImageResponse.NameFile, _httpContextAccessor);
+                        serviceImageResponse.NameFile = _uploadService.GetFileLink(serviceImageResponse.NameFile, _httpContextAccessor);
                     }
                     foreach(FeedbackFileUploadResponse feedbackFileUploadResponse in customerHistoryResponse.FeedbackFileUploads)
                     {
-                        feedbackFileUploadResponse.NameFile = _uploadService.GetImageLink(feedbackFileUploadResponse.NameFile, _httpContextAccessor);
+                        feedbackFileUploadResponse.NameFile = _uploadService.GetFileLink(feedbackFileUploadResponse.NameFile, _httpContextAccessor);
                     }
 
 
