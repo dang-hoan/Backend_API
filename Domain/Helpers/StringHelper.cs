@@ -31,5 +31,26 @@
             }
             return str;
         }
+
+        // Ex: keyword is 'Luận' then result is 'Luận', 'Luận123', ...
+        //     keyword is 'Luan' then result is 'Luận', 'Luan', 'Luận123', ...
+        public static bool Contains(string data, string keyword)
+        {
+            data = data.ToLower(); keyword = keyword.ToLower();            
+            string keywordTMP = ConvertFromVietnameseText(keyword);
+
+            if (!keywordTMP.Equals(keyword)) // => keyword is accented string
+            {
+                if (data.Contains(keyword))
+                    return true;
+            }
+            else
+            {
+                if (ConvertFromVietnameseText(data).Contains(keyword))
+                    return true;
+            }
+
+            return false;
+        }
     }
 }

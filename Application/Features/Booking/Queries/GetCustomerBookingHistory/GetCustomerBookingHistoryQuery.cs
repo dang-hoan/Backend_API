@@ -1,13 +1,9 @@
-﻿using Application.Features.Employee.Queries.GetById;
-using Application.Interfaces.Booking;
-using Application.Interfaces.View.ViewCustomerBookingHistory;
+﻿using Application.Interfaces.View.ViewCustomerBookingHistory;
 using AutoMapper;
 using Domain.Entities.View.ViewCustomerBookingHistory;
 using Domain.Wrappers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.util;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Application.Features.Booking.Queries.GetCustomerBookingHistory
 {

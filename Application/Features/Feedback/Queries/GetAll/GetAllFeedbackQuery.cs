@@ -2,9 +2,9 @@ using Application.Interfaces.Feedback;
 using Domain.Wrappers;
 using MediatR;
 using System.Linq.Dynamic.Core;
-using Microsoft.EntityFrameworkCore;
 using Application.Interfaces.Customer;
 using Application.Interfaces.Service;
+using Domain.Helpers;
 
 namespace Application.Features.Feedback.Queries.GetAll
 {
@@ -30,18 +30,24 @@ namespace Application.Features.Feedback.Queries.GetAll
         }
         public async Task<PaginatedResult<GetAllFeedbackResponse>> Handle(GetAllFeedbackQuery request, CancellationToken cancellationToken)
         {
-            var query = from fb in _feedbackRepository.Entities
-                        join c in _customerRepository.Entities on fb.CustomerId equals c.Id
-                        join s in _serviceRepository.Entities on fb.ServiceId equals s.Id
+            if (request.Keyword != null)
+                request.Keyword = request.Keyword.Trim();
+
+            if (request.ServiceName != null)
+                request.ServiceName = request.ServiceName.Trim();
+
+            var query = from fb in _feedbackRepository.Entities.AsEnumerable()
+                        join c in _customerRepository.Entities.AsEnumerable() on fb.CustomerId equals c.Id
+                        join s in _serviceRepository.Entities.AsEnumerable() on fb.ServiceId equals s.Id
                         where !c.IsDeleted && !fb.IsDeleted && !s.IsDeleted
                         && (string.IsNullOrEmpty(request.Keyword)
-                            || s.Name.Contains(request.Keyword)
+                            || StringHelper.Contains(s.Name, request.Keyword)
                             || c.PhoneNumber.Contains(request.Keyword)
                             || c.Id.ToString().Contains(request.Keyword)
-                            || c.CustomerName.Contains(request.Keyword)
+                            || StringHelper.Contains(c.CustomerName, request.Keyword)
                            )
-                        && (string.IsNullOrEmpty(request.ServiceName) || s.Name == request.ServiceName)
-                        && (request.Rating == null || (int)fb.Rating == request.Rating)
+                        && (string.IsNullOrEmpty(request.ServiceName) || StringHelper.Contains(s.Name, request.ServiceName))
+                        && (request.Rating == null || (int?)fb.Rating == request.Rating)
                         select new GetAllFeedbackResponse
                         {
                             Id = fb.Id,
@@ -53,15 +59,15 @@ namespace Application.Features.Feedback.Queries.GetAll
                             CreatedOn = fb.CreatedOn
                         };
 
-            var data = query.OrderBy(request.OrderBy);
+            var data = query.AsQueryable().OrderBy(request.OrderBy);
             var totalRecord = data.Count();
             List<GetAllFeedbackResponse> result;
 
             //Pagination
             if (!request.IsExport)
-                result = await data.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToListAsync(cancellationToken);
+                result = data.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToList();
             else
-                result = await data.ToListAsync(cancellationToken);
+                result = data.ToList();
             return PaginatedResult<GetAllFeedbackResponse>.Success(result, totalRecord, request.PageNumber, request.PageSize);
         }
     }

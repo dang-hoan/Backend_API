@@ -1,9 +1,9 @@
 ﻿using Application.Features.Cusomter.Queries.GetAll;
 using Application.Interfaces.Customer;
 using Application.Parameters;
+using Domain.Helpers;
 using Domain.Wrappers;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 
 namespace Application.Features.Customer.Queries.GetAll
@@ -20,9 +20,15 @@ namespace Application.Features.Customer.Queries.GetAll
         }
         public async Task<PaginatedResult<GetAllCustomerResponse>> Handle(GetAllCustomerQuery request, CancellationToken cancellationToken)
         {
-            var query = _CustomerRepository.Entities.Where(x => !x.IsDeleted
-                                                                && (string.IsNullOrEmpty(request.Keyword) || x.CustomerName.Contains(request.Keyword) || x.PhoneNumber.Contains(request.Keyword)))
-                        
+            if (request.Keyword != null)
+                request.Keyword = request.Keyword.Trim();
+
+            var query = _CustomerRepository.Entities.AsEnumerable()
+                        .Where(x => !x.IsDeleted 
+                                && (string.IsNullOrEmpty(request.Keyword) 
+                                || StringHelper.Contains(x.CustomerName, request.Keyword) 
+                                || x.PhoneNumber.Contains(request.Keyword)))
+                        .AsQueryable()
                         .Select(x => new GetAllCustomerResponse
                         {
                             Id = x.Id,
@@ -40,9 +46,9 @@ namespace Application.Features.Customer.Queries.GetAll
 
             //Pagination
             if (!request.IsExport)
-                result = await data.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToListAsync(cancellationToken);
+                result = data.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToList();
             else
-                result = await data.ToListAsync(cancellationToken);
+                result = data.ToList();
             return PaginatedResult<GetAllCustomerResponse>.Success(result, totalRecord, request.PageNumber, request.PageSize);
         }
     }
