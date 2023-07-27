@@ -40,11 +40,7 @@ namespace WebApi.Controllers.V1.Customer
         public async Task<IActionResult> AddCustomer(AddCustomerCommand command)
         {
             var result = await Mediator.Send(command);
-            if (result.Succeeded == false)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
 
         /// Get all customers pagination, filter
@@ -76,11 +72,7 @@ namespace WebApi.Controllers.V1.Customer
         public async Task<IActionResult> EditCustomer(EditCustomerCommand command)
         {
             var result = await Mediator.Send(command);
-            if (result.Succeeded == false)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
         /// <summary>
         /// Delete customer
@@ -91,10 +83,11 @@ namespace WebApi.Controllers.V1.Customer
         [HttpDelete]
         public async Task<IActionResult> DeleteCustomer(long Id)
         {
-            return Ok(await Mediator.Send(new DeleteCustomerCommand
+            var result = await Mediator.Send(new DeleteCustomerCommand
             {
                 Id = Id
-            }));
+            });
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
     }
 }

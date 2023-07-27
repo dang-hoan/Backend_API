@@ -48,11 +48,7 @@ namespace WebApi.Controllers.V1.Feeback
         public async Task<IActionResult> AddReplyAtFeedback([FromForm] AddReplyAtFeedbackCommand command)
         {
             var result = await Mediator.Send(command);
-            if (result.Succeeded == false)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
         /// <summary>
         /// Edit reply
@@ -65,11 +61,7 @@ namespace WebApi.Controllers.V1.Feeback
         public async Task<IActionResult> EditReply([FromForm] EditReplyCommand command)
         {
             var result = await Mediator.Send(command);
-            if (result.Succeeded == false)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
         /// <summary>
         /// Delete feedback
@@ -126,11 +118,7 @@ namespace WebApi.Controllers.V1.Feeback
         public async Task<IActionResult> AddFeedback([FromForm] AddFeedbackCommand command)
         {
             var result = await Mediator.Send(command);
-            if (result.Succeeded == false)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
     }
 }

@@ -43,7 +43,8 @@ namespace WebApi.Controllers.V1.Service
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AddService([FromForm] AddServiceCommand command)
         {
-            return Ok(await Mediator.Send(command));
+            var result = await Mediator.Send(command);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
 
         //[Authorize]
@@ -51,7 +52,8 @@ namespace WebApi.Controllers.V1.Service
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> EditService([FromForm] EditServiceCommand command)
         {
-            return Ok(await Mediator.Send(command));
+            var result = await Mediator.Send(command);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
 
         /// <summary>
@@ -63,10 +65,11 @@ namespace WebApi.Controllers.V1.Service
         [HttpDelete]
         public async Task<IActionResult> DeleteService(short id)
         {
-            return Ok(await Mediator.Send(new DeleteServiceCommand
+            var result = await Mediator.Send(new DeleteServiceCommand
             {
                 Id = id
-            }));
+            });
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
         /// <summary>
         /// Get Service detail by Id
