@@ -24,12 +24,7 @@ namespace WebApi.Controllers.Identity
         public async Task<ActionResult> Get(TokenRequest model)
         {
             var response = await _identityService.LoginAsync(model);
-            if (response.Succeeded)
-            {
-                return Ok(response);
-            }
-
-            return BadRequest(response);
+            return (response.Succeeded) ? Ok(response) : BadRequest(response);
         }
 
         /// <summary>
@@ -41,7 +36,7 @@ namespace WebApi.Controllers.Identity
         public async Task<ActionResult> Refresh([FromBody] RefreshTokenRequest model)
         {
             var response = await _identityService.GetRefreshTokenAsync(model);
-            return Ok(response);
+            return (response.Succeeded) ?  Ok(response) : BadRequest(response);
         }
     }
 }

@@ -5,6 +5,7 @@ using Application.Interfaces.Services.Account;
 using Application.Interfaces.Services.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.WebSockets;
 
 namespace WebApi.Controllers.Account
 {
@@ -33,7 +34,7 @@ namespace WebApi.Controllers.Account
         public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
         {
             var result = await _accountService.ChangePasswordAsync(request, _currentUserService.Username);
-            return Ok(result);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
 
         /// <summary>
@@ -45,7 +46,8 @@ namespace WebApi.Controllers.Account
         [AllowAnonymous]
         public async Task<IActionResult> ForgotPasswordAsync(ForgotPasswordRequest request)
         {
-            return Ok(await _userService.ForgotPasswordAsync(request));
+            var result = await _userService.ForgotPasswordAsync(request);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
 
         /// <summary>
@@ -57,7 +59,8 @@ namespace WebApi.Controllers.Account
         [AllowAnonymous]
         public async Task<IActionResult> ResetPasswordAsync(ResetPasswordRequest request)
         {
-            return Ok(await _userService.ResetPasswordAsync(request));
+            var result = await _userService.ResetPasswordAsync(request);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
     }
 }
