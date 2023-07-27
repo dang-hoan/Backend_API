@@ -61,11 +61,7 @@ namespace WebApi.Controllers.V1.Employee
         public async Task<IActionResult> AddEmployee([FromForm] AddEmployeeCommand command)
         {
             var result = await Mediator.Send(command);
-            if (result.Succeeded == false)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
 
 
@@ -95,11 +91,7 @@ namespace WebApi.Controllers.V1.Employee
         public async Task<IActionResult> EditEmployee([FromForm] EditEmployeeCommand command)
         {
             var result = await Mediator.Send(command);
-            if (result.Succeeded == false)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
         /// <summary>
         /// Reset employee password to default
@@ -114,11 +106,7 @@ namespace WebApi.Controllers.V1.Employee
             {
                 Username = Username
             });
-            if (result.Succeeded == false)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
 
         /// <summary>
@@ -131,11 +119,7 @@ namespace WebApi.Controllers.V1.Employee
         public async Task<IActionResult> EditWorkShiftEmployee(EditWorkShiftEmployeeCommand command)
         {
             var result = await Mediator.Send(command);
-            if (result.Succeeded == false)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
     }
 }

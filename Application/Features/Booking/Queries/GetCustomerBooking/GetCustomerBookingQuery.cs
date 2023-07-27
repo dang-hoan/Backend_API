@@ -5,6 +5,7 @@ using Application.Interfaces.BookingDetail;
 using Application.Interfaces.Service;
 using Application.Interfaces.ServiceImage;
 using AutoMapper;
+using Domain.Helpers;
 using Domain.Wrappers;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -93,7 +94,13 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
                             imageResponse.NameFile = _uploadService.GetFileLink(imageResponse.NameFile, _httpContextAccessor);
                         }
                         bookingDetailResponses.Add(bookingDetailResponse);
-                        if (string.IsNullOrEmpty(request.KeyWord) || service.Name.ToLower().Contains(request.KeyWord.ToLower()) || booking.Id.ToString().Contains(request.KeyWord) || booking.BookingDate.ToString("dd/MM/yyyy").Contains(request.KeyWord) || booking.BookingDate.ToString("dd-MM-yyyy").Contains(request.KeyWord))
+
+                        if (request.KeyWord != null)
+                            request.KeyWord = request.KeyWord.Trim();
+
+                        if (string.IsNullOrEmpty(request.KeyWord) || StringHelper.Contains(service.Name, request.KeyWord) 
+                            || booking.Id.ToString().Contains(request.KeyWord) || booking.BookingDate.ToString("dd/MM/yyyy").Contains(request.KeyWord) 
+                            || booking.BookingDate.ToString("dd-MM-yyyy").Contains(request.KeyWord))
                         {
                             checkServiceName = true;
                         }

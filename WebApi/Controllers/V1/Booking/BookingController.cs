@@ -49,11 +49,7 @@ namespace WebApi.Controllers.V1.Booking
         public async Task<IActionResult> AddBooking(AddBookingCommand command)
         {
             var result = await Mediator.Send(command);
-            if (result.Succeeded == false)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
         /// <summary>
         /// Get Booking Detail
@@ -80,10 +76,11 @@ namespace WebApi.Controllers.V1.Booking
         [HttpDelete]
         public async Task<IActionResult> DeleteService(short id)
         {
-            return Ok(await Mediator.Send(new DeleteBookingCommand
+            var result = await Mediator.Send(new DeleteBookingCommand
             {
                 Id = id
-            }));
+            });
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
 
         /// <summary>
@@ -96,11 +93,7 @@ namespace WebApi.Controllers.V1.Booking
         public async Task<IActionResult> EditBooking(EditBookingCommand command)
         {
             var result = await Mediator.Send(command);
-            if (result.Succeeded == false)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
         /// <summary>
         /// Get customer booking history

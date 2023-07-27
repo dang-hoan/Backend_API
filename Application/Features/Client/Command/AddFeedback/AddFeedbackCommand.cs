@@ -87,6 +87,7 @@ namespace Application.Features.Client.Command.AddFeedback
             }
             var addFeedback = _mapper.Map<Domain.Entities.Feedback.Feedback>(request);
             var userName = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customerId = (long)0;
             var currentLoginUser = new AppUser();
             if (userName != null)
             {
@@ -95,7 +96,7 @@ namespace Application.Features.Client.Command.AddFeedback
                     return await Result<AddFeedbackCommand>.FailAsync("You are not customer");
 
                 var isCustomerHasBooking = _bookingRepository.Entities.Where(x => x.CustomerId == currentLoginUser.UserId && x.Id == isExistInBookingDetail.BookingId && x.Status == BookingStatus.Done).Select(x => x.Id);
-         
+                customerId = currentLoginUser.UserId;
                 if (isCustomerHasBooking.Count() == 0)
                     return await Result<AddFeedbackCommand>.FailAsync("You cannot leave feedback of other customer");
             }
@@ -103,7 +104,7 @@ namespace Application.Features.Client.Command.AddFeedback
             {
                 return await Result<AddFeedbackCommand>.FailAsync(StaticVariable.IS_NOT_LOGIN);
             }
-
+            _logger.LogInformation($"log: {JsonConvert.SerializeObject(customerId)}");
             // Check Image is valid
             if (request.ListImages != null)
             {
@@ -139,6 +140,7 @@ namespace Application.Features.Client.Command.AddFeedback
                 if (videoCheckMaxSize != "")
                     return await Result<AddFeedbackCommand>.FailAsync(videoCheckMaxSize);
             }
+            addFeedback.CustomerId = customerId;
             await _feedbackRepository.AddAsync(addFeedback);
             await _unitOfWork.Commit(cancellationToken);
 

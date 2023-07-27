@@ -43,11 +43,7 @@ namespace WebApi.Controllers.V1.WorkShift
         public async Task<IActionResult> AddWorkShift(AddWorkShiftCommand command)
         {
             var result = await Mediator.Send(command);
-            if (result.Succeeded == false)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
 
         /// <summary>
@@ -60,11 +56,7 @@ namespace WebApi.Controllers.V1.WorkShift
         public async Task<IActionResult> EditWorkShift(EditWorkShiftCommand command)
         {
             var result = await Mediator.Send(command);
-            if (result.Succeeded == false)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
 
         /// <summary>
@@ -76,10 +68,11 @@ namespace WebApi.Controllers.V1.WorkShift
         [HttpDelete]
         public async Task<IActionResult> DeleteWorkShift(long id)
         {
-            return Ok(await Mediator.Send(new DeleteWorkShiftCommand
+            var result = await Mediator.Send(new DeleteWorkShiftCommand
             {
                 Id = id
-            }));
+            });
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
         /// <summary>
         /// Get Workshfit detail by Id
