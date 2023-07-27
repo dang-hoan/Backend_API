@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace Domain.Entities.FeebackFileUpload
+namespace Domain.Entities.FeedbackFileUpload
 {
     [Table("feedback_file_upload")]
     public class FeedbackFileUpload : AuditableBaseEntity<long>

@@ -6,6 +6,7 @@ using Domain.Wrappers;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.WorkShift.Command.EditWorkShift;
 using Application.Features.WorkShift.Queries.GetById;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApi.Controllers.V1.WorkShift
 {
@@ -18,7 +19,7 @@ namespace WebApi.Controllers.V1.WorkShift
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllWorkShiftResponse>>> GetAllWorkShift([FromQuery] RequestParameter parameter)
         {
@@ -37,7 +38,7 @@ namespace WebApi.Controllers.V1.WorkShift
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpPost]
         public async Task<IActionResult> AddWorkShift(AddWorkShiftCommand command)
         {
@@ -50,7 +51,7 @@ namespace WebApi.Controllers.V1.WorkShift
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpPut]
         public async Task<IActionResult> EditWorkShift(EditWorkShiftCommand command)
         {
@@ -63,7 +64,7 @@ namespace WebApi.Controllers.V1.WorkShift
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpDelete]
         public async Task<IActionResult> DeleteWorkShift(long id)
         {
@@ -78,7 +79,7 @@ namespace WebApi.Controllers.V1.WorkShift
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Result<GetWorkshiftByIdResponse>>> GetWorkshiftById(long id)
         {

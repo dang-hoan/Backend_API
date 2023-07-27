@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces.FeedbackFileUpload
 {
-    public interface IFeedbackFileUploadRepository : IRepositoryAsync<Domain.Entities.FeebackFileUpload.FeedbackFileUpload,long>
+    public interface IFeedbackFileUploadRepository : IRepositoryAsync<Domain.Entities.FeedbackFileUpload.FeedbackFileUpload,long>
     {
     }
 }

@@ -5,10 +5,6 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
 {
     public class GetCustomerBookingResponse
     {
-       public List<BookingResponse> bookings { get; set; } = new List<BookingResponse>();
-    }
-    public class BookingResponse
-    {
         public long BookingId { get; set; }
         public DateTime BookingDate { get; set; }
         public BookingStatus? BookingStatus { get; set; }

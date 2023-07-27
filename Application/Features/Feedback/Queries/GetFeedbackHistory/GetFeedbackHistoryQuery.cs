@@ -14,11 +14,11 @@ using System.Linq.Dynamic.Core;
 
 namespace Application.Features.Feedback.Queries.GetHistoryFeedback
 {
-    public class GetFeedbackHistoryQuery : IRequest<Result<GetFeebackHistoryResponse>>
+    public class GetFeedbackHistoryQuery : IRequest<Result<List<GetFeebackHistoryResponse>>>
     {
         public long BookingId { get; set; }
     }
-    internal class GetFeedbackHistoryQueryHandler : IRequestHandler<GetFeedbackHistoryQuery, Result<GetFeebackHistoryResponse>>
+    internal class GetFeedbackHistoryQueryHandler : IRequestHandler<GetFeedbackHistoryQuery, Result<List<GetFeebackHistoryResponse>>>
     {
         private readonly IMapper _mapper;
         private readonly IViewCustomerReviewHisotyRepository _viewCustomerReviewHisotyRepository;
@@ -40,7 +40,7 @@ namespace Application.Features.Feedback.Queries.GetHistoryFeedback
             _httpContextAccessor = httpContextAccessor;
             _uploadService = uploadService;
         }
-        public async Task<Result<GetFeebackHistoryResponse>> Handle(GetFeedbackHistoryQuery request, CancellationToken cancellationToken)
+        public async Task<Result<List<GetFeebackHistoryResponse>>> Handle(GetFeedbackHistoryQuery request, CancellationToken cancellationToken)
         {
             var cusotmerReviewHistories = await _viewCustomerReviewHisotyRepository.Entities.Where(_ => _.BookingId == request.BookingId)
                  .Select(s => new Domain.Entities.View.ViewCustomerReviewHistory.ViewCustomerReviewHistory
@@ -57,12 +57,12 @@ namespace Application.Features.Feedback.Queries.GetHistoryFeedback
                      ReplyId = s.ReplyId,
                      CreateOnFeedback = s.CreateOnFeedback,
                  }).ToListAsync();
-            GetFeebackHistoryResponse response = new GetFeebackHistoryResponse();
+            List<GetFeebackHistoryResponse> response = new List<GetFeebackHistoryResponse>();
             if(cusotmerReviewHistories != null)
             {
                 foreach (var history in cusotmerReviewHistories)
                 {
-                    var customerHistoryResponse = new FeebackHistoryResponse()
+                    var customerHistoryResponse = new GetFeebackHistoryResponse()
                     {
                         ServiceId = history.ServiceId,
                         ServiceName = history.ServiceName,
@@ -108,10 +108,10 @@ namespace Application.Features.Feedback.Queries.GetHistoryFeedback
                             LastModifiedOn = reply.LastModifiedOn,
                         };
                     }
-                    response.feebackHistoryResponses.Add(customerHistoryResponse);
+                    response.Add(customerHistoryResponse);
                 }
             }
-            return await Result<GetFeebackHistoryResponse>.SuccessAsync(response);
+            return await Result<List<GetFeebackHistoryResponse>>.SuccessAsync(response);
         }
     }
 }

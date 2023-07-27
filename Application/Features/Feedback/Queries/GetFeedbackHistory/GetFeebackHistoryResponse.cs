@@ -11,10 +11,6 @@ namespace Application.Features.Feedback.Queries.GetHistoryFeedback
 {
     public class GetFeebackHistoryResponse
     {
-        public List<FeebackHistoryResponse> feebackHistoryResponses { get; set; } = new List<FeebackHistoryResponse>();
-    }
-    public class FeebackHistoryResponse
-    {
         public long ServiceId { get; set; }
         public string ServiceName { get; set; }
         public List<ServiceImageResponse> ServiceImages { get; set; }
@@ -28,7 +24,6 @@ namespace Application.Features.Feedback.Queries.GetHistoryFeedback
         public ReplyResponse? Reply { get; set; }
         public DateTime CreatedOnFeedback { get; set; }
         public List<FeedbackFileUploadResponse> FeedbackFileUploads { get; set; }
-
     }
     public class ReplyResponse
     {

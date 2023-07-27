@@ -182,7 +182,7 @@ namespace Application.Features.Client.Command.AddFeedback
 
             if (filePath != "")
             {
-                var obj = new Domain.Entities.FeebackFileUpload.FeedbackFileUpload
+                var obj = new Domain.Entities.FeedbackFileUpload.FeedbackFileUpload
                 {
                     FeedbackId = targetId,
                     NameFile = filePath,

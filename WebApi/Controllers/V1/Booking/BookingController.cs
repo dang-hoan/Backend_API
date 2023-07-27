@@ -7,6 +7,7 @@ using Application.Features.Booking.Queries.GetById;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Booking.Queries.GetCustomerBookingHistory;
 using Application.Features.Booking.Queries.GetCustomerBooking;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApi.Controllers.V1.Booking
 {
@@ -14,11 +15,12 @@ namespace WebApi.Controllers.V1.Booking
     [Route("api/v{version:apiVersion}/booking")]
     public class BookingController : BaseApiController<BookingController>
     {
+        /// <summary>
         /// Get all bookings pagination, filter
         /// </summary>
-        /// <param name="parameter"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        // [Authorize]
+        [Authorize("Superadmin")]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllBookingResponse>>> GetAllBookings([FromQuery] GetAllBookingQuery query)
         {
@@ -36,13 +38,13 @@ namespace WebApi.Controllers.V1.Booking
                 Status = query.Status
             }));
         }
-        
+
         /// <summary>
         /// Add Booking
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize(Roles = "Superadmin,Customer")]
         [HttpPost]
         public async Task<IActionResult> AddBooking(AddBookingCommand command)
         {
@@ -54,7 +56,7 @@ namespace WebApi.Controllers.V1.Booking
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize(Roles = "Superadmin,Customer")]
         [HttpGet("{Id}")]
         public async Task<IActionResult> BookingDetail(long Id)
         {
@@ -70,7 +72,7 @@ namespace WebApi.Controllers.V1.Booking
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize(Roles = "Superadmin, Customer")]
         [HttpDelete]
         public async Task<IActionResult> DeleteService(short id)
         {
@@ -86,7 +88,7 @@ namespace WebApi.Controllers.V1.Booking
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize(Roles = "Superadmin, Customer")]
         [HttpPut]
         public async Task<IActionResult> EditBooking(EditBookingCommand command)
         {
@@ -98,7 +100,7 @@ namespace WebApi.Controllers.V1.Booking
         /// </summary>
         /// <param name="idCustomer"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpGet("customer/{idCustomer}")]
         public async Task<IActionResult> GetCustomerBookingHistory(long idCustomer)
         {
@@ -112,7 +114,7 @@ namespace WebApi.Controllers.V1.Booking
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Customer")]
         [HttpGet("customer")]
         public async Task<IActionResult> GetCustomerBooking([FromQuery]GetCustomerBookingQuery query)
         {

@@ -21,7 +21,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Result<GetEmployeeByIdResponse>>> GetEmployeeById(long id)
         {
@@ -36,7 +36,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllEmployeeResponse>>> GetAllEmployee([FromQuery] GetAllEmployeeParameter parameter)
         {
@@ -55,7 +55,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpPost]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AddEmployee([FromForm] AddEmployeeCommand command)
@@ -70,7 +70,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpDelete]
         public async Task<IActionResult> DeleteEmployee(short id)
         {
@@ -85,7 +85,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpPut]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> EditEmployee([FromForm] EditEmployeeCommand command)
@@ -98,7 +98,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="Username"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpPatch("{Username}/reset-password")]
         public async Task<IActionResult> ResetPasswordEmployee(string Username)
         {
@@ -114,7 +114,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpPatch("change-workshift")]
         public async Task<IActionResult> EditWorkShiftEmployee(EditWorkShiftEmployeeCommand command)
         {

@@ -40,8 +40,7 @@ namespace Application.Features.Feedback.Queries.GetById
                     ReplyId = s.ReplyId,
                     ReplyTitle = s.ReplyTitle,
                     ReplyContent = s.ReplyContent,
-                    Rating = s.Rating
-                    
+                    Rating = s.Rating  
                 })
                 .FirstOrDefaultAsync();
             if (feedback == null)
