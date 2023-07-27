@@ -40,11 +40,12 @@ namespace Application.Features.Employee.Command.AddEmployee
         private readonly IAccountService _accountService;
         private readonly IUploadService _uploadService;
         private readonly ICheckFileType _checkFileType;
+        private readonly ICheckSizeFile _checkSizeFile;
         private readonly IWorkShiftRepository _workshiftRepository;
 
 
         public AddEmployeeCommandHandler(IMapper mapper, IEmployeeRepository employeeRepository, IUnitOfWork<long> unitOfWork, IAccountService accountService,
-                                                IUploadService uploadService, ICheckFileType checkFileType, IWorkShiftRepository workshiftRepository)
+                                                IUploadService uploadService, ICheckFileType checkFileType, ICheckSizeFile checkSizeFile, IWorkShiftRepository workshiftRepository)
         {
             _mapper = mapper;
             _employeeRepository = employeeRepository;
@@ -52,6 +53,7 @@ namespace Application.Features.Employee.Command.AddEmployee
             _accountService = accountService;
             _uploadService = uploadService;
             _checkFileType = checkFileType;
+            _checkSizeFile = checkSizeFile;
             _workshiftRepository = workshiftRepository;
         }
 
@@ -88,8 +90,17 @@ namespace Application.Features.Employee.Command.AddEmployee
                     Files = listImages
                 });
 
+                var imageCheckMaxSize = _checkSizeFile.CheckImageSize(new Dtos.Requests.CheckImageSizeRequest
+                {
+                    Files = listImages
+                });
+
                 if (msgCheck != "")
                     return await Result<AddEmployeeCommand>.FailAsync(msgCheck);
+
+                if (imageCheckMaxSize != "")
+                    return await Result<AddEmployeeCommand>.FailAsync(imageCheckMaxSize);
+                    
                 var filePath = _uploadService.UploadAsync(new Dtos.Requests.UploadRequest
                 {
                     FileName = request.ImageFile.FileName,
@@ -120,7 +131,7 @@ namespace Application.Features.Employee.Command.AddEmployee
                 TypeFlag = TypeFlagEnum.Employee,
                 UserId = (long)request.Id,
             };
-            bool result = await _accountService.AddAcount(user, request.Password,RoleConstants.EmployeeRole);
+            bool result = await _accountService.AddAcount(user, request.Password, RoleConstants.EmployeeRole);
             if (result == false)
             {
                 return await Result<AddEmployeeCommand>.FailAsync(StaticVariable.ERROR_ADD_USER);

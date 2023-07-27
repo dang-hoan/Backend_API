@@ -38,17 +38,19 @@ namespace Application.Features.Service.Command.EditService
         private readonly IServiceRepository _serviceRepository;
         private readonly IServiceImageRepository _serviceImageRepository;
         private readonly ICheckFileType _checkFileType;
+        private readonly ICheckSizeFile _checkSizeFile;
         private readonly IUploadService _uploadService;
         private readonly IRemoveImageService _removeImageService;
         private readonly IUnitOfWork<long> _unitOfWork;
 
-        public EditServiceCommandHandler(IMapper mapper, IServiceRepository serviceRepository, IServiceImageRepository serviceImageRepository, 
-            ICheckFileType checkFileType, IUploadService uploadService, IRemoveImageService removeImageService, IUnitOfWork<long> unitOfWork)
+        public EditServiceCommandHandler(IMapper mapper, IServiceRepository serviceRepository, IServiceImageRepository serviceImageRepository,
+            ICheckFileType checkFileType, IUploadService uploadService, IRemoveImageService removeImageService, IUnitOfWork<long> unitOfWork, ICheckSizeFile checkSizeFile)
         {
             _mapper = mapper;
             _serviceRepository = serviceRepository;
             _serviceImageRepository = serviceImageRepository;
             _checkFileType = checkFileType;
+            _checkSizeFile = checkSizeFile;
             _uploadService = uploadService;
             _removeImageService = removeImageService;
             _unitOfWork = unitOfWork;
@@ -66,9 +68,16 @@ namespace Application.Features.Service.Command.EditService
             {
                 Files = request.ListImages
             });
+            var imageCheckMaxSize = _checkSizeFile.CheckImageSize(new Dtos.Requests.CheckImageSizeRequest
+            {
+                Files = request.ListImages
+            });
 
             if (result != "")
                 return await Result<EditServiceCommand>.FailAsync(result);
+
+            if (imageCheckMaxSize != "")
+                return await Result<EditServiceCommand>.FailAsync(imageCheckMaxSize);
 
             _mapper.Map(request, editService);
             await _serviceRepository.UpdateAsync(editService);

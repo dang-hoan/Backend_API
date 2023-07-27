@@ -36,16 +36,18 @@ namespace Application.Features.Service.Command.AddService
         private readonly IServiceImageRepository _serviceImageRepository;
         private readonly ICheckFileType _checkFileType;
         private readonly IUploadService _uploadService;
+        private readonly ICheckSizeFile _checkSizeFile;
         private readonly IUnitOfWork<long> _unitOfWork;
 
 
-        public AddServiceCommandHandler(IMapper mapper, IServiceRepository serviceRepository, 
-            IServiceImageRepository serviceImageRepository, IUnitOfWork<long> unitOfWork, IUploadService uploadService, ICheckFileType checkFileType)
+        public AddServiceCommandHandler(IMapper mapper, IServiceRepository serviceRepository,
+            IServiceImageRepository serviceImageRepository, IUnitOfWork<long> unitOfWork, IUploadService uploadService, ICheckFileType checkFileType, ICheckSizeFile checkSizeFile)
         {
             _mapper = mapper;
             _serviceRepository = serviceRepository;
             _serviceImageRepository = serviceImageRepository;
             _checkFileType = checkFileType;
+            _checkSizeFile = checkSizeFile;
             _uploadService = uploadService;
             _unitOfWork = unitOfWork;
         }
@@ -56,9 +58,15 @@ namespace Application.Features.Service.Command.AddService
             {
                 Files = request.ListImages
             });
-
+            var imageCheckMaxSize = _checkSizeFile.CheckImageSize(new Dtos.Requests.CheckImageSizeRequest
+            {
+                Files = request.ListImages
+            });
             if (result != "")
                 return await Result<AddServiceCommand>.FailAsync(result);
+
+            if (imageCheckMaxSize != "")
+                return await Result<AddServiceCommand>.FailAsync(imageCheckMaxSize);
 
             var addService = _mapper.Map<Domain.Entities.Service.Service>(request);
             await _serviceRepository.AddAsync(addService);
@@ -87,7 +95,7 @@ namespace Application.Features.Service.Command.AddService
                 else
                 {
                     return await Result<AddServiceCommand>.FailAsync($"File {file.FileName} isn't uploaded!");
-                }                  
+                }
             }
 
             await _unitOfWork.Commit(cancellationToken);
