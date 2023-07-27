@@ -6,7 +6,7 @@ namespace Application.Mappings.ViewCustomerBookingHistory
     public class ViewCustomerBookingHistoryMapping : Profile
     {
         public ViewCustomerBookingHistoryMapping() { 
-            CreateMap<Domain.Entities.View.ViewCustomerBookingHistory.ViewCustomerBookingHistory, CustomerBookingHistoryResponse>().ReverseMap();
+            CreateMap<Domain.Entities.View.ViewCustomerBookingHistory.ViewCustomerBookingHistory, GetCustomerBookingHistoryResponse>().ReverseMap();
         }
     }
 }

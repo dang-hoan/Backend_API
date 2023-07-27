@@ -6,7 +6,7 @@ using Domain.Entities.BookingDetail;
 using Domain.Entities.Customer;
 using Domain.Entities.Employee;
 using Domain.Entities.EmployeeService;
-using Domain.Entities.FeebackFileUpload;
+using Domain.Entities.FeedbackFileUpload;
 using Domain.Entities.Feedback;
 using Domain.Entities.Reply;
 using Domain.Entities.Service;

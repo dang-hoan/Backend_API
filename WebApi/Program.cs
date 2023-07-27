@@ -1,4 +1,5 @@
 using Application.Extensions;
+using Domain.Entities.Employee;
 using Domain.Entities.Service;
 using Hangfire;
 using Infrastructure.Extensions;
@@ -43,6 +44,26 @@ try
     builder.Services.AddEndpointsApiExplorer();
 
     builder.Services.AddLazyCache();
+
+    //authorize
+    builder.Services.AddAuthorization(options =>
+    {
+        options.AddPolicy("Superadmin",
+            authBuilder =>
+            {
+                authBuilder.RequireRole("Superadmin");
+            });
+        options.AddPolicy("Employee",
+            authBuilder =>
+            {
+                authBuilder.RequireRole("Employee");
+            });
+        options.AddPolicy("Customer",
+            authBuilder =>
+            {
+                authBuilder.RequireRole("Customer");
+            });
+    });
 
     var app = builder.Build();
 

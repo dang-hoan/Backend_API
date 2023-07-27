@@ -10,6 +10,7 @@ using Domain.Wrappers;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Feedback.Queries.GetHistoryFeedback;
 using Application.Features.Client.Command.AddFeedback;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApi.Controllers.V1.Feeback
 {
@@ -17,11 +18,12 @@ namespace WebApi.Controllers.V1.Feeback
     [Route("api/v{version:apiVersion}/feedback")]
     public class FeedbackController : BaseApiController<FeedbackController>
     {
+        /// <summary>
         /// Get all Feedback pagination, filter
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllFeedbackResponse>>> GetAllFeedback([FromQuery] GetAllFeedbackParameter parameter)
         {
@@ -42,7 +44,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpPost("reply")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AddReplyAtFeedback([FromForm] AddReplyAtFeedbackCommand command)
@@ -59,7 +61,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpPut("reply")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> EditReply([FromForm] EditReplyCommand command)
@@ -76,7 +78,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpDelete]
         public async Task<IActionResult> DeleteFeedback(long Id)
         {
@@ -90,7 +92,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFeedbackById(long id)
         {
@@ -104,7 +106,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Customer")]
         [HttpGet("customer-booking/{id}")]
         public async Task<IActionResult> GetFeedbackHistory(long id)
         {
@@ -119,7 +121,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Customer")]
         [HttpPost("mybooking")]
         [Consumes("multipart/form-data")]
         [RequestSizeLimit(50 * 1024 * 1024)] //50MB

@@ -11,11 +11,11 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Application.Features.Booking.Queries.GetCustomerBookingHistory
 {
-    public class GetCustomerBookingHistoryQuery : IRequest<Result<GetCustomerBookingHistoryResponse>>
+    public class GetCustomerBookingHistoryQuery : IRequest<Result<List<GetCustomerBookingHistoryResponse>>>
     {
         public long CustomerId { get; set; }
     }
-    internal class GetCustomerBookingHistoryQueryHandler : IRequestHandler<GetCustomerBookingHistoryQuery, Result<GetCustomerBookingHistoryResponse>>
+    internal class GetCustomerBookingHistoryQueryHandler : IRequestHandler<GetCustomerBookingHistoryQuery, Result<List<GetCustomerBookingHistoryResponse>>>
     {
         private readonly IViewCustomerBookingHistoryRepository _viewCustomerBookingHistoryRepository;
         private readonly IMapper _mapper;
@@ -25,7 +25,7 @@ namespace Application.Features.Booking.Queries.GetCustomerBookingHistory
             _mapper = mapper;
         }
 
-        public async Task<Result<GetCustomerBookingHistoryResponse>> Handle(GetCustomerBookingHistoryQuery request, CancellationToken cancellationToken)
+        public async Task<Result<List<GetCustomerBookingHistoryResponse>>> Handle(GetCustomerBookingHistoryQuery request, CancellationToken cancellationToken)
         {
             var history = await _viewCustomerBookingHistoryRepository.Entities
                 .Where(_ => _.CustomerId == request.CustomerId)
@@ -41,16 +41,8 @@ namespace Application.Features.Booking.Queries.GetCustomerBookingHistory
                     ServiceName = s.ServiceName,
                     Price = s.Price,
                 }).ToListAsync();
-            GetCustomerBookingHistoryResponse historyResponse = new GetCustomerBookingHistoryResponse();
-            var historyConvertData = _mapper.Map<List<CustomerBookingHistoryResponse>>(history);
-            if (historyConvertData != null)
-            {
-                foreach (CustomerBookingHistoryResponse customerBookingHistory in historyConvertData)
-                {
-                    historyResponse.CustomerBookingHistorys.Add(customerBookingHistory);
-                }
-            }
-            return await Result<GetCustomerBookingHistoryResponse>.SuccessAsync(historyResponse);
+            var historyResponse = _mapper.Map<List<GetCustomerBookingHistoryResponse>>(history);
+            return await Result<List<GetCustomerBookingHistoryResponse>>.SuccessAsync(historyResponse);
         }
     }
 }

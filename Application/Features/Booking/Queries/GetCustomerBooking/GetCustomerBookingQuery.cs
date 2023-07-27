@@ -13,13 +13,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Application.Features.Booking.Queries.GetCustomerBooking
 {
-    public class GetCustomerBookingQuery : IRequest<Result<GetCustomerBookingResponse>>
+    public class GetCustomerBookingQuery : IRequest<Result<List<GetCustomerBookingResponse>>>
     {
         [Required]
         public long CustomerId { get; set; }
         public string? KeyWord { get; set; }
     }
-    internal class GetCustomerBookingQueryHandler : IRequestHandler<GetCustomerBookingQuery, Result<GetCustomerBookingResponse>>
+    internal class GetCustomerBookingQueryHandler : IRequestHandler<GetCustomerBookingQuery, Result<List<GetCustomerBookingResponse>>>
     {
         private readonly IBookingRepository _bookingRepository;
         private readonly IBookingDetailRepository _bookingDetailRepository;
@@ -41,7 +41,7 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<Result<GetCustomerBookingResponse>> Handle(GetCustomerBookingQuery request, CancellationToken cancellationToken)
+        public async Task<Result<List<GetCustomerBookingResponse>>> Handle(GetCustomerBookingQuery request, CancellationToken cancellationToken)
         {
             var bookings = await _bookingRepository.Entities.Where(_ => !_.IsDeleted && _.CustomerId == request.CustomerId)
                 .Select(s => new Domain.Entities.Booking.Booking
@@ -55,10 +55,10 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
                     Status = s.Status,
                     Note = s.Note,
                 }).ToListAsync();
-            GetCustomerBookingResponse response = new GetCustomerBookingResponse();
+            List<GetCustomerBookingResponse> response = new List<GetCustomerBookingResponse>();
             foreach(var booking in bookings)
             {
-                var bookingResponse = new BookingResponse { 
+                var bookingResponse = new GetCustomerBookingResponse { 
                     BookingId = booking.Id,
                     BookingDate = booking.BookingDate,
                     BookingStatus = booking.Status,
@@ -102,10 +102,10 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
                 if (checkServiceName)
                 {
                     bookingResponse.bookingDetailResponses.AddRange(bookingDetailResponses);
-                    response.bookings.Add(bookingResponse);
+                    response.Add(bookingResponse);
                 }
             }
-            return await Result<GetCustomerBookingResponse>.SuccessAsync(response);
+            return await Result<List<GetCustomerBookingResponse>>.SuccessAsync(response);
         }
     }
 }

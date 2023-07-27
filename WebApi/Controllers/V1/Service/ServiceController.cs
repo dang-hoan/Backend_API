@@ -13,11 +13,12 @@ namespace WebApi.Controllers.V1.Service
     [Route("api/v{version:apiVersion}/service")]
     public class ServiceController : BaseApiController<ServiceController>
     {
+        /// <summary>
         /// Get all Serivce pagination, filter
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        // [Authorize(Roles = "SUPERADMIN")]
+        [Authorize("Superadmin")]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllServiceResponse>>> GetAllService([FromQuery] GetAllServiceParameter parameter)
         {
@@ -38,7 +39,7 @@ namespace WebApi.Controllers.V1.Service
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpPost]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AddService([FromForm] AddServiceCommand command)
@@ -46,7 +47,7 @@ namespace WebApi.Controllers.V1.Service
             return Ok(await Mediator.Send(command));
         }
 
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpPut]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> EditService([FromForm] EditServiceCommand command)
@@ -59,7 +60,7 @@ namespace WebApi.Controllers.V1.Service
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize("Superadmin")]
         [HttpDelete]
         public async Task<IActionResult> DeleteService(short id)
         {
@@ -73,6 +74,7 @@ namespace WebApi.Controllers.V1.Service
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [Authorize("Superadmin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Result<GetServiceByIdResponse>>> GetServiceById(short id)
         {

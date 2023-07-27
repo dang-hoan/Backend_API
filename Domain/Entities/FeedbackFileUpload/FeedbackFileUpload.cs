@@ -1,10 +1,10 @@
-using System.ComponentModel.DataAnnotations;
+﻿using Domain.Contracts;
 using System.ComponentModel.DataAnnotations.Schema;
-using Domain.Contracts;
+using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Entities.FeedbackFileUpload
 {
-    [Table("feedback_fileupload")]
+    [Table("feedback_file_upload")]
     public class FeedbackFileUpload : AuditableBaseEntity<long>
     {
         [Required]
@@ -12,11 +12,11 @@ namespace Domain.Entities.FeedbackFileUpload
         public long FeedbackId { get; set; }
 
         [Required]
-        [Column("name_file", TypeName = "varchar(MAX)")]
+        [Column("name_file", TypeName = "nvarchar(MAX)")]
         public string NameFile { get; set; }
 
         [Required]
-        [Column("type_file", TypeName = "varchar(MAX)")]
+        [Column("type_file", TypeName = "nvarchar(MAX)")]
         public string TypeFile { get; set; }
     }
 }

@@ -18,7 +18,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Domain.Constants.Enum;
 using Application.Interfaces.Booking;
-using Domain.Entities.FeedbackFileUpload;
 
 namespace Application.Features.Client.Command.AddFeedback
 {
@@ -181,7 +180,7 @@ namespace Application.Features.Client.Command.AddFeedback
 
             if (filePath != "")
             {
-                var obj = new Domain.Entities.FeebackFileUpload.FeedbackFileUpload
+                var obj = new Domain.Entities.FeedbackFileUpload.FeedbackFileUpload
                 {
                     FeedbackId = targetId,
                     NameFile = filePath,
