@@ -1,10 +1,9 @@
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using Application.Interfaces.Service;
 using Application.Interfaces.Feedback;
 using Domain.Wrappers;
 using MediatR;
 using System.Linq.Dynamic.Core;
+using Domain.Helpers;
 
 namespace Application.Features.Service.Queries.GetAll
 {
@@ -26,20 +25,23 @@ namespace Application.Features.Service.Queries.GetAll
         public async Task<PaginatedResult<GetAllServiceResponse>> Handle(GetAllServiceQuery request, CancellationToken cancellationToken)
         {
             var avgRating = from s in _serviceRepository.Entities
-                    join f in _feedbackRepository.Entities on s.Id equals f.ServiceId into g
-                    from fb in g.DefaultIfEmpty()
-                    group fb by s.Id
-                        into grp
-                    select new
-                    {
-                        ServiceId = grp.Key,
-                        AvgRating = grp.Average(query => (decimal)query.Rating == null ? 0 : (decimal)query.Rating)
-                    };
+                            join f in _feedbackRepository.Entities on s.Id equals f.ServiceId into g
+                            from fb in g.DefaultIfEmpty()
+                            group fb by s.Id
+                                into grp
+                            select new
+                            {
+                                ServiceId = grp.Key,
+                                AvgRating = grp.Average(query => (decimal?)query.Rating == null ? 0 : (decimal)query.Rating)
+                            };
 
-            var query = from s in _serviceRepository.Entities
-                        join r in avgRating on s.Id equals r.ServiceId
-                        where !s.IsDeleted 
-                        && (string.IsNullOrEmpty(request.Keyword) || s.Name.Contains(request.Keyword) || s.Id.ToString().Contains(request.Keyword))
+            if (request.Keyword != null)
+                request.Keyword = request.Keyword.Trim();
+
+            var query = from s in _serviceRepository.Entities.AsEnumerable()
+                        join r in avgRating.AsEnumerable() on s.Id equals r.ServiceId
+                        where !s.IsDeleted
+                        && (string.IsNullOrEmpty(request.Keyword) || StringHelper.Contains(s.Name, request.Keyword) || s.Id.ToString().Contains(request.Keyword))
                         && (!request.Time.HasValue || s.ServiceTime == request.Time.Value)
                         && (request.Review == null || (int) Math.Round(r.AvgRating) == request.Review.Value)
                         select new GetAllServiceResponse
@@ -53,15 +55,15 @@ namespace Application.Features.Service.Queries.GetAll
                             Review = (int) Math.Round(r.AvgRating)
                         };
 
-            var data = query.OrderBy(request.OrderBy);
+            var data = query.AsQueryable().OrderBy(request.OrderBy);
             var totalRecord = query.Count();
             List<GetAllServiceResponse> result;
 
             //Pagination
             if (!request.IsExport)
-                result = await data.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToListAsync(cancellationToken: cancellationToken);
+                result = data.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToList();
             else
-                result = await data.ToListAsync(cancellationToken);
+                result = data.ToList();
             return PaginatedResult<GetAllServiceResponse>.Success(result, totalRecord, request.PageNumber, request.PageSize);
         }
 

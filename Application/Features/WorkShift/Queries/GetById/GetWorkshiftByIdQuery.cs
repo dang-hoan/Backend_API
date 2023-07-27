@@ -1,5 +1,4 @@
 ﻿using Application.Interfaces.WorkShift;
-using AutoMapper;
 using Domain.Constants;
 using Domain.Wrappers;
 using MediatR;
@@ -13,12 +12,10 @@ namespace Application.Features.WorkShift.Queries.GetById
     internal class GetWorkshiftByIdQueryHandler : IRequestHandler<GetWorkshiftByIdQuery, Result<GetWorkshiftByIdResponse>>
     {
         private readonly IWorkShiftRepository _workshiftRepository;
-        private readonly IMapper _mapper;
 
-        public GetWorkshiftByIdQueryHandler(IWorkShiftRepository workshiftRepository, IMapper mapper)
+        public GetWorkshiftByIdQueryHandler(IWorkShiftRepository workshiftRepository)
         {
             _workshiftRepository = workshiftRepository;
-            _mapper = mapper;
         }
 
         public async Task<Result<GetWorkshiftByIdResponse>> Handle(GetWorkshiftByIdQuery request, CancellationToken cancellationToken)
