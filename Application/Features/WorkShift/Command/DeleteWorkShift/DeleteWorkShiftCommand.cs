@@ -28,7 +28,8 @@ namespace Application.Features.WorkShift.Command.DeleteWorkShift
 
         public async Task<Result<long>> Handle(DeleteWorkShiftCommand request, CancellationToken cancellationToken)
         {
-            var workShift = await _workShiftRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            var workShift = await _workShiftRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
+            if (workShift == null) return await Result<long>.FailAsync(StaticVariable.NOT_FOUND_MSG);
 
             var workShiftIsAssigned = await _employeeRepository.GetByCondition(x => x.WorkShiftId == request.Id && !x.IsDeleted);
             if (workShiftIsAssigned.Any())

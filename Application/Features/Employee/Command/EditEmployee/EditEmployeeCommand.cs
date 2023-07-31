@@ -60,7 +60,8 @@ namespace Application.Features.Employee.Command.EditEmployee
             {
                 return await Result<EditEmployeeCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             }
-            var editEmployee = await _employeeRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            var editEmployee = await _employeeRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
+            if (editEmployee == null) return await Result<EditEmployeeCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             if (request.Email != editEmployee.Email)
             {
                 var existEmail = _employeeRepository.Entities.FirstOrDefault(_ => _.Email == request.Email && _.IsDeleted == false);
@@ -73,9 +74,10 @@ namespace Application.Features.Employee.Command.EditEmployee
             {
                 return await Result<EditEmployeeCommand>.FailAsync(StaticVariable.PHONE_ERROR_MSG);
             }
-            var isExistedWorkshift = await _workshiftRepository.FindAsync(_ => _.IsDeleted == false && _.Id == request.WorkShiftId) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_WORK_SHIFT);
-            _mapper.Map(request, editEmployee);
+            var isExistedWorkshift = await _workshiftRepository.FindAsync(_ => _.IsDeleted == false && _.Id == request.WorkShiftId);
+            if (isExistedWorkshift == null) return await Result<EditEmployeeCommand>.FailAsync(StaticVariable.NOT_FOUND_WORK_SHIFT);
 
+            _mapper.Map(request, editEmployee);
 
             if (request.ImageFile != null)
             {

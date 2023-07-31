@@ -47,7 +47,7 @@ namespace Application.Features.Employee.Queries.GetById
                                       UserName = _userManager.Users.Where(e => e.UserId == request.Id && !e.IsDeleted).Select(e => e.UserName).FirstOrDefault(),
                                       Password = _userManager.Users.Where(e => e.UserId == request.Id && !e.IsDeleted).Select(e => e.PasswordHash).FirstOrDefault()
                                   }).FirstOrDefaultAsync(cancellationToken: cancellationToken);
-            if (employee == null) throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            if (employee == null) return await Result<GetEmployeeByIdResponse>.FailAsync(StaticVariable.NOT_FOUND_MSG);
 
             if (employee.Image != null)
                 employee.Image = _uploadService.GetFileLink(employee.Image, _httpContextAccessor);

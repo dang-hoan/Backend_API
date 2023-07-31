@@ -47,7 +47,7 @@ namespace Application.Features.Booking.Queries.GetById
                 }).FirstOrDefaultAsync();
             if(Booking == null)
             {
-                throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+                return await Result<GetBookingByIdResponse>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             }
             var BookingDetailResponse = _mapper.Map<GetBookingByIdResponse>(Booking);
             var CustomerBooking = await _customerRepository.Entities
@@ -60,7 +60,7 @@ namespace Application.Features.Booking.Queries.GetById
                 }).FirstOrDefaultAsync();
             if(CustomerBooking == null)
             {
-                throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+                return await Result<GetBookingByIdResponse>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             }
             BookingDetailResponse.CutomerName = CustomerBooking.CustomerName;
             BookingDetailResponse.PhoneNumber = CustomerBooking.PhoneNumber;

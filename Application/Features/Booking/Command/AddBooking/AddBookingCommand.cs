@@ -8,6 +8,8 @@ using Application.Interfaces.Service;
 using Application.Interfaces.BookingDetail;
 using Domain.Constants;
 using Domain.Constants.Enum;
+using System.Reflection.Metadata.Ecma335;
+using Org.BouncyCastle.Asn1.Crmf;
 
 namespace Application.Features.Booking.Command.AddBooking
 {
@@ -44,15 +46,16 @@ namespace Application.Features.Booking.Command.AddBooking
         public async Task<Result<AddBookingCommand>> Handle(AddBookingCommand request, CancellationToken cancellationToken)
         {
             request.ServiceId = request.ServiceId.Distinct().ToList();
-            var ExistCustomer = await _customerRepository.FindAsync(_ => _.Id == request.CustomerId && _.IsDeleted == false) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_CUSTOMER);
-            if(request.Totime.CompareTo(request.FromTime) < 0)
+            var ExistCustomer = await _customerRepository.FindAsync(_ => _.Id == request.CustomerId && _.IsDeleted == false);
+            if (ExistCustomer == null) return await Result<AddBookingCommand>.FailAsync(StaticVariable.NOT_FOUND_CUSTOMER);
+            if (request.Totime.CompareTo(request.FromTime) < 0)
             {
                 return await Result<AddBookingCommand>.FailAsync(StaticVariable.NOT_LOGIC_DATE_ORDER);
             }
 
             // check request.ServiceId exist in db
             List<long> listExistServiceId = _serviceRepository.Entities.Where(_ => !_.IsDeleted).Select(_ => _.Id).ToList();
-            if (request.ServiceId.Except(listExistServiceId).ToList().Any()) throw new KeyNotFoundException(StaticVariable.NOT_FOUND_SERVICE);
+            if (request.ServiceId.Except(listExistServiceId).ToList().Any()) return await Result<AddBookingCommand>.FailAsync(StaticVariable.NOT_FOUND_SERVICE);
 
             var booking = _mapper.Map<Domain.Entities.Booking.Booking>(request);
             booking.Status = BookingStatus.Waiting;

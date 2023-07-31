@@ -33,7 +33,8 @@ namespace Application.Features.Reply.Command.EditReply
         }
         public async Task<Result<EditReplyCommand>> Handle(EditReplyCommand request, CancellationToken cancellationToken)
         {
-            var editReply = await _replyRepository.FindAsync(_ => _.Id ==  request.Id && !_.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            var editReply = await _replyRepository.FindAsync(_ => _.Id ==  request.Id && !_.IsDeleted);
+            if (editReply == null) return await Result<EditReplyCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             editReply.Title = request.Title;
             editReply.Content = request.Content;
             await _replyRepository.UpdateAsync(editReply);

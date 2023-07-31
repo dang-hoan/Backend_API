@@ -32,7 +32,7 @@ namespace Application.Features.WorkShift.Queries.GetById
                     IsDefault = s.IsDefault,
                     WorkDays = ConvertStringToList(s.WorkDays)
                 }).FirstOrDefault();
-            if (service == null) throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            if (service == null) return await Result<GetWorkshiftByIdResponse>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             return await Result<GetWorkshiftByIdResponse>.SuccessAsync(service);
         }
         public static List<int>? ConvertStringToList(string value)

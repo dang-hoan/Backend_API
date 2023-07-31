@@ -37,11 +37,12 @@ namespace Application.Features.Employee.Command.EditWorkShiftEmployee
             {
                 return await Result<EditWorkShiftEmployeeCommand>.FailAsync(StaticVariable.NOT_FOUND_WORK_SHIFT);
             }
-            var isExistedWorkShift = await _workShiftRepository.FindAsync(_ => _.Id == request.WorkShiftId && _.IsDeleted == false) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_WORK_SHIFT);
+            var isExistedWorkShift = await _workShiftRepository.FindAsync(_ => _.Id == request.WorkShiftId && _.IsDeleted == false);
+            if (isExistedWorkShift == null) return await Result<EditWorkShiftEmployeeCommand>.FailAsync(StaticVariable.NOT_FOUND_WORK_SHIFT);
 
             // check request.ListId exist in db
             List<long> listExistEmployeeId = _employeeRepository.Entities.Where(_ => !_.IsDeleted).Select(_ => _.Id).ToList();
-            if (request.ListId.Except(listExistEmployeeId).ToList().Any()) throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            if (request.ListId.Except(listExistEmployeeId).ToList().Any()) return await Result<EditWorkShiftEmployeeCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
 
             List<Domain.Entities.Employee.Employee> Employees = _employeeRepository.Entities.Where(_ => request.ListId.Contains(_.Id)).ToList();
             Employees.ForEach(_ => _.WorkShiftId = request.WorkShiftId);

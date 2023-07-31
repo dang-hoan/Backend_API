@@ -78,7 +78,8 @@ namespace Application.Features.Client.Command.AddFeedback
 
         public async Task<Result<AddFeedbackCommand>> Handle(AddFeedbackCommand request, CancellationToken cancellationToken)
         {
-            var isExistInBookingDetail = await _bookingDetailRepository.FindAsync(_ => _.Id == request.BookingDetailId && _.IsDeleted == false) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_BOOKING_DETAIL);
+            var isExistInBookingDetail = await _bookingDetailRepository.FindAsync(_ => _.Id == request.BookingDetailId && _.IsDeleted == false);
+            if (isExistInBookingDetail == null) return await Result<AddFeedbackCommand>.FailAsync(StaticVariable.NOT_FOUND_BOOKING_DETAIL);
             var isExistBookingFeedback = await _feedbackRepository.FindAsync(_ => _.BookingDetailId == request.BookingDetailId && _.IsDeleted == false);
             
             if (isExistBookingFeedback != null)

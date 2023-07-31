@@ -45,7 +45,7 @@ namespace Application.Features.Feedback.Queries.GetById
                 .FirstOrDefaultAsync();
             if (feedback == null)
             {
-                throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+                return await Result<GetFeedbackByIdResponse>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             }
             var feedbackResponse = _mapper.Map<GetFeedbackByIdResponse>(feedback);
             return await Result<GetFeedbackByIdResponse>.SuccessAsync(feedbackResponse);

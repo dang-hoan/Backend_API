@@ -28,7 +28,8 @@ namespace Application.Features.Customer.Command.DeleteCustomer
 
         public async Task<Result<long>> Handle(DeleteCustomerCommand request, CancellationToken cancellationToken)
         {
-            var deleteCustomer = await _customerRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            var deleteCustomer = await _customerRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
+            if(deleteCustomer == null) return await Result<long>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             var query = from c in _customerRepository.Entities
                         join b in _bookingRepository.Entities on c.Id equals b.CustomerId
                         where !c.IsDeleted && !b.IsDeleted && c.Id == request.Id

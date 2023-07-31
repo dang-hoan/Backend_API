@@ -39,9 +39,10 @@ namespace Application.Features.Customer.Command.EditCustomer
         {
             if(request.Id == 0)
             {
-                throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+                return await Result<EditCustomerCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             }
-            var editCustomer = await _customnerRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            var editCustomer = await _customnerRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
+            if(editCustomer == null) return await Result<EditCustomerCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             _mapper.Map(request, editCustomer);
             await _customnerRepository.UpdateAsync(editCustomer);
             await _unitOfWork.Commit(cancellationToken);
