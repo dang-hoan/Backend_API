@@ -5,6 +5,7 @@ using Infrastructure.Contexts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -63,6 +64,15 @@ namespace WebApi.Extensions
             });
         }
 
+        public static void AddHangFire(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHangfire(x =>
+            {
+                x.UseSqlServerStorage(configuration.GetConnectionString("DefaultConnection"));
+            });
+            services.AddHangfireServer();
+        }
+
         public static void AddApiversioningExtension(this IServiceCollection services)
         {
             services.AddApiVersioning(config =>
@@ -85,7 +95,7 @@ namespace WebApi.Extensions
                 options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
-                options.User.RequireUniqueEmail = true;
+                options.User.RequireUniqueEmail = false;
             }).AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
         }

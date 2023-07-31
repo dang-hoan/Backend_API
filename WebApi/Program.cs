@@ -1,4 +1,7 @@
 using Application.Extensions;
+using Domain.Entities.Employee;
+using Domain.Entities.Service;
+using Hangfire;
 using Infrastructure.Extensions;
 using Serilog;
 using Shared.Extensions;
@@ -22,9 +25,13 @@ try
 
     builder.Services.AddSwaggerExtension();
 
+    builder.Services.AddHangFire(builder.Configuration);
+
     builder.Services.AddApiversioningExtension();
 
     builder.Services.AddCorsExtensions();
+
+    builder.Services.AddRepositories();
 
     builder.Services.AddIdentityServices();
 
@@ -38,6 +45,26 @@ try
 
     builder.Services.AddLazyCache();
 
+    //authorize
+    builder.Services.AddAuthorization(options =>
+    {
+        options.AddPolicy("Superadmin",
+            authBuilder =>
+            {
+                authBuilder.RequireRole("Superadmin");
+            });
+        options.AddPolicy("Employee",
+            authBuilder =>
+            {
+                authBuilder.RequireRole("Employee");
+            });
+        options.AddPolicy("Customer",
+            authBuilder =>
+            {
+                authBuilder.RequireRole("Customer");
+            });
+    });
+
     var app = builder.Build();
 
     app.UseRouting();
@@ -46,9 +73,11 @@ try
 
     app.UseCors("CorsPolicy");
 
+    app.UseFolderAsStatic(app.Services.GetRequiredService<IWebHostEnvironment>());
+
     app.UseSwaggerExtension();
 
-    //app.UseHangfireExtension();
+    app.UseHangfireExtension();
 
     app.UseErrorHandlingMiddleware();
 

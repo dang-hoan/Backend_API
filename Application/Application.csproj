@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net7.0</TargetFramework>
@@ -27,10 +27,5 @@
 		<PackageReference Include="System.Text.Json" Version="7.0.1" />
 		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.25" />
 		<PackageReference Include="QRCoder" Version="1.4.1" />
-	</ItemGroup>
-	<ItemGroup>
-		<Folder Include="Features\Employee\" />
-		<Folder Include="Interfaces\Employee\" />
-		<Folder Include="Mappings\" />
 	</ItemGroup>
 </Project>

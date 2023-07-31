@@ -1,6 +1,20 @@
 ﻿using Application.Interfaces;
 using Domain.Contracts;
 using Domain.Entities;
+using Domain.Entities.Booking;
+using Domain.Entities.BookingDetail;
+using Domain.Entities.Customer;
+using Domain.Entities.Employee;
+using Domain.Entities.EmployeeService;
+using Domain.Entities.FeedbackFileUpload;
+using Domain.Entities.Feedback;
+using Domain.Entities.Reply;
+using Domain.Entities.Service;
+using Domain.Entities.ServiceImage;
+using Domain.Entities.View.ViewCustomerBookingHistory;
+using Domain.Entities.View.ViewCustomerFeedbackReply;
+using Domain.Entities.View.ViewCustomerReviewHistory;
+using Domain.Entities.WorkShift;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +22,7 @@ namespace Infrastructure.Contexts
 {
     public class ApplicationDbContext : AudtableContext
     {
-        private readonly Application.Interfaces.ICurrentUserService _currentUserService;
+        private readonly ICurrentUserService _currentUserService;
         private readonly IDateTimeService _dateTimeService;
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ICurrentUserService currentUserService, IDateTimeService dateTimeService) : base(options)
@@ -20,7 +34,20 @@ namespace Infrastructure.Contexts
         private DbSet<AppUser> AppUsers { get; set; } = default!;
         private DbSet<AppRole> AppRoles { get; set; } = default!;
         private DbSet<AppRoleClaim> AppRoleClaims { get; set; } = default!;
-
+        public virtual DbSet<Booking> Bookings { get; set; }
+        public virtual DbSet<BookingDetail> BookingDetails { get; set; }
+        public virtual DbSet<Customer> Customers { get; set; }
+        public virtual DbSet<Employee> Employees { get; set; }
+        public virtual DbSet<EmployeeService> EmployeeServices { get; set; }
+        public virtual DbSet<Feedback> Feedbacks { get; set; }
+        public virtual DbSet<FeedbackFileUpload> FeedbackFileUploads { get; set; }
+        public virtual DbSet<Reply> Replies { get; set; }
+        public virtual DbSet<Service> Services { get; set; }
+        public virtual DbSet<ServiceImage> ServiceImages { get; set; }
+        public virtual DbSet<WorkShift> WorkShifts { get; set; }
+        public virtual DbSet<ViewCustomerBookingHistory> ViewCustomerBookingHistories { get; set; }
+        public virtual DbSet<ViewCustomerFeedbackReply> ViewCustomerFeedbackReplies { get; set; }
+        public virtual DbSet<ViewCustomerReviewHistory> ViewCustomerReviewHistories { get; set; }
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
         {
             foreach (var entry in ChangeTracker.Entries<IAuditableEntity>().ToList())
@@ -34,7 +61,7 @@ namespace Infrastructure.Contexts
 
                     case EntityState.Modified:
                         entry.Entity.LastModifiedOn = _dateTimeService.NowUtc;
-                        entry.Entity.LastModifiedBy = entry.Entity.CreatedBy = string.IsNullOrEmpty(_currentUserService.Username) ? "System" : _currentUserService.Username;
+                        entry.Entity.LastModifiedBy = string.IsNullOrEmpty(_currentUserService.Username) ? "System" : _currentUserService.Username;
                         break;
                 }
             }
@@ -91,6 +118,23 @@ namespace Infrastructure.Contexts
             builder.Entity<IdentityUserToken<string>>(entity =>
             {
                 entity.ToTable("UserTokens", "Identity");
+            });
+            builder.Entity<ViewCustomerBookingHistory>(entity =>
+            {
+                entity.ToView("View_CustomerBookingHistory");
+                entity.HasNoKey();
+            });
+
+            builder.Entity<ViewCustomerFeedbackReply>(entity =>
+            {
+                entity.ToView("View_CustomerFeedbackReply");
+                entity.HasNoKey();
+            });
+
+            builder.Entity<ViewCustomerReviewHistory>(entity =>
+            {
+                entity.ToView("View_CustomerReviewHistory");
+                entity.HasNoKey();
             });
         }
     }

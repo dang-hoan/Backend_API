@@ -7,5 +7,7 @@ namespace Application.Dtos.Requests.Identity
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+        [Required]
+        public string UrlFE { get; set; }
     }
 }

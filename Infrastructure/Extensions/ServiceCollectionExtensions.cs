@@ -20,11 +20,10 @@ namespace Infrastructure.Extensions
         {
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), hius =>
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), o =>
                 {
-                    hius.EnableRetryOnFailure();
-                    hius.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
-
+                    o.EnableRetryOnFailure();
+                    o.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
                 });
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
@@ -41,7 +40,27 @@ namespace Infrastructure.Extensions
             services.AddScoped<IAuditService, AuditService>();
             services.AddScoped<IExcelService, ExcelService>();
             services.AddScoped<IUploadService, UploadService>();
-
+            services.AddScoped<IRemoveImageService, RemoveImageService>();
+            services.AddScoped<ICheckFileType, CheckFileType>();
+            services.AddScoped<ICheckSizeFile, CheckFileSize>();
         }
+
+        public static void AddRepositories(this IServiceCollection services)
+        {
+            services.AddEmployeeRepository();
+            services.AddServiceRepository();
+            services.AddServiceImageRepository();
+            services.AddCustomerRepository();
+            services.AddBookingRepository();
+            services.AddBookingDetailRepository();
+            services.AddViewCustomerBookingHistoryRepository();
+            services.AddFeedbackRepository();
+            services.AddReplyRepository();
+            services.AddViewCustomerFeedbackReplyRepository();
+            services.AddWorkShiftRepository();
+            services.AddViewCustomerReviewHistoryRepository();
+            services.AddFeedbackFileUploadRepository();
+        }
+
     }
 }

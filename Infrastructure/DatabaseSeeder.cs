@@ -56,6 +56,18 @@ namespace Infrastructure
                     _logger.LogInformation("Seeded Employee Role.");
                 }
 
+                var customerRole = new AppRole()
+                {
+                    Name = RoleConstants.CustomerRole,
+                    Description = "Customer role with custom permission"
+                };
+                var customerRoleInDb = await _roleManager.FindByNameAsync(RoleConstants.CustomerRole);
+                if (customerRoleInDb == null)
+                {
+                    await _roleManager.CreateAsync(customerRole);
+                    _logger.LogInformation("Seeded Customer Role.");
+                }
+
                 //Check if User Exists
                 var superUser = new AppUser()
                 {

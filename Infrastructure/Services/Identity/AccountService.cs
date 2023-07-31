@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.Requests.Account;
 using Application.Interfaces.Services.Account;
+using Domain.Constants;
 using Domain.Entities;
 using Domain.Wrappers;
 using Microsoft.AspNetCore.Identity;
@@ -31,6 +32,17 @@ namespace Infrastructure.Services.Identity
             var identityResult = await this._userManager.ChangePasswordAsync(user, model.Password, model.NewPassword);
 
             return identityResult.Succeeded ? await Result.SuccessAsync() : await Result.FailAsync("Đổi mật khẩu không thành công");
+        }
+        public async Task<bool> IsExistUsername(string userName)
+        {
+            var user = await _userManager.FindByNameAsync(userName);
+            return user != null;
+        }
+        public async Task<bool> AddAcount(AppUser user, string password,string role)
+        {
+            await _userManager.CreateAsync(user, password);
+            var result = await _userManager.AddToRoleAsync(user, role);
+            return result.Succeeded;
         }
     }
 }
