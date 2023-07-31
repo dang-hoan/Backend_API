@@ -20,7 +20,7 @@ namespace WebApi.Controllers.V1.Customer
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin,Customer")]
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Result<GetCustomerByIdResponse>>> GetCustomerById(long id)
         {
@@ -35,7 +35,6 @@ namespace WebApi.Controllers.V1.Customer
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin,Customer")]
         [HttpPost]
         public async Task<IActionResult> AddCustomer(AddCustomerCommand command)
         {
@@ -47,7 +46,7 @@ namespace WebApi.Controllers.V1.Customer
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        [Authorize("Superadmin")]
+        [Authorize(Roles = "Superadmin,Employee")]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllCustomerResponse>>> GetAllCustomer([FromQuery] GetAllCustomerQuery query)
         {
@@ -67,7 +66,7 @@ namespace WebApi.Controllers.V1.Customer
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin,Customer")]
+        [Authorize]
         [HttpPut]
         public async Task<IActionResult> EditCustomer(EditCustomerCommand command)
         {
@@ -79,7 +78,7 @@ namespace WebApi.Controllers.V1.Customer
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        [Authorize("Superadmin")]
+        [Authorize(Roles ="Superadmin,Employee")]
         [HttpDelete]
         public async Task<IActionResult> DeleteCustomer(long Id)
         {

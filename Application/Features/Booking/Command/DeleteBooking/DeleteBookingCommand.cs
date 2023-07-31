@@ -4,6 +4,7 @@ using Application.Interfaces.Customer;
 using Application.Interfaces.Repositories;
 using Domain.Constants;
 using Domain.Constants.Enum;
+using Domain.Entities.BookingDetail;
 using Domain.Wrappers;
 using MediatR;
 
@@ -35,14 +36,16 @@ namespace Application.Features.Booking.Command.DeleteBooking
 
         public async Task<Result<long>> Handle(DeleteBookingCommand request, CancellationToken cancellationToken)
         {
-            var booking = await _bookingRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            var booking = await _bookingRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
+            if (booking == null) return await Result<long>.FailAsync(StaticVariable.NOT_FOUND_MSG);
 
             try
             {
 
                 if (!(booking.Status == BookingStatus.Inprogress))
                 {
-                    var bookingDetail = await _bookingDetailRepository.GetByCondition(x => x.BookingId == request.Id && !x.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+                    var bookingDetail = await _bookingDetailRepository.GetByCondition(x => x.BookingId == request.Id && !x.IsDeleted);
+                    if (bookingDetail == null) return await Result<long>.FailAsync(StaticVariable.NOT_FOUND_MSG);
 
                     await _bookingRepository.DeleteAsync(booking);
 

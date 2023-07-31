@@ -47,13 +47,16 @@ namespace Application.Features.Booking.Command.EditBooking
             {
                 return await Result<EditBookingCommand>.FailAsync(StaticVariable.NOT_LOGIC_DATE_ORDER);
             }
-            var isExistBooking = await _bookingRepository.FindAsync(_ => _.Id == request.Id && _.IsDeleted == false) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_BOOKING);
-            var customer = await _customerRepository.FindAsync(_ => _.Id == isExistBooking.CustomerId && !_.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_CUSTOMER);
+            var isExistBooking = await _bookingRepository.FindAsync(_ => _.Id == request.Id && _.IsDeleted == false);
+            if (isExistBooking == null) return await Result<EditBookingCommand>.FailAsync(StaticVariable.NOT_FOUND_BOOKING);
+            var customer = await _customerRepository.FindAsync(_ => _.Id == isExistBooking.CustomerId && !_.IsDeleted);
+            if (customer == null) return await Result<EditBookingCommand>.FailAsync(StaticVariable.NOT_FOUND_CUSTOMER);
+
             _mapper.Map(request, isExistBooking);
 
             // check request.ServiceId exist in db
             List<long> listExistServiceId = _serviceRepository.Entities.Where(_ => !_.IsDeleted).Select(_ => _.Id).ToList();
-            if(request.ServiceId.Except(listExistServiceId).ToList().Any()) throw new KeyNotFoundException(StaticVariable.NOT_FOUND_SERVICE);
+            if(request.ServiceId.Except(listExistServiceId).ToList().Any()) return await Result<EditBookingCommand>.FailAsync(StaticVariable.NOT_FOUND_SERVICE);
 
             List<long> existingServiceIds = _bookingDetailRepository.Entities.Where(_ => _.IsDeleted == false && _.BookingId == request.Id)
                 .Select(b => b.ServiceId).ToList();

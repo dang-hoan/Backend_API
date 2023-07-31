@@ -62,7 +62,8 @@ namespace Application.Features.Service.Command.EditService
             {
                 return await Result<EditServiceCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             }
-            var editService = await _serviceRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            var editService = await _serviceRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
+            if(editService == null) return await Result<EditServiceCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
 
             var result = _checkFileType.CheckFilesIsImage(new Dtos.Requests.CheckImagesTypeRequest
             {

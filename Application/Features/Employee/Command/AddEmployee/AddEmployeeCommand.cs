@@ -78,7 +78,8 @@ namespace Application.Features.Employee.Command.AddEmployee
             {
                 return await Result<AddEmployeeCommand>.FailAsync(StaticVariable.PHONE_ERROR_MSG);
             }
-            var isExistedWorkshift = await _workshiftRepository.FindAsync(_ => _.IsDeleted == false && _.Id == request.WorkShiftId) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_WORK_SHIFT);
+            var isExistedWorkshift = await _workshiftRepository.FindAsync(_ => _.IsDeleted == false && _.Id == request.WorkShiftId);
+            if (isExistedWorkshift == null) return await Result<AddEmployeeCommand>.FailAsync(StaticVariable.NOT_FOUND_WORK_SHIFT);
             var addEmployee = _mapper.Map<Domain.Entities.Employee.Employee>(request);
 
             if (request.ImageFile != null)

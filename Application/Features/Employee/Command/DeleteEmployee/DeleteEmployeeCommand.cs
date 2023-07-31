@@ -28,7 +28,8 @@ namespace Application.Features.Employee.Command.DeleteEmployee
 
         public async Task<Result<long>> Handle(DeleteEmployeeCommand request, CancellationToken cancellationToken)
         {
-            var deleteEmployee = await _employeeRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            var deleteEmployee = await _employeeRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
+            if (deleteEmployee == null) return await Result<long>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             await _employeeRepository.DeleteAsync(deleteEmployee);
             await _userService.DeleteUser(new Dtos.Requests.Identity.DeleteUserRequest
             {

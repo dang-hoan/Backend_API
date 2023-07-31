@@ -31,11 +31,11 @@ namespace Application.Features.Employee.Command.ResetPasswordEmployee
         {
             if(string.IsNullOrEmpty(request.Username))
             {
-                throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+                return await Result<ResetPasswordEmployeeCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             }
             var user = await _userManager.FindByNameAsync(request.Username);
             if(user == null)
-                throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+                return await Result<ResetPasswordEmployeeCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
 
             string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
             

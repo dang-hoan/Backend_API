@@ -55,7 +55,8 @@ namespace Application.Features.WorkShift.Command.EditWorkShift
                 return await Result<EditWorkShiftCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             }
 
-            var editWorkShift = await _workShiftRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            var editWorkShift = await _workShiftRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
+            if (editWorkShift == null) return await Result<EditWorkShiftCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
 
             if (request.IsDefault != null && request.IsDefault == true)
             {

@@ -43,7 +43,7 @@ namespace Application.Features.Service.Queries.GetById
                     ServiceTime = s.ServiceTime,
                     Images = _mapper.Map<List<ServiceImageResponse>>(_serviceImageRepository.Entities.Where(_ => _.ServiceId == s.Id && _.IsDeleted == false ).ToList())
                 }).FirstOrDefault();
-            if (service == null) throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            if (service == null) return await Result<GetServiceByIdResponse>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             foreach(ServiceImageResponse imageResponse in service.Images)
             {
                 imageResponse.NameFile = _uploadService.GetFileLink(imageResponse.NameFile, _httpContextAccessor);

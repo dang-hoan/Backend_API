@@ -6,6 +6,7 @@ using Domain.Constants;
 using Domain.Constants.Enum;
 using Domain.Wrappers;
 using MediatR;
+using Microsoft.VisualBasic;
 
 namespace Application.Features.Service.Command.DeleteService
 {
@@ -47,7 +48,8 @@ namespace Application.Features.Service.Command.DeleteService
                             BookingIsDeleted = b.IsDeleted,
                             BoookingDetailsDeleted = bd.IsDeleted
                         };
-            var service = await _serviceRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            var service = await _serviceRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
+            if (service == null) return await Result<long>.FailAsync(StaticVariable.NOT_FOUND_MSG);
 
             try
             {
@@ -63,7 +65,8 @@ namespace Application.Features.Service.Command.DeleteService
 
                 if (canDelete)
                 {
-                    var bookingDetail = await _bookingDetailRepository.GetByCondition(x => x.ServiceId == request.Id && !x.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+                    var bookingDetail = await _bookingDetailRepository.GetByCondition(x => x.ServiceId == request.Id && !x.IsDeleted);
+                    if (bookingDetail == null) return await Result<long>.FailAsync(StaticVariable.NOT_FOUND_MSG);
 
                     await _serviceRepository.DeleteAsync(service);
 

@@ -36,7 +36,8 @@ namespace Application.Features.Reply.Command.AddReplyAtFeeback
             {
                 return await Result<AddReplyAtFeedbackCommand>.FailAsync("The field FeedbackId is required.");
             }
-            var feeback = await _feedbackRepository.FindAsync(_ => _.Id == request.FeedbackId && !_.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            var feeback = await _feedbackRepository.FindAsync(_ => _.Id == request.FeedbackId && !_.IsDeleted);
+            if (feeback == null) return await Result<AddReplyAtFeedbackCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             if(feeback.ReplyId != null)
             {
                 return await Result<AddReplyAtFeedbackCommand>.FailAsync("This feedback has been replied to.");

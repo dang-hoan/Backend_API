@@ -31,7 +31,7 @@ namespace Application.Features.Customer.Queries.GetById
                                       DateOfBirth = e.DateOfBirth,
                                       TotalMoney = e.TotalMoney
                                   }).FirstOrDefaultAsync(cancellationToken: cancellationToken);
-            if (Customer == null) throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            if (Customer == null) return await Result<GetCustomerByIdResponse>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             return await Result<GetCustomerByIdResponse>.SuccessAsync(Customer);
         }
     }

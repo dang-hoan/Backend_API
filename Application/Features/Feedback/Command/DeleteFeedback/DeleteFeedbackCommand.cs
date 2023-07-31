@@ -30,7 +30,8 @@ namespace Application.Features.Feedback.Command.DeleteFeedback
         }
         public async Task<Result<long>> Handle(DeleteFeedbackCommand request, CancellationToken cancellationToken)
         {
-            var deleteFeedback = await _feedbackRepository.FindAsync(_ => _.Id == request.Id && !_.IsDeleted) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_MSG);
+            var deleteFeedback = await _feedbackRepository.FindAsync(_ => _.Id == request.Id && !_.IsDeleted);
+            if (deleteFeedback == null) return await Result<long>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             var deleteReply = await _replyRepository.FindAsync(_ => _.Id == deleteFeedback.ReplyId && !_.IsDeleted);
             if (deleteReply != null)
             {

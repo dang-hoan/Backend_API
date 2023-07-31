@@ -18,7 +18,7 @@ namespace WebApi.Controllers.V1.Service
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        [Authorize("Superadmin")]
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllServiceResponse>>> GetAllService([FromQuery] GetAllServiceParameter parameter)
         {
@@ -77,7 +77,7 @@ namespace WebApi.Controllers.V1.Service
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize("Superadmin")]
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Result<GetServiceByIdResponse>>> GetServiceById(short id)
         {
