@@ -28,12 +28,10 @@ namespace WebApi.Extensions
                 {
                     Version = "v1",
                     Title = "Source.API.Core",
-                    Description = "This Api will be responsible for overall data distribution and authorization.",
+                    Description = "API NinePlus Booking Spa",
                     Contact = new OpenApiContact
                     {
-                        Name = "Nguyen Phuoc Le Hieu",
-                        Email = "lehieu.qrt@gmail.com.vn",
-                        Url = new Uri("https://www.facebook.com/leehieuit"),
+                        Name = "Nine Plus Booking Spa",
                     }
                 });
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
