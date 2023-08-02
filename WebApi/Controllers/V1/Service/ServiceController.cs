@@ -41,8 +41,7 @@ namespace WebApi.Controllers.V1.Service
         /// <returns></returns>
         [Authorize("Superadmin")]
         [HttpPost]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> AddService([FromForm] AddServiceCommand command)
+        public async Task<IActionResult> AddService(AddServiceCommand command)
         {
             var result = await Mediator.Send(command);
             return (result.Succeeded) ? Ok(result) : BadRequest(result);
@@ -50,8 +49,7 @@ namespace WebApi.Controllers.V1.Service
 
         [Authorize("Superadmin")]
         [HttpPut]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> EditService([FromForm] EditServiceCommand command)
+        public async Task<IActionResult> EditService(EditServiceCommand command)
         {
             var result = await Mediator.Send(command);
             return (result.Succeeded) ? Ok(result) : BadRequest(result);

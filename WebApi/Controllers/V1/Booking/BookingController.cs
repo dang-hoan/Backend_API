@@ -1,13 +1,13 @@
 using Application.Features.Booking.Command.AddBooking;
+using Application.Features.Booking.Command.DeleteBooking;
 using Application.Features.Booking.Command.EditBooking;
 using Application.Features.Booking.Queries.GetAll;
-using Domain.Wrappers;
-using Application.Features.Booking.Command.DeleteBooking;
 using Application.Features.Booking.Queries.GetById;
-using Microsoft.AspNetCore.Mvc;
-using Application.Features.Booking.Queries.GetCustomerBookingHistory;
 using Application.Features.Booking.Queries.GetCustomerBooking;
+using Application.Features.Booking.Queries.GetCustomerBookingHistory;
+using Domain.Wrappers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.V1.Booking
 {
@@ -20,7 +20,7 @@ namespace WebApi.Controllers.V1.Booking
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        [Authorize(Roles ="Superadmin")]
+        [Authorize(Roles = "Superadmin")]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllBookingResponse>>> GetAllBookings([FromQuery] GetAllBookingQuery query)
         {
@@ -51,6 +51,7 @@ namespace WebApi.Controllers.V1.Booking
             var result = await Mediator.Send(command);
             return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
+
         /// <summary>
         /// Get Booking Detail
         /// </summary>
@@ -95,12 +96,13 @@ namespace WebApi.Controllers.V1.Booking
             var result = await Mediator.Send(command);
             return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
+
         /// <summary>
         /// Get customer booking history
         /// </summary>
         /// <param name="idCustomer"></param>
         /// <returns></returns>
-        [Authorize(Roles ="Superadmin,Employee")]
+        [Authorize(Roles = "Superadmin,Employee")]
         [HttpGet("customer/{idCustomer}")]
         public async Task<IActionResult> GetCustomerBookingHistory(long idCustomer)
         {
@@ -109,6 +111,7 @@ namespace WebApi.Controllers.V1.Booking
                 CustomerId = idCustomer
             }));
         }
+
         /// <summary>
         /// Get customer booking
         /// </summary>
@@ -116,7 +119,7 @@ namespace WebApi.Controllers.V1.Booking
         /// <returns></returns>
         [Authorize(Roles = "Customer")]
         [HttpGet("customer")]
-        public async Task<IActionResult> GetCustomerBooking([FromQuery]GetCustomerBookingQuery query)
+        public async Task<IActionResult> GetCustomerBooking([FromQuery] GetCustomerBookingQuery query)
         {
             return Ok(await Mediator.Send(new GetCustomerBookingQuery
             {

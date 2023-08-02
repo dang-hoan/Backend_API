@@ -40,7 +40,8 @@ namespace WebApi.Controllers.V1.Employee
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllEmployeeResponse>>> GetAllEmployee([FromQuery] GetAllEmployeeParameter parameter)
         {
-            return Ok(await Mediator.Send(new GetAllEmployeeQuery() {
+            return Ok(await Mediator.Send(new GetAllEmployeeQuery()
+            {
                 IsExport = parameter.IsExport,
                 Keyword = parameter.Keyword,
                 OrderBy = parameter.OrderBy,
@@ -57,8 +58,7 @@ namespace WebApi.Controllers.V1.Employee
         /// <returns></returns>
         [Authorize(Roles = "Superadmin")]
         [HttpPost]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> AddEmployee([FromForm] AddEmployeeCommand command)
+        public async Task<IActionResult> AddEmployee(AddEmployeeCommand command)
         {
             var result = await Mediator.Send(command);
             return (result.Succeeded) ? Ok(result) : BadRequest(result);
@@ -87,8 +87,7 @@ namespace WebApi.Controllers.V1.Employee
         /// <returns></returns>
         [Authorize(Roles = "Superadmin")]
         [HttpPut]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> EditEmployee([FromForm] EditEmployeeCommand command)
+        public async Task<IActionResult> EditEmployee(EditEmployeeCommand command)
         {
             var result = await Mediator.Send(command);
             return (result.Succeeded) ? Ok(result) : BadRequest(result);

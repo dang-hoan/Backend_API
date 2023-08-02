@@ -46,8 +46,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// <returns></returns>
         [Authorize(Roles = "Superadmin,Employee")]
         [HttpPost("reply")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> AddReplyAtFeedback([FromForm] AddReplyAtFeedbackCommand command)
+        public async Task<IActionResult> AddReplyAtFeedback(AddReplyAtFeedbackCommand command)
         {
             var result = await Mediator.Send(command);
             return (result.Succeeded) ? Ok(result) : BadRequest(result);
@@ -59,8 +58,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// <returns></returns>
         [Authorize(Roles = "Superadmin,Employee")]
         [HttpPut("reply")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> EditReply([FromForm] EditReplyCommand command)
+        public async Task<IActionResult> EditReply(EditReplyCommand command)
         {
             var result = await Mediator.Send(command);
             return (result.Succeeded) ? Ok(result) : BadRequest(result);
@@ -84,7 +82,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize(Roles ="Superadmin,Employee")]
+        [Authorize(Roles = "Superadmin,Employee")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFeedbackById(long id)
         {
@@ -98,7 +96,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize(Roles ="Customer")]
+        [Authorize(Roles = "Customer")]
         [HttpGet("customer-booking/{id}")]
         public async Task<IActionResult> GetFeedbackHistory(long id)
         {
@@ -113,11 +111,10 @@ namespace WebApi.Controllers.V1.Feeback
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [Authorize(Roles ="Customer")]
+        [Authorize(Roles = "Customer")]
         [HttpPost("mybooking")]
-        [Consumes("multipart/form-data")]
         [RequestSizeLimit(50 * 1024 * 1024)] //50MB
-        public async Task<IActionResult> AddFeedback([FromForm] AddFeedbackCommand command)
+        public async Task<IActionResult> AddFeedback(AddFeedbackCommand command)
         {
             var result = await Mediator.Send(command);
             return (result.Succeeded) ? Ok(result) : BadRequest(result);
