@@ -1,5 +1,5 @@
-﻿using System.Linq.Expressions;
-using Domain.Contracts;
+﻿using Domain.Contracts;
+using System.Linq.Expressions;
 
 namespace Application.Interfaces.Repositories
 {
@@ -30,6 +30,10 @@ namespace Application.Interfaces.Repositories
         Task DeleteAsync(T entity);
 
         Task DeleteRange(List<T> entity);
+
+        Task RemoveAsync(T entity);
+
+        Task RemoveRangeAsync(List<T> entity);
 
         Task<bool> IsUnique(Expression<Func<T, bool>> includeProperties);
     }
