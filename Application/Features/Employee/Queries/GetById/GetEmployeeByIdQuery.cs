@@ -1,12 +1,11 @@
-﻿using Application.Interfaces.Employee;
+﻿using Application.Interfaces;
+using Application.Interfaces.Employee;
+using Domain.Constants;
+using Domain.Entities;
 using Domain.Wrappers;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Domain.Constants;
 using Microsoft.AspNetCore.Identity;
-using Domain.Entities;
-using Microsoft.AspNetCore.Http;
-using Application.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Employee.Queries.GetById
 {
@@ -14,18 +13,17 @@ namespace Application.Features.Employee.Queries.GetById
     {
         public long Id { get; set; }
     }
+
     internal class GetEmployeeByIdQueryHandler : IRequestHandler<GetEmployeeByIdQuery, Result<GetEmployeeByIdResponse>>
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly UserManager<AppUser> _userManager;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUploadService _uploadService;
 
-        public GetEmployeeByIdQueryHandler(IEmployeeRepository employeeRepository, UserManager<AppUser> userManager, IHttpContextAccessor httpContextAccessor, IUploadService uploadService)
+        public GetEmployeeByIdQueryHandler(IEmployeeRepository employeeRepository, UserManager<AppUser> userManager, IUploadService uploadService)
         {
             _employeeRepository = employeeRepository;
             _userManager = userManager;
-            _httpContextAccessor = httpContextAccessor;
             _uploadService = uploadService;
         }
 
@@ -44,13 +42,11 @@ namespace Application.Features.Employee.Queries.GetById
                                       Address = e.Address,
                                       Image = e.Image,
                                       WorkShiftId = e.WorkShiftId,
+                                      ImageLink = _uploadService.GetFullUrl(e.Image),
                                       UserName = _userManager.Users.Where(e => e.UserId == request.Id && !e.IsDeleted).Select(e => e.UserName).FirstOrDefault(),
                                       Password = _userManager.Users.Where(e => e.UserId == request.Id && !e.IsDeleted).Select(e => e.PasswordHash).FirstOrDefault()
                                   }).FirstOrDefaultAsync(cancellationToken: cancellationToken);
             if (employee == null) return await Result<GetEmployeeByIdResponse>.FailAsync(StaticVariable.NOT_FOUND_MSG);
-
-            if (employee.Image != null)
-                employee.Image = _uploadService.GetFileLink(employee.Image, _httpContextAccessor);
 
             return await Result<GetEmployeeByIdResponse>.SuccessAsync(employee);
         }

@@ -1,11 +1,15 @@
 ﻿using Application.Dtos.Requests;
+using Application.Dtos.Responses.Upload;
+using Domain.Wrappers;
 using Microsoft.AspNetCore.Http;
 
 namespace Application.Interfaces
 {
     public interface IUploadService
     {
-        string UploadAsync(UploadRequest request);
-        string GetFileLink(string relativePath, IHttpContextAccessor httpContextAccessor);
+
+        Task<Result<UploadResponse>> UploadAsync(UploadRequest request);
+        string GetFullUrl(string? filePath);
+        Task<Result<bool>> DeleteAsync(string filePath);
     }
 }

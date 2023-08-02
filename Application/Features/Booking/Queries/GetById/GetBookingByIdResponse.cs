@@ -1,9 +1,4 @@
 ﻿using Domain.Constants.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Features.Booking.Queries.GetById
 {
@@ -19,6 +14,7 @@ namespace Application.Features.Booking.Queries.GetById
         public string? Note { get; set; }
         public List<ServiceBookingResponse> Services { get; set; } = new List<ServiceBookingResponse>();
     }
+
     public class ServiceBookingResponse
     {
         public long Id { get; set; }

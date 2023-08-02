@@ -20,6 +20,7 @@ namespace Application.Features.Booking.Command.EditBooking
         public string? Note { get; set; }
         public List<long> ServiceId { get; set; }
     }
+
     internal class EditBookingCommandHandler : IRequestHandler<EditBookingCommand, Result<EditBookingCommand>>
     {
         private readonly IMapper _mapper;
@@ -28,7 +29,6 @@ namespace Application.Features.Booking.Command.EditBooking
         private readonly IServiceRepository _serviceRepository;
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly IBookingDetailRepository _bookingDetailRepository;
-
 
         public EditBookingCommandHandler(IMapper mapper, IBookingRepository bookingRepository, ICustomerRepository customerRepository, IServiceRepository serviceRepository, IUnitOfWork<long> unitOfWork, IBookingDetailRepository bookingDetailService)
         {
@@ -42,6 +42,7 @@ namespace Application.Features.Booking.Command.EditBooking
 
         public async Task<Result<EditBookingCommand>> Handle(EditBookingCommand request, CancellationToken cancellationToken)
         {
+            var transaction = await _unitOfWork.BeginTransactionAsync();
             request.ServiceId = request.ServiceId.Distinct().ToList();
             if (request.Totime.CompareTo(request.FromTime) < 0)
             {
@@ -56,7 +57,7 @@ namespace Application.Features.Booking.Command.EditBooking
 
             // check request.ServiceId exist in db
             List<long> listExistServiceId = _serviceRepository.Entities.Where(_ => !_.IsDeleted).Select(_ => _.Id).ToList();
-            if(request.ServiceId.Except(listExistServiceId).ToList().Any()) return await Result<EditBookingCommand>.FailAsync(StaticVariable.NOT_FOUND_SERVICE);
+            if (request.ServiceId.Except(listExistServiceId).ToList().Any()) return await Result<EditBookingCommand>.FailAsync(StaticVariable.NOT_FOUND_SERVICE);
 
             List<long> existingServiceIds = _bookingDetailRepository.Entities.Where(_ => _.IsDeleted == false && _.BookingId == request.Id)
                 .Select(b => b.ServiceId).ToList();
@@ -82,6 +83,8 @@ namespace Application.Features.Booking.Command.EditBooking
             customer.TotalMoney = _bookingRepository.GetAllTotalMoneyBookingByCustomerId(isExistBooking.CustomerId);
             await _customerRepository.UpdateAsync(customer);
             await _unitOfWork.Commit(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            await transaction.DisposeAsync();
             return await Result<EditBookingCommand>.SuccessAsync(request);
         }
     }

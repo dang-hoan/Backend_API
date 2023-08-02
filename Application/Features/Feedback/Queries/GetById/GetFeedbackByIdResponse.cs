@@ -1,11 +1,4 @@
 ﻿using Domain.Constants.Enum;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Features.Feedback.Queries.GetById
 {
@@ -24,6 +17,5 @@ namespace Application.Features.Feedback.Queries.GetById
         public string? ReplyTitle { get; set; }
         public string? ReplyContent { get; set; }
         public Rating? Rating { get; set; }
-
     }
 }

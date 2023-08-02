@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Application.Features.Employee.Queries.GetAll
+﻿namespace Application.Features.Employee.Queries.GetAll
 {
     public class GetAllEmployeeResponse
     {
@@ -16,5 +10,7 @@ namespace Application.Features.Employee.Queries.GetAll
         public long WorkShiftId { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? LastModifiedOn { get; set; }
+        public string? ImageFile { get; set; }
+        public string? ImageLink { get; set; }
     }
 }

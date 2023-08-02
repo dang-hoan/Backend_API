@@ -36,6 +36,8 @@ namespace Application.Features.Booking.Command.DeleteBooking
 
         public async Task<Result<long>> Handle(DeleteBookingCommand request, CancellationToken cancellationToken)
         {
+            var transaction = await _unitOfWork.BeginTransactionAsync();
+
             var booking = await _bookingRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
             if (booking == null) return await Result<long>.FailAsync(StaticVariable.NOT_FOUND_MSG);
 
@@ -55,7 +57,8 @@ namespace Application.Features.Booking.Command.DeleteBooking
 
                     Domain.Entities.Customer.Customer ExistCustomer = await _customerRepository.FindAsync(_ => _.Id == booking.CustomerId && !_.IsDeleted);
 
-                    if(ExistCustomer != null) {
+                    if (ExistCustomer != null)
+                    {
                         ExistCustomer.TotalMoney = _bookingRepository.GetAllTotalMoneyBookingByCustomerId(ExistCustomer.Id);
                         await _customerRepository.UpdateAsync(ExistCustomer);
                         await _unitOfWork.Commit(cancellationToken);
@@ -63,7 +66,8 @@ namespace Application.Features.Booking.Command.DeleteBooking
 
                     return await Result<long>.SuccessAsync(request.Id, $"Delete booking and booking detail by booking id {request.Id} successfully!");
                 }
-
+                await transaction.CommitAsync(cancellationToken);
+                await transaction.DisposeAsync();
                 return await Result<long>.FailAsync("Booking is inprogress");
             }
             catch (System.Exception e)

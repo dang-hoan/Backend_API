@@ -4,6 +4,7 @@
     {
         public long Id { get; set; }
         public long ServiceId { get; set; }
-        public string NameFile { get; set; }
+        public string? NameFile { get; set; }
+        public string? NameFileLink { get; set; }
     }
 }

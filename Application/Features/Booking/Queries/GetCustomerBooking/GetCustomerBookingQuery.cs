@@ -18,8 +18,10 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
     {
         [Required]
         public long CustomerId { get; set; }
+
         public string? KeyWord { get; set; }
     }
+
     internal class GetCustomerBookingQueryHandler : IRequestHandler<GetCustomerBookingQuery, Result<List<GetCustomerBookingResponse>>>
     {
         private readonly IBookingRepository _bookingRepository;
@@ -27,11 +29,10 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
         private readonly IServiceRepository _serviceRepository;
         private readonly IServiceImageRepository _serviceImageRepository;
         private readonly IUploadService _uploadService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
 
         public GetCustomerBookingQueryHandler(IBookingRepository bookingRepository, IBookingDetailRepository bookingDetailRepository, IServiceRepository serviceRepository,
-            IServiceImageRepository serviceImageRepository, IMapper mapper, IUploadService uploadService, IHttpContextAccessor httpContextAccessor)
+            IServiceImageRepository serviceImageRepository, IMapper mapper, IUploadService uploadService)
         {
             _bookingRepository = bookingRepository;
             _bookingDetailRepository = bookingDetailRepository;
@@ -39,7 +40,6 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
             _serviceImageRepository = serviceImageRepository;
             _uploadService = uploadService;
             _mapper = mapper;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<Result<List<GetCustomerBookingResponse>>> Handle(GetCustomerBookingQuery request, CancellationToken cancellationToken)
@@ -57,9 +57,10 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
                     Note = s.Note,
                 }).ToListAsync();
             List<GetCustomerBookingResponse> response = new List<GetCustomerBookingResponse>();
-            foreach(var booking in bookings)
+            foreach (var booking in bookings)
             {
-                var bookingResponse = new GetCustomerBookingResponse { 
+                var bookingResponse = new GetCustomerBookingResponse
+                {
                     BookingId = booking.Id,
                     BookingDate = booking.BookingDate,
                     BookingStatus = booking.Status,
@@ -75,10 +76,10 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
                     }).ToListAsync();
                 bool checkServiceName = false;
                 List<BookingDetailResponse> bookingDetailResponses = new List<BookingDetailResponse>();
-                foreach(var bookingDetail in bookingDetails)
+                foreach (var bookingDetail in bookingDetails)
                 {
                     var service = await _serviceRepository.FindAsync(_ => !_.IsDeleted && _.Id == bookingDetail.ServiceId);
-                    if(service != null)
+                    if (service != null)
                     {
                         var bookingDetailResponse = new BookingDetailResponse
                         {
@@ -91,15 +92,15 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
                         };
                         foreach (ServiceImageResponse imageResponse in bookingDetailResponse.ServiceImages)
                         {
-                            imageResponse.NameFile = _uploadService.GetFileLink(imageResponse.NameFile, _httpContextAccessor);
+                            imageResponse.NameFile = _uploadService.GetFullUrl(imageResponse.NameFile);
                         }
                         bookingDetailResponses.Add(bookingDetailResponse);
 
                         if (request.KeyWord != null)
                             request.KeyWord = request.KeyWord.Trim();
 
-                        if (string.IsNullOrEmpty(request.KeyWord) || StringHelper.Contains(service.Name, request.KeyWord) 
-                            || booking.Id.ToString().Contains(request.KeyWord) || booking.BookingDate.ToString("dd/MM/yyyy").Contains(request.KeyWord) 
+                        if (string.IsNullOrEmpty(request.KeyWord) || StringHelper.Contains(service.Name, request.KeyWord)
+                            || booking.Id.ToString().Contains(request.KeyWord) || booking.BookingDate.ToString("dd/MM/yyyy").Contains(request.KeyWord)
                             || booking.BookingDate.ToString("dd-MM-yyyy").Contains(request.KeyWord))
                         {
                             checkServiceName = true;
