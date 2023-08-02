@@ -1,11 +1,10 @@
 ﻿using Application.Interfaces.Employee;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services.Identity;
-using AutoMapper;
+using Application.Interfaces.WorkShift;
 using Domain.Constants;
 using Domain.Wrappers;
 using MediatR;
-using Application.Interfaces.WorkShift;
 
 namespace Application.Features.Employee.Command.EditWorkShiftEmployee
 {
@@ -17,15 +16,12 @@ namespace Application.Features.Employee.Command.EditWorkShiftEmployee
 
     internal class EditWorkShiftEmployeeCommandHandler : IRequestHandler<EditWorkShiftEmployeeCommand, Result<EditWorkShiftEmployeeCommand>>
     {
-        private readonly IMapper _mapper;
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IWorkShiftRepository _workShiftRepository;
         private readonly IUnitOfWork<long> _unitOfWork;
 
-
-        public EditWorkShiftEmployeeCommandHandler(IMapper mapper, IEmployeeRepository employeeRepository, IUnitOfWork<long> unitOfWork, IUserService userService, IWorkShiftRepository workShiftRepository)
+        public EditWorkShiftEmployeeCommandHandler(IEmployeeRepository employeeRepository, IUnitOfWork<long> unitOfWork, IUserService userService, IWorkShiftRepository workShiftRepository)
         {
-            _mapper = mapper;
             _employeeRepository = employeeRepository;
             _unitOfWork = unitOfWork;
             _workShiftRepository = workShiftRepository;

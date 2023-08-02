@@ -8,6 +8,7 @@ using Domain.Constants;
 using Domain.Entities.ServiceImage;
 using Domain.Wrappers;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Service.Command.EditService
 {
@@ -27,16 +28,15 @@ namespace Application.Features.Service.Command.EditService
         private readonly IMapper _mapper;
         private readonly IServiceRepository _serviceRepository;
         private readonly IServiceImageRepository _serviceImageRepository;
-        private readonly IRemoveImageService _removeImageService;
         private readonly IUnitOfWork<long> _unitOfWork;
-
-        public EditServiceCommandHandler(IMapper mapper, IServiceRepository serviceRepository, IServiceImageRepository serviceImageRepository, IRemoveImageService removeImageService, IUnitOfWork<long> unitOfWork)
+        private readonly IUploadService _uploadService;
+        public EditServiceCommandHandler(IMapper mapper, IServiceRepository serviceRepository, IServiceImageRepository serviceImageRepository, IUnitOfWork<long> unitOfWork, IUploadService uploadService)
         {
             _mapper = mapper;
             _serviceRepository = serviceRepository;
             _serviceImageRepository = serviceImageRepository;
-            _removeImageService = removeImageService;
             _unitOfWork = unitOfWork;
+            _uploadService = uploadService;
         }
 
         public async Task<Result<EditServiceCommand>> Handle(EditServiceCommand request, CancellationToken cancellationToken)
@@ -52,23 +52,30 @@ namespace Application.Features.Service.Command.EditService
             _mapper.Map(request, editService);
             await _serviceRepository.UpdateAsync(editService);
 
-            IReadOnlyList<ServiceImage> oldServiceImages = await _serviceImageRepository.GetByCondition(serviceImage => serviceImage.ServiceId == request.Id);
-            await _serviceImageRepository.DeleteRange(oldServiceImages.ToList());
-            foreach (ServiceImage serviceImage in oldServiceImages)
-            {
-                if (!_removeImageService.RemoveImage(new Dtos.Requests.RemoveImageRequest
-                {
-                    FilePath = serviceImage.NameFile
-                }))
-                    return await Result<EditServiceCommand>.FailAsync(StaticVariable.SERVER_ERROR_MSG);
-            }
-
             if (request.ServicesImageRequests != null)
             {
-                var addImage = _mapper.Map<List<ServiceImage>>(request.ServicesImageRequests);
-                addImage.ForEach(x => x.ServiceId = editService.Id);
-                await _serviceImageRepository.AddRangeAsync(addImage);
+                //Remove and Add List Request Image
+                var requestImages = await _serviceImageRepository.Entities.Where(x => x.ServiceId == editService.Id && !x.IsDeleted).ToListAsync(cancellationToken);
+                if (requestImages.Any())
+                {
+                    foreach (var item in requestImages)
+                    {
+                        await _uploadService.DeleteAsync(item.NameFile);
+                    }
+                    await _serviceImageRepository.RemoveRangeAsync(requestImages);
+                    await _unitOfWork.Commit(cancellationToken);
+                }
+                var image = _mapper.Map<List<ServiceImage>>(request.ServicesImageRequests);
+                var requestImage = image.Select(x =>
+                {
+                    x.Id = 0;
+                    x.ServiceId = editService.Id;
+                    return x;
+                }).ToList();
+                await _serviceImageRepository.AddRangeAsync(requestImage);
+                await _unitOfWork.Commit(cancellationToken);
             }
+
             await _unitOfWork.Commit(cancellationToken);
             await transaction.CommitAsync();
             await transaction.DisposeAsync();

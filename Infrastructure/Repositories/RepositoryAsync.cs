@@ -1,9 +1,8 @@
-﻿using System.Linq.Expressions;
-using Application.Interfaces.Repositories;
+﻿using Application.Interfaces.Repositories;
 using Domain.Contracts;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories
 {
@@ -30,6 +29,7 @@ namespace Infrastructure.Repositories
                 .Where(includeProperties)
                 .ToListAsync();
         }
+
         public async Task<T?> FindAsync(Expression<Func<T, bool>> includeProperties)
         {
             return await _dbContext
@@ -104,10 +104,21 @@ namespace Infrastructure.Repositories
             return await _dbContext.Set<T>().AnyAsync(includeProperties);
         }
 
-
         public async Task<List<T>> SearchAsync(Expression<Func<T, bool>> includeProperties)
         {
             return await _dbContext.Set<T>().Where(includeProperties).ToListAsync();
+        }
+
+        public Task RemoveRangeAsync(List<T> entity)
+        {
+            _dbContext.RemoveRange(entity);
+            return Task.CompletedTask;
+        }
+
+        public Task RemoveAsync(T entity)
+        {
+            _dbContext.Remove(entity);
+            return Task.CompletedTask;
         }
     }
 }
