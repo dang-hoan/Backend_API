@@ -1,45 +1,39 @@
-using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-using Application.Dtos.Responses.FeedbackFileUpload;
-using Application.Enums;
-using Application.Interfaces;
+﻿using Application.Dtos.Requests.Feedback;
+using Application.Exceptions;
+using Application.Interfaces.Booking;
 using Application.Interfaces.BookingDetail;
 using Application.Interfaces.Feedback;
 using Application.Interfaces.FeedbackFileUpload;
 using Application.Interfaces.Repositories;
 using AutoMapper;
 using Domain.Constants;
+using Domain.Constants.Enum;
 using Domain.Entities;
+using Domain.Entities.FeedbackFileUpload;
 using Domain.Wrappers;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Domain.Constants.Enum;
-using Application.Interfaces.Booking;
+using System.Security.Claims;
 
 namespace Application.Features.Client.Command.AddFeedback
 {
     public class AddFeedbackCommand : IRequest<Result<AddFeedbackCommand>>
     {
-        [Required]
-        public string Rating { get; set; }
-        [Required]
-        public long BookingDetailId { get; set; }
+        public string Rating { get; set; } = default!;
+        public long BookingDetailId { get; set; } = default!;
         public string? StaffContent { get; set; }
         public string? ServiceContent { get; set; }
-        public List<IFormFile>? ListImages { get; set; }
-        public List<IFormFile>? ListVideos { get; set; }
+        public List<ImageRequest>? FeedbackImageRequests { get; set; } // Hình ảnh mô tả (File)
     }
+
     internal class AddFeedbackCommandHandler : IRequestHandler<AddFeedbackCommand, Result<AddFeedbackCommand>>
     {
         private readonly IMapper _mapper;
         private readonly IFeedbackRepository _feedbackRepository;
         private readonly IFeedbackFileUploadRepository _feedbackFileUploadRepository;
-        private readonly ICheckFileType _checkFileType;
-        private readonly ICheckSizeFile _checkSizeFile;
-        private readonly IUploadService _uploadService;
         private readonly IBookingDetailRepository _bookingDetailRepository;
         private readonly IBookingRepository _bookingRepository;
         private readonly IUnitOfWork<long> _unitOfWork;
@@ -53,9 +47,6 @@ namespace Application.Features.Client.Command.AddFeedback
             IBookingDetailRepository bookingDetailRepository,
             IBookingRepository bookingRepository,
             IUnitOfWork<long> unitOfWork,
-            IUploadService uploadService,
-            ICheckFileType checkFileType,
-            ICheckSizeFile checkSizeFile,
             IHttpContextAccessor httpContextAccessor,
             ILogger<AddFeedbackCommand> logger,
             UserManager<AppUser> userManager
@@ -66,29 +57,25 @@ namespace Application.Features.Client.Command.AddFeedback
             _feedbackFileUploadRepository = feedbackFileUploadRepository;
             _bookingDetailRepository = bookingDetailRepository;
             _bookingRepository = bookingRepository;
-            _checkFileType = checkFileType;
-            _checkSizeFile = checkSizeFile;
-            _uploadService = uploadService;
             _unitOfWork = unitOfWork;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
-
         }
 
         public async Task<Result<AddFeedbackCommand>> Handle(AddFeedbackCommand request, CancellationToken cancellationToken)
         {
-            var isExistInBookingDetail = await _bookingDetailRepository.FindAsync(_ => _.Id == request.BookingDetailId && _.IsDeleted == false);
-            if (isExistInBookingDetail == null) return await Result<AddFeedbackCommand>.FailAsync(StaticVariable.NOT_FOUND_BOOKING_DETAIL);
-            var isExistBookingFeedback = await _feedbackRepository.FindAsync(_ => _.BookingDetailId == request.BookingDetailId && _.IsDeleted == false);
-            
+            var transaction = await _unitOfWork.BeginTransactionAsync();
+            var isExistInBookingDetail = await _bookingDetailRepository.FindAsync(x => x.Id == request.BookingDetailId && !x.IsDeleted) ?? throw new ApiException(StaticVariable.NOT_FOUND_BOOKING_DETAIL);
+            var isExistBookingFeedback = await _feedbackRepository.FindAsync(x => x.BookingDetailId == request.BookingDetailId && !x.IsDeleted);
             if (isExistBookingFeedback != null)
             {
                 return await Result<AddFeedbackCommand>.FailAsync("You rated this feedback");
             }
             var addFeedback = _mapper.Map<Domain.Entities.Feedback.Feedback>(request);
+
             var userName = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var customerId = (long)0;
+            long customerId = 0;
             var currentLoginUser = new AppUser();
             if (userName != null)
             {
@@ -107,97 +94,21 @@ namespace Application.Features.Client.Command.AddFeedback
             }
             _logger.LogInformation($"log: {JsonConvert.SerializeObject(customerId)}");
             // Check Image is valid
-            if (request.ListImages != null)
-            {
-                var imagesResult = _checkFileType.CheckFilesIsImage(new Dtos.Requests.CheckImagesTypeRequest
-                {
-                    Files = request.ListImages
-                });
-                var imageCheckMaxSize = _checkSizeFile.CheckImageSize(new Dtos.Requests.CheckImageSizeRequest
-                {
-                    Files = request.ListImages
-                });
-
-                if (imagesResult != "")
-                    return await Result<AddFeedbackCommand>.FailAsync(imagesResult);
-
-                if (imageCheckMaxSize != "")
-                    return await Result<AddFeedbackCommand>.FailAsync(imageCheckMaxSize);
-            }
-            // Check Video is valid
-            if (request.ListVideos != null)
-            {
-                var videosResult = _checkFileType.CheckFilesIsVideo(new Dtos.Requests.CheckVideoTypeRequest
-                {
-                    Files = request.ListVideos
-                });
-                var videoCheckMaxSize = _checkSizeFile.CheckVideoSize(new Dtos.Requests.CheckVideoSizeRequest
-                {
-                    Files = request.ListVideos
-                });
-                if (videosResult != "")
-                    return await Result<AddFeedbackCommand>.FailAsync(videosResult);
-
-                if (videoCheckMaxSize != "")
-                    return await Result<AddFeedbackCommand>.FailAsync(videoCheckMaxSize);
-            }
             addFeedback.CustomerId = customerId;
             await _feedbackRepository.AddAsync(addFeedback);
             await _unitOfWork.Commit(cancellationToken);
 
-            if (request.ListImages != null)
+            if (request.FeedbackImageRequests != null)
             {
-                foreach (IFormFile file in request.ListImages)
-                {
-                    string uploadResult = await UploadFile(file, addFeedback.Id, Enums.UploadType.ProfilePicture);
-                    if (uploadResult != "")
-                        return await Result<AddFeedbackCommand>.FailAsync(uploadResult);
-                }
+                var addImage = _mapper.Map<List<FeedbackFileUpload>>(request.FeedbackImageRequests);
+                addImage.ForEach(x => x.FeedbackId = addFeedback.Id);
+                await _feedbackFileUploadRepository.AddRangeAsync(addImage);
+                await _unitOfWork.Commit(cancellationToken);
             }
-            if (request.ListVideos != null)
-            {
-                foreach (IFormFile file in request.ListVideos)
-                {
-                    string uploadResult = await UploadFile(file, addFeedback.Id, Enums.UploadType.UploadVideo);
-                    if (uploadResult != "")
-                        return await Result<AddFeedbackCommand>.FailAsync(uploadResult);
-                }
-            }
-
-            await _unitOfWork.Commit(cancellationToken);
+            await transaction.CommitAsync();
+            await transaction.DisposeAsync();
 
             return await Result<AddFeedbackCommand>.SuccessAsync(request);
-        }
-
-        public async Task<string> UploadFile(IFormFile file, long targetId, UploadType uploadTypes)
-        {
-            string resultFileUpload = "";
-
-            var filePath = _uploadService.UploadAsync(new Dtos.Requests.UploadRequest
-            {
-                FileName = file.FileName,
-                Extension = Path.GetExtension(file.FileName),
-                UploadType = uploadTypes,
-                Data = _mapper.Map<byte[]>(file)
-            });
-
-            if (filePath != "")
-            {
-                var obj = new Domain.Entities.FeedbackFileUpload.FeedbackFileUpload
-                {
-                    FeedbackId = targetId,
-                    NameFile = filePath,
-                    TypeFile = (uploadTypes == UploadType.ProfilePicture) ? "Image" : "Video"
-                };
-
-                await _feedbackFileUploadRepository.AddAsync(obj);
-            }
-            else
-            {
-                resultFileUpload = file.FileName;
-                return resultFileUpload;
-            }
-            return resultFileUpload;
         }
     }
 }

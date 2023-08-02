@@ -1,15 +1,13 @@
-﻿using Application.Interfaces.Repositories;
-using AutoMapper;
-using Domain.Wrappers;
-using MediatR;
-using Application.Interfaces.Booking;
-using Application.Interfaces.Customer;
-using Application.Interfaces.Service;
+﻿using Application.Interfaces.Booking;
 using Application.Interfaces.BookingDetail;
+using Application.Interfaces.Customer;
+using Application.Interfaces.Repositories;
+using Application.Interfaces.Service;
+using AutoMapper;
 using Domain.Constants;
 using Domain.Constants.Enum;
-using System.Reflection.Metadata.Ecma335;
-using Org.BouncyCastle.Asn1.Crmf;
+using Domain.Wrappers;
+using MediatR;
 
 namespace Application.Features.Booking.Command.AddBooking
 {
@@ -23,6 +21,7 @@ namespace Application.Features.Booking.Command.AddBooking
         public string? Note { get; set; }
         public List<long> ServiceId { get; set; }
     }
+
     internal class AddBookingCommandHandler : IRequestHandler<AddBookingCommand, Result<AddBookingCommand>>
     {
         private readonly IMapper _mapper;
@@ -32,8 +31,7 @@ namespace Application.Features.Booking.Command.AddBooking
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly IBookingDetailRepository _bookingDetailService;
 
-
-        public AddBookingCommandHandler(IMapper mapper, IBookingRepository bookingRepository,ICustomerRepository customerRepository, IServiceRepository serviceRepository, IUnitOfWork<long> unitOfWork, IBookingDetailRepository bookingDetailService)
+        public AddBookingCommandHandler(IMapper mapper, IBookingRepository bookingRepository, ICustomerRepository customerRepository, IServiceRepository serviceRepository, IUnitOfWork<long> unitOfWork, IBookingDetailRepository bookingDetailService)
         {
             _mapper = mapper;
             _bookingRepository = bookingRepository;
@@ -41,12 +39,14 @@ namespace Application.Features.Booking.Command.AddBooking
             _customerRepository = customerRepository;
             _serviceRepository = serviceRepository;
             _bookingDetailService = bookingDetailService;
-    }
+        }
 
         public async Task<Result<AddBookingCommand>> Handle(AddBookingCommand request, CancellationToken cancellationToken)
         {
+            //open transaction
+            var transaction = await _unitOfWork.BeginTransactionAsync();
             request.ServiceId = request.ServiceId.Distinct().ToList();
-            var ExistCustomer = await _customerRepository.FindAsync(_ => _.Id == request.CustomerId && _.IsDeleted == false);
+            var ExistCustomer = await _customerRepository.FindAsync(x => x.Id == request.CustomerId && !x.IsDeleted);
             if (ExistCustomer == null) return await Result<AddBookingCommand>.FailAsync(StaticVariable.NOT_FOUND_CUSTOMER);
             if (request.Totime.CompareTo(request.FromTime) < 0)
             {
@@ -62,7 +62,7 @@ namespace Application.Features.Booking.Command.AddBooking
             await _bookingRepository.AddAsync(booking);
             await _unitOfWork.Commit(cancellationToken);
             request.Id = booking.Id;
-            foreach(long i in request.ServiceId)
+            foreach (long i in request.ServiceId)
             {
                 await _bookingDetailService.AddAsync(new Domain.Entities.BookingDetail.BookingDetail
                 {
@@ -75,6 +75,9 @@ namespace Application.Features.Booking.Command.AddBooking
             ExistCustomer.TotalMoney = _bookingRepository.GetAllTotalMoneyBookingByCustomerId(ExistCustomer.Id);
             await _customerRepository.UpdateAsync(ExistCustomer);
             await _unitOfWork.Commit(cancellationToken);
+            //commit transaction
+            await transaction.CommitAsync(cancellationToken);
+            await transaction.DisposeAsync();
             return await Result<AddBookingCommand>.SuccessAsync(request);
         }
     }

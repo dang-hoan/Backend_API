@@ -10,6 +10,7 @@ namespace Application.Features.Booking.Queries.GetAll
     public class GetAllBookingQuery : GetAllBookingParameter, IRequest<PaginatedResult<GetAllBookingResponse>>
     {
     }
+
     internal class GetAllBookingHandler : IRequestHandler<GetAllBookingQuery, PaginatedResult<GetAllBookingResponse>>
     {
         private readonly IBookingRepository _bookingRepository;
@@ -20,15 +21,16 @@ namespace Application.Features.Booking.Queries.GetAll
             _bookingRepository = bookingRepository;
             _customerRepository = customerRepository;
         }
+
         public async Task<PaginatedResult<GetAllBookingResponse>> Handle(GetAllBookingQuery request, CancellationToken cancellationToken)
         {
-            if(request.Keyword != null)
+            if (request.Keyword != null)
                 request.Keyword = request.Keyword.Trim();
 
             var query = from booking in _bookingRepository.Entities.AsEnumerable()
                         join customer in _customerRepository.Entities.AsEnumerable() on booking.CustomerId equals customer.Id
-                        where !booking.IsDeleted 
-                                && (string.IsNullOrEmpty(request.Keyword) 
+                        where !booking.IsDeleted
+                                && (string.IsNullOrEmpty(request.Keyword)
                                 || StringHelper.Contains(customer.CustomerName, request.Keyword)
                                 || booking.Id.ToString().Contains(request.Keyword)
                                 || customer.PhoneNumber.Contains(request.Keyword))
@@ -38,7 +40,7 @@ namespace Application.Features.Booking.Queries.GetAll
                                 && (!request.Status.HasValue || booking.Status.Equals(request.Status))
                         select new GetAllBookingResponse
                         {
-                            Id = booking.Id,                            
+                            Id = booking.Id,
                             CustomerName = customer.CustomerName,
                             PhoneNumber = customer.PhoneNumber,
                             BookingDate = booking.BookingDate,
@@ -48,7 +50,6 @@ namespace Application.Features.Booking.Queries.GetAll
                             CreatedOn = booking.CreatedOn,
                             LastModifiedOn = booking.LastModifiedOn,
                         };
-
 
             var data = query.AsQueryable().OrderBy(request.OrderBy);
             var totalRecord = data.Count();

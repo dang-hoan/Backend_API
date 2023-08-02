@@ -1,11 +1,6 @@
 ﻿using Application.Dtos.Responses.FeedbackFileUpload;
 using Application.Dtos.Responses.ServiceImage;
 using Domain.Constants.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Features.Feedback.Queries.GetHistoryFeedback
 {
@@ -25,6 +20,7 @@ namespace Application.Features.Feedback.Queries.GetHistoryFeedback
         public DateTime CreatedOnFeedback { get; set; }
         public List<FeedbackFileUploadResponse> FeedbackFileUploads { get; set; }
     }
+
     public class ReplyResponse
     {
         public long Id { get; set; }

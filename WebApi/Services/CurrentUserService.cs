@@ -5,31 +5,20 @@ namespace WebApi.Services
 {
     public class CurrentUserService : ICurrentUserService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
         public CurrentUserService(IHttpContextAccessor httpContextAccessor)
         {
-            _httpContextAccessor = httpContextAccessor;
-        }
-        private string _userName;
-        public string Username
-        {
-            get
-            {
-                _userName = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
-                return _userName;
-            }
+            UserId = httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            RoleName = httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Role)!;
+            HostServerName = httpContextAccessor.HttpContext?.Request.Scheme + "://" + httpContextAccessor.HttpContext?.Request.Host;
+            OriginRequest = httpContextAccessor.HttpContext?.Request.Headers["Origin"].ToString()!;
+            Claims = httpContextAccessor.HttpContext?.User?.Claims.AsEnumerable().Select(item => new KeyValuePair<string, string>(item.Type, item.Value)).ToList()!;
         }
 
-        private string _roleName;
-        public string RoleName
-        {
-            get
-            {
-                _roleName = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Role) ?? "";
-                return _roleName;
-            }
-        }
+        public string UserId { get; }
+        public string RoleName { get; }
+        public string HostServerName { get; }
+        public string OriginRequest { get; }
+
 
         public List<KeyValuePair<string, string>>? Claims { get; set; }
     }

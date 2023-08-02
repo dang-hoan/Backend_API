@@ -56,17 +56,17 @@ namespace Infrastructure.Contexts
                 {
                     case EntityState.Added:
                         entry.Entity.CreatedOn = _dateTimeService.NowUtc;
-                        entry.Entity.CreatedBy = string.IsNullOrEmpty(_currentUserService.Username) ? "System" : _currentUserService.Username;
+                        entry.Entity.CreatedBy = string.IsNullOrEmpty(_currentUserService.UserId) ? "System" : _currentUserService.UserId;
                         break;
 
                     case EntityState.Modified:
                         entry.Entity.LastModifiedOn = _dateTimeService.NowUtc;
-                        entry.Entity.LastModifiedBy = string.IsNullOrEmpty(_currentUserService.Username) ? "System" : _currentUserService.Username;
+                        entry.Entity.LastModifiedBy = string.IsNullOrEmpty(_currentUserService.UserId) ? "System" : _currentUserService.UserId;
                         break;
                 }
             }
 
-            return await base.SaveChangesAsync(_currentUserService.Username, cancellationToken);
+            return await base.SaveChangesAsync(_currentUserService.UserId, cancellationToken);
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

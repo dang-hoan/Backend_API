@@ -1,96 +1,69 @@
 ﻿using Application.Dtos.Requests;
+using Application.Dtos.Responses.Upload;
 using Application.Exceptions;
 using Application.Interfaces;
-using Microsoft.AspNetCore.Http;
+using Application.Shared;
+using Domain.Wrappers;
 
 namespace Infrastructure.Services
 {
     public class UploadService : IUploadService
     {
+        private readonly ICurrentUserService _currentUserService;
 
-        public string UploadAsync(UploadRequest request)
+        public UploadService(ICurrentUserService currentUserService)
         {
-            var streamData = new MemoryStream(request.Data);
-            if (streamData.Length > 0)
-            {
-                var folder = request.UploadType.ToDescriptionString();
-                var folderName = Path.Combine("Files", folder);
-                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-                bool exists = System.IO.Directory.Exists(pathToSave);
-                if (!exists)
-                    System.IO.Directory.CreateDirectory(pathToSave);
-                var fileName = request.FileName.Trim('"');
-                var fullPath = Path.Combine(pathToSave, fileName);
-                var dbPath = Path.Combine(folderName, fileName);
-                if (File.Exists(dbPath))
-                {
-                    dbPath = NextAvailableFilename(dbPath);
-                    fullPath = NextAvailableFilename(fullPath);
-                }
-                using (var stream = new FileStream(fullPath, FileMode.Create))
-                {
-                    streamData.CopyTo(stream);
-                }
-                return dbPath;
-            }
-            else
-            {
-                return string.Empty;
-            }
+            _currentUserService = currentUserService;
         }
 
-        private static string numberPattern = " ({0})";
-
-        public static string NextAvailableFilename(string path)
+        public async Task<Result<UploadResponse>> UploadAsync(UploadRequest request)
         {
-            // Short-cut if already available
-            if (!File.Exists(path))
-                return path;
-
-            // If path has extension then insert the number pattern just before the extension and return next filename
-            if (Path.HasExtension(path))
-                return GetNextFilename(path.Insert(path.LastIndexOf(Path.GetExtension(path)), numberPattern));
-
-            // Otherwise just append the pattern to the path and return next filename
-            return GetNextFilename(path + numberPattern);
-        }
-
-        private static string GetNextFilename(string pattern)
-        {
-            string tmp = string.Format(pattern, 1);
-            //if (tmp == pattern)
-            //throw new ArgumentException("The pattern must include an index place-holder", "pattern");
-
-            if (!File.Exists(tmp))
-                return tmp; // short-circuit if no matches
-
-            int min = 1, max = 2; // min is inclusive, max is exclusive/untested
-
-            while (File.Exists(string.Format(pattern, max)))
+            var fileName = $"{DateTime.Now:yyyyMMddHHmmsss}_{request.File.FileName}";
+            var folderName = Path.Combine("Files", request.FilePath);
+            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+            if (!Directory.Exists(pathToSave))
             {
-                min = max;
-                max *= 2;
+                Directory.CreateDirectory(pathToSave);
             }
 
-            while (max != min + 1)
+            var dbPath = Path.Combine(folderName, fileName);
+
+            using (var stream = new FileStream(dbPath, FileMode.Create))
             {
-                int pivot = (max + min) / 2;
-                if (File.Exists(string.Format(pattern, pivot)))
-                    min = pivot;
-                else
-                    max = pivot;
+                await request.File.CopyToAsync(stream);
             }
 
-            return string.Format(pattern, max);
+            var result = new UploadResponse()
+            {
+                FilePath = dbPath,
+                FileUrl = Path.Combine(_currentUserService.HostServerName, dbPath.Replace("\\", "/"))
+            };
+
+            return await Result<UploadResponse>.SuccessAsync(result);
         }
 
-        public string GetFileLink(string relativePath, IHttpContextAccessor httpContextAccessor)
+        public string GetFullUrl(string? filePath)
         {
-            HttpContext httpContext = httpContextAccessor.HttpContext;
-            var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
-            var fileUrl = $"{baseUrl}/{relativePath.Replace('\\', '/')}";
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                var result = _currentUserService.HostServerName + "/" + filePath;
+                return result;
+            }
 
-            return fileUrl;
+            return "";
+        }
+
+        public Task<Result<bool>> DeleteAsync(string filePath)
+        {
+            var fileToDelete = Path.Combine(Directory.GetCurrentDirectory(), filePath);
+
+            if (File.Exists(fileToDelete))
+            {
+                File.Delete(fileToDelete);
+                return Result<bool>.SuccessAsync(true, ApplicationConstants.SuccessMessage.DeletedSuccess);
+            }
+
+            throw new ApiException(ApplicationConstants.ErrorMessage.NotFound);
         }
     }
 }

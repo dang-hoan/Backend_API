@@ -1,8 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using Domain.Constants.Enum;
 using Domain.Contracts;
-using Domain.Constants.Enum;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities.Feedback
 {
@@ -31,6 +30,7 @@ namespace Domain.Entities.Feedback
 
         [Column("rating", TypeName = "smallInt")]
         public Rating? Rating { get; set; }
+
         [Column("booking_detail_id", TypeName = "bigInt")]
         public long BookingDetailId { get; set; }
     }
