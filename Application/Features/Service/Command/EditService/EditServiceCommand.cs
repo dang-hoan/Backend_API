@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Requests.Feedback;
+using Application.Exceptions;
 using Application.Interfaces;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Service;
@@ -30,6 +31,7 @@ namespace Application.Features.Service.Command.EditService
         private readonly IServiceImageRepository _serviceImageRepository;
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly IUploadService _uploadService;
+
         public EditServiceCommandHandler(IMapper mapper, IServiceRepository serviceRepository, IServiceImageRepository serviceImageRepository, IUnitOfWork<long> unitOfWork, IUploadService uploadService)
         {
             _mapper = mapper;
@@ -42,44 +44,54 @@ namespace Application.Features.Service.Command.EditService
         public async Task<Result<EditServiceCommand>> Handle(EditServiceCommand request, CancellationToken cancellationToken)
         {
             var transaction = await _unitOfWork.BeginTransactionAsync();
-            if (request.Id == 0)
+            try
             {
-                return await Result<EditServiceCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
-            }
-            var editService = await _serviceRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
-            if (editService == null) return await Result<EditServiceCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
-
-            _mapper.Map(request, editService);
-            await _serviceRepository.UpdateAsync(editService);
-
-            if (request.ServicesImageRequests != null)
-            {
-                //Remove and Add List Request Image
-                var requestImages = await _serviceImageRepository.Entities.Where(x => x.ServiceId == editService.Id && !x.IsDeleted).ToListAsync(cancellationToken);
-                if (requestImages.Any())
+                if (request.Id == 0)
                 {
-                    foreach (var item in requestImages)
+                    return await Result<EditServiceCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
+                }
+                var editService = await _serviceRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
+                if (editService == null) return await Result<EditServiceCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
+
+                _mapper.Map(request, editService);
+                await _serviceRepository.UpdateAsync(editService);
+
+                if (request.ServicesImageRequests != null)
+                {
+                    //Remove and Add List Request Image
+                    var requestImages = await _serviceImageRepository.Entities.Where(x => x.ServiceId == editService.Id && !x.IsDeleted).ToListAsync(cancellationToken);
+                    if (requestImages.Any())
                     {
-                        await _uploadService.DeleteAsync(item.NameFile);
+                        foreach (var item in requestImages)
+                        {
+                            await _uploadService.DeleteAsync(item.NameFile);
+                        }
+                        await _serviceImageRepository.RemoveRangeAsync(requestImages);
+                        await _unitOfWork.Commit(cancellationToken);
                     }
-                    await _serviceImageRepository.RemoveRangeAsync(requestImages);
+                    var image = _mapper.Map<List<ServiceImage>>(request.ServicesImageRequests);
+                    var requestImage = image.Select(x =>
+                    {
+                        x.Id = 0;
+                        x.ServiceId = editService.Id;
+                        return x;
+                    }).ToList();
+                    await _serviceImageRepository.AddRangeAsync(requestImage);
                     await _unitOfWork.Commit(cancellationToken);
                 }
-                var image = _mapper.Map<List<ServiceImage>>(request.ServicesImageRequests);
-                var requestImage = image.Select(x =>
-                {
-                    x.Id = 0;
-                    x.ServiceId = editService.Id;
-                    return x;
-                }).ToList();
-                await _serviceImageRepository.AddRangeAsync(requestImage);
-                await _unitOfWork.Commit(cancellationToken);
-            }
 
-            await _unitOfWork.Commit(cancellationToken);
-            await transaction.CommitAsync();
-            await transaction.DisposeAsync();
-            return await Result<EditServiceCommand>.SuccessAsync(request);
+                await transaction.CommitAsync();
+                return await Result<EditServiceCommand>.SuccessAsync(request);
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw new ApiException(ex.Message);
+            }
+            finally
+            {
+                await transaction.DisposeAsync();
+            }
         }
     }
 }

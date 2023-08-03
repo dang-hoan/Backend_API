@@ -66,49 +66,58 @@ namespace Application.Features.Client.Command.AddFeedback
         public async Task<Result<AddFeedbackCommand>> Handle(AddFeedbackCommand request, CancellationToken cancellationToken)
         {
             var transaction = await _unitOfWork.BeginTransactionAsync();
-            var isExistInBookingDetail = await _bookingDetailRepository.FindAsync(x => x.Id == request.BookingDetailId && !x.IsDeleted) ?? throw new ApiException(StaticVariable.NOT_FOUND_BOOKING_DETAIL);
-            var isExistBookingFeedback = await _feedbackRepository.FindAsync(x => x.BookingDetailId == request.BookingDetailId && !x.IsDeleted);
-            if (isExistBookingFeedback != null)
+            try
             {
-                return await Result<AddFeedbackCommand>.FailAsync("You rated this feedback");
-            }
-            var addFeedback = _mapper.Map<Domain.Entities.Feedback.Feedback>(request);
+                var isExistInBookingDetail = await _bookingDetailRepository.FindAsync(x => x.Id == request.BookingDetailId && !x.IsDeleted) ?? throw new ApiException(StaticVariable.NOT_FOUND_BOOKING_DETAIL);
+                var isExistBookingFeedback = await _feedbackRepository.FindAsync(x => x.BookingDetailId == request.BookingDetailId && !x.IsDeleted);
+                if (isExistBookingFeedback != null)
+                {
+                    return await Result<AddFeedbackCommand>.FailAsync("You rated this feedback");
+                }
+                var addFeedback = _mapper.Map<Domain.Entities.Feedback.Feedback>(request);
 
-            var userName = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            long customerId = 0;
-            var currentLoginUser = new AppUser();
-            if (userName != null)
+                var userName = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                long customerId = 0;
+                var currentLoginUser = new AppUser();
+                if (userName != null)
+                {
+                    currentLoginUser = await _userManager.FindByNameAsync(userName);
+                    if (currentLoginUser.TypeFlag != TypeFlagEnum.Customer)
+                        return await Result<AddFeedbackCommand>.FailAsync("You are not customer");
+
+                    var isCustomerHasBooking = _bookingRepository.Entities.Where(x => x.CustomerId == currentLoginUser.UserId && x.Id == isExistInBookingDetail.BookingId && x.Status == BookingStatus.Done).Select(x => x.Id);
+                    customerId = currentLoginUser.UserId;
+                    if (isCustomerHasBooking.Count() == 0)
+                        return await Result<AddFeedbackCommand>.FailAsync("You cannot leave feedback of other customer");
+                }
+                else
+                {
+                    return await Result<AddFeedbackCommand>.FailAsync(StaticVariable.IS_NOT_LOGIN);
+                }
+                _logger.LogInformation($"log: {JsonConvert.SerializeObject(customerId)}");
+                // Check Image is valid
+                addFeedback.CustomerId = customerId;
+                await _feedbackRepository.AddAsync(addFeedback);
+
+                if (request.FeedbackImageRequests != null)
+                {
+                    var addImage = _mapper.Map<List<FeedbackFileUpload>>(request.FeedbackImageRequests);
+                    addImage.ForEach(x => x.FeedbackId = addFeedback.Id);
+                    await _feedbackFileUploadRepository.AddRangeAsync(addImage);
+                }
+
+                await transaction.CommitAsync(cancellationToken);
+                return await Result<AddFeedbackCommand>.SuccessAsync(request);
+            }
+            catch (Exception ex)
             {
-                currentLoginUser = await _userManager.FindByNameAsync(userName);
-                if (currentLoginUser.TypeFlag != TypeFlagEnum.Customer)
-                    return await Result<AddFeedbackCommand>.FailAsync("You are not customer");
-
-                var isCustomerHasBooking = _bookingRepository.Entities.Where(x => x.CustomerId == currentLoginUser.UserId && x.Id == isExistInBookingDetail.BookingId && x.Status == BookingStatus.Done).Select(x => x.Id);
-                customerId = currentLoginUser.UserId;
-                if (isCustomerHasBooking.Count() == 0)
-                    return await Result<AddFeedbackCommand>.FailAsync("You cannot leave feedback of other customer");
+                await transaction.RollbackAsync(cancellationToken);
+                throw new ApiException(ex.Message);
             }
-            else
+            finally
             {
-                return await Result<AddFeedbackCommand>.FailAsync(StaticVariable.IS_NOT_LOGIN);
+                await transaction.DisposeAsync();
             }
-            _logger.LogInformation($"log: {JsonConvert.SerializeObject(customerId)}");
-            // Check Image is valid
-            addFeedback.CustomerId = customerId;
-            await _feedbackRepository.AddAsync(addFeedback);
-            await _unitOfWork.Commit(cancellationToken);
-
-            if (request.FeedbackImageRequests != null)
-            {
-                var addImage = _mapper.Map<List<FeedbackFileUpload>>(request.FeedbackImageRequests);
-                addImage.ForEach(x => x.FeedbackId = addFeedback.Id);
-                await _feedbackFileUploadRepository.AddRangeAsync(addImage);
-                await _unitOfWork.Commit(cancellationToken);
-            }
-            await transaction.CommitAsync();
-            await transaction.DisposeAsync();
-
-            return await Result<AddFeedbackCommand>.SuccessAsync(request);
         }
     }
 }

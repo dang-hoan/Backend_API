@@ -2,6 +2,7 @@
 
 namespace Application.Interfaces.Repositories
 {
+
     public interface IUnitOfWork<TId> : IDisposable
     {
         Task<int> Commit(CancellationToken cancellationToken);

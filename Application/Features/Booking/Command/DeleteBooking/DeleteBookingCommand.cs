@@ -1,10 +1,10 @@
+using Application.Exceptions;
 using Application.Interfaces.Booking;
 using Application.Interfaces.BookingDetail;
 using Application.Interfaces.Customer;
 using Application.Interfaces.Repositories;
 using Domain.Constants;
 using Domain.Constants.Enum;
-using Domain.Entities.BookingDetail;
 using Domain.Wrappers;
 using MediatR;
 
@@ -37,13 +37,10 @@ namespace Application.Features.Booking.Command.DeleteBooking
         public async Task<Result<long>> Handle(DeleteBookingCommand request, CancellationToken cancellationToken)
         {
             var transaction = await _unitOfWork.BeginTransactionAsync();
-
-            var booking = await _bookingRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
-            if (booking == null) return await Result<long>.FailAsync(StaticVariable.NOT_FOUND_MSG);
-
             try
             {
-
+                var booking = await _bookingRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
+                if (booking == null) return await Result<long>.FailAsync(StaticVariable.NOT_FOUND_MSG);
                 if (!(booking.Status == BookingStatus.Inprogress))
                 {
                     var bookingDetail = await _bookingDetailRepository.GetByCondition(x => x.BookingId == request.Id && !x.IsDeleted);
@@ -63,16 +60,19 @@ namespace Application.Features.Booking.Command.DeleteBooking
                         await _customerRepository.UpdateAsync(ExistCustomer);
                         await _unitOfWork.Commit(cancellationToken);
                     }
-
                     return await Result<long>.SuccessAsync(request.Id, $"Delete booking and booking detail by booking id {request.Id} successfully!");
                 }
                 await transaction.CommitAsync(cancellationToken);
-                await transaction.DisposeAsync();
                 return await Result<long>.FailAsync("Booking is inprogress");
             }
-            catch (System.Exception e)
+            catch (Exception ex)
             {
-                return await Result<long>.FailAsync(e.Message);
+                await transaction.RollbackAsync(cancellationToken);
+                throw new ApiException(ex.Message);
+            }
+            finally
+            {
+                await transaction.DisposeAsync();
             }
         }
     }
