@@ -29,18 +29,28 @@ namespace Application.Features.Feedback.Command.DeleteFeedback
         public async Task<Result<long>> Handle(DeleteFeedbackCommand request, CancellationToken cancellationToken)
         {
             var transaction = await _unitOfWork.BeginTransactionAsync();
-            var deleteFeedback = await _feedbackRepository.FindAsync(_ => _.Id == request.Id && !_.IsDeleted) ?? throw new ApiException(StaticVariable.NOT_FOUND_MSG);
-            var deleteReply = await _replyRepository.FindAsync(_ => _.Id == deleteFeedback.ReplyId && !_.IsDeleted);
-            if (deleteReply != null)
+            try
             {
-                await _replyRepository.DeleteAsync(deleteReply);
-                await _unitOfWork.Commit(cancellationToken);
+                var deleteFeedback = await _feedbackRepository.FindAsync(_ => _.Id == request.Id && !_.IsDeleted) ?? throw new ApiException(StaticVariable.NOT_FOUND_MSG);
+                var deleteReply = await _replyRepository.FindAsync(_ => _.Id == deleteFeedback.ReplyId && !_.IsDeleted);
+                if (deleteReply != null)
+                {
+                    await _replyRepository.DeleteAsync(deleteReply);
+                }
+                await _feedbackRepository.DeleteAsync(deleteFeedback);
+
+                await transaction.CommitAsync();
+                return await Result<long>.SuccessAsync(request.Id, $"Delete feedback by id successfully!");
             }
-            await _feedbackRepository.DeleteAsync(deleteFeedback);
-            await _unitOfWork.Commit(cancellationToken);
-            await transaction.CommitAsync();
-            await transaction.DisposeAsync();
-            return await Result<long>.SuccessAsync(request.Id, $"Delete feedback by id successfully!");
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw new ApiException(ex.Message);
+            }
+            finally
+            {
+                await transaction.DisposeAsync();
+            }
         }
     }
 }

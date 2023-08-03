@@ -22,10 +22,9 @@ namespace Infrastructure.Extensions
             {
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), o =>
                 {
-                    o.EnableRetryOnFailure();
                     o.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
                 });
-                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                //options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly());

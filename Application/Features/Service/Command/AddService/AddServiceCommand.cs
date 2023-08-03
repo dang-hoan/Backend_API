@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Requests.Feedback;
+using Application.Exceptions;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Service;
 using Application.Interfaces.ServiceImage;
@@ -37,22 +38,33 @@ namespace Application.Features.Service.Command.AddService
         public async Task<Result<AddServiceCommand>> Handle(AddServiceCommand request, CancellationToken cancellationToken)
         {
             var transaction = await _unitOfWork.BeginTransactionAsync();
-            var addService = _mapper.Map<Domain.Entities.Service.Service>(request);
-            await _serviceRepository.AddAsync(addService);
-            await _unitOfWork.Commit(cancellationToken);
-            request.Id = addService.Id;
-
-            if (request.ServicesImageRequests != null)
+            try
             {
-                var addImage = _mapper.Map<List<ServiceImage>>(request.ServicesImageRequests);
-                addImage.ForEach(x => x.ServiceId = addService.Id);
-                await _serviceImageRepository.AddRangeAsync(addImage);
+                var addService = _mapper.Map<Domain.Entities.Service.Service>(request);
+                await _serviceRepository.AddAsync(addService);
                 await _unitOfWork.Commit(cancellationToken);
-            }
-            await transaction.CommitAsync();
-            await transaction.DisposeAsync();
+                request.Id = addService.Id;
 
-            return await Result<AddServiceCommand>.SuccessAsync(request);
+                if (request.ServicesImageRequests != null)
+                {
+                    var addImage = _mapper.Map<List<ServiceImage>>(request.ServicesImageRequests);
+                    addImage.ForEach(x => x.ServiceId = addService.Id);
+                    await _serviceImageRepository.AddRangeAsync(addImage);
+                    await _unitOfWork.Commit(cancellationToken);
+                }
+
+                await transaction.CommitAsync();
+                return await Result<AddServiceCommand>.SuccessAsync(request);
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw new ApiException(ex.Message);
+            }
+            finally
+            {
+                await transaction.DisposeAsync();
+            }
         }
     }
 }
