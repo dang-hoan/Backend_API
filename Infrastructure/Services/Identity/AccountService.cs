@@ -21,17 +21,17 @@ namespace Infrastructure.Services.Identity
             var user = await this._userManager.FindByNameAsync(employeeNo);
             if (user == null)
             {
-                return await Result.FailAsync("Không tìm thấy người dùng");
+                return await Result.FailAsync(StaticVariable.NOT_FOUND_MSG);
             }
 
             if (!model.NewPassword.Equals(model.ConfirmNewPassword))
             {
-                return await Result.FailAsync("Mật khẩu không khớp.");
+                return await Result.FailAsync("Password confirmation does not match.");
             }
 
             var identityResult = await this._userManager.ChangePasswordAsync(user, model.Password, model.NewPassword);
 
-            return identityResult.Succeeded ? await Result.SuccessAsync() : await Result.FailAsync("Đổi mật khẩu không thành công");
+            return identityResult.Succeeded ? await Result.SuccessAsync() : await Result.FailAsync("Failed to change password.");
         }
         public async Task<bool> IsExistUsername(string userName)
         {
