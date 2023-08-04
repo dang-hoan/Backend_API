@@ -84,7 +84,7 @@ namespace Application.Features.WorkShift.Command.EditWorkShift
                 return await Result<EditWorkShiftCommand>.FailAsync(StaticVariable.NOT_LOGIC_DATE_ORDER);
             }
             
-            var workShift = _mapper.Map<Domain.Entities.WorkShift.WorkShift>(request);
+            var workShift = _mapper.Map(request, editWorkShift);
 
             request.WorkDays = request.WorkDays.Distinct().ToList();
             foreach (int i in request.WorkDays)
