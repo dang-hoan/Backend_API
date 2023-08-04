@@ -73,7 +73,7 @@ namespace Infrastructure.Services.Identity
             if (user == null)
             {
                 // Don't reveal that the user does not exist
-                return await Result.FailAsync("Lỗi hệ thống");
+                return await Result.FailAsync("System Error");
             }
 
             var token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
@@ -82,7 +82,7 @@ namespace Infrastructure.Services.Identity
             {
                 return await Result.SuccessAsync();
             }
-            return await Result.FailAsync("Lỗi hệ thống");
+            return await Result.FailAsync("System Error");
         }
 
         public async Task<IResult> DeleteUser(DeleteUserRequest request)
@@ -91,7 +91,7 @@ namespace Infrastructure.Services.Identity
             if (user == null)
             {
                 // Don't reveal that the user does not exist
-                return await Result.FailAsync("Lỗi hệ thống");
+                return await Result.FailAsync("System Error");
             }
 
             user.IsActive = false;
@@ -102,7 +102,7 @@ namespace Infrastructure.Services.Identity
             {
                 return await Result.SuccessAsync();
             }
-            return await Result.FailAsync("Lỗi hệ thống");
+            return await Result.FailAsync("System Error");
         }
 
         public async Task<IResult> EditUser(EditUserRequest request)

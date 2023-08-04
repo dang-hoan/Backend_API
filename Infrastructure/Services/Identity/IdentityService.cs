@@ -30,12 +30,12 @@ namespace Infrastructure.Services.Identity
             var user = await _userManager.FindByNameAsync(model.EmployeeNo);
             if (user == null)
             {
-                return await Result<TokenResponse>.FailAsync("Tên người dùng hoặc mật khẩu không đúng.");
+                return await Result<TokenResponse>.FailAsync("Incorrect username or password.");
             }
             var passwordValid = await _userManager.CheckPasswordAsync(user, model.Password);
             if (!passwordValid)
             {
-                return await Result<TokenResponse>.FailAsync("Tên người dùng hoặc mật khẩu không đúng.");
+                return await Result<TokenResponse>.FailAsync("Incorrect username or password.");
             }
 
             user.RefreshToken = GenerateRefreshToken();
@@ -63,15 +63,15 @@ namespace Infrastructure.Services.Identity
         {
             if (model is null)
             {
-                return await Result<TokenResponse>.FailAsync("Token không hợp lệ");
+                return await Result<TokenResponse>.FailAsync("Invalid Token");
             }
             var userPrincipal = GetPrincipalFromExpiredToken(model.Token);
             var userUsername = userPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await _userManager.FindByNameAsync(userUsername);
             if (user == null)
-                return await Result<TokenResponse>.FailAsync("Tên người dùng hoặc mật khẩu không đúng.");
+                return await Result<TokenResponse>.FailAsync("Incorrect username or password.");
             if (user.RefreshToken != model.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
-                return await Result<TokenResponse>.FailAsync("Token không hợp lệ");
+                return await Result<TokenResponse>.FailAsync("Invalid Token");
             var token = GenerateEncryptedToken(GetSigningCredentials(), await GetClaimsAsync(user));
             user.RefreshToken = GenerateRefreshToken();
             await _userManager.UpdateAsync(user);
@@ -118,7 +118,8 @@ namespace Infrastructure.Services.Identity
                     new(ClaimTypes.NameIdentifier, user.UserName),
                     (user.Email != null) ? new(ClaimTypes.Email, user.Email) : null,
                     new(ClaimTypes.Name, user.FullName),
-                    new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty)
+                    new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty),
+                    new("UserId",user.UserId.ToString())
                 }
                 .Union(userClaims)
                 .Union(roleClaims);

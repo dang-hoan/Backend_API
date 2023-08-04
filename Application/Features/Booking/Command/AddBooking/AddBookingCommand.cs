@@ -1,6 +1,7 @@
 ﻿using Application.Exceptions;
 using Application.Interfaces.Booking;
 using Application.Interfaces.BookingDetail;
+using Application.Interfaces.Customer;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Service;
 using AutoMapper;
@@ -30,14 +31,16 @@ namespace Application.Features.Booking.Command.AddBooking
         private readonly IServiceRepository _serviceRepository;
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly IBookingDetailRepository _bookingDetailService;
+        private readonly ICustomerRepository _customerRepository;
 
-        public AddBookingCommandHandler(IMapper mapper, IBookingRepository bookingRepository, IServiceRepository serviceRepository, IUnitOfWork<long> unitOfWork, IBookingDetailRepository bookingDetailService)
+        public AddBookingCommandHandler(IMapper mapper, IBookingRepository bookingRepository, IServiceRepository serviceRepository, IUnitOfWork<long> unitOfWork, IBookingDetailRepository bookingDetailService, ICustomerRepository customerRepository)
         {
             _mapper = mapper;
             _bookingRepository = bookingRepository;
             _unitOfWork = unitOfWork;
             _serviceRepository = serviceRepository;
             _bookingDetailService = bookingDetailService;
+            _customerRepository = customerRepository;
         }
 
         public async Task<Result<AddBookingCommand>> Handle(AddBookingCommand request, CancellationToken cancellationToken)
@@ -51,6 +54,8 @@ namespace Application.Features.Booking.Command.AddBooking
                 {
                     return await Result<AddBookingCommand>.FailAsync(StaticVariable.NOT_LOGIC_DATE_ORDER);
                 }
+                var ExistCustomer = await _customerRepository.FindAsync(x => x.Id == request.CustomerId && !x.IsDeleted);
+                if (ExistCustomer == null) return await Result<AddBookingCommand>.FailAsync(StaticVariable.NOT_FOUND_CUSTOMER);
 
                 // check request.ServiceId exist in db
                 List<long> listExistServiceId = await _serviceRepository.Entities.Where(x => !x.IsDeleted).Select(x => x.Id).ToListAsync();
@@ -59,6 +64,7 @@ namespace Application.Features.Booking.Command.AddBooking
                 var booking = _mapper.Map<Domain.Entities.Booking.Booking>(request);
                 booking.Status = BookingStatus.Waiting;
                 await _bookingRepository.AddAsync(booking);
+                await _unitOfWork.Commit(cancellationToken);
                 request.Id = booking.Id;
                 foreach (long i in request.ServiceId)
                 {
@@ -69,7 +75,10 @@ namespace Application.Features.Booking.Command.AddBooking
                         Note = booking.Note
                     });
                 }
-
+                await _unitOfWork.Commit(cancellationToken);
+                ExistCustomer.TotalMoney = _bookingRepository.GetAllTotalMoneyBookingByCustomerId(ExistCustomer.Id);
+                await _customerRepository.UpdateAsync(ExistCustomer);
+                await _unitOfWork.Commit(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
                 return await Result<AddBookingCommand>.SuccessAsync(request);
             }
