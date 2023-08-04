@@ -1,16 +1,17 @@
 ﻿using Application.Interfaces.Booking;
 using Infrastructure.Contexts;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.Booking
 {
     public class BookingRepository : RepositoryAsync<Domain.Entities.Booking.Booking, long>, IBookingRepository
     {
         private readonly ApplicationDbContext _dbContext;
+
         public BookingRepository(ApplicationDbContext dbContext) : base(dbContext)
         {
             _dbContext = dbContext;
         }
+
         public decimal GetAllTotalMoneyBookingByCustomerId(long id)
         {
             var totalMoney = _dbContext.Bookings.Where(b => b.CustomerId == id && !b.IsDeleted)
@@ -23,7 +24,7 @@ namespace Infrastructure.Repositories.Booking
                 TotalMoney = group.Sum(bb => bb.Service.Price)
             })
             .FirstOrDefault(); ;
-            return (totalMoney != null) ?  totalMoney.TotalMoney : 0;
+            return (totalMoney != null) ? totalMoney.TotalMoney : 0;
         }
     }
 }
