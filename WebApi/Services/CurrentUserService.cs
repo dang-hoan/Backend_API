@@ -13,13 +13,10 @@ namespace WebApi.Services
             OriginRequest = httpContextAccessor.HttpContext?.Request.Headers["Origin"].ToString()!;
             Claims = httpContextAccessor.HttpContext?.User?.Claims.AsEnumerable().Select(item => new KeyValuePair<string, string>(item.Type, item.Value)).ToList()!;
         }
-
         public string UserId { get; }
         public string RoleName { get; }
         public string HostServerName { get; }
         public string OriginRequest { get; }
-
-
         public List<KeyValuePair<string, string>>? Claims { get; set; }
     }
 }
