@@ -24,7 +24,7 @@ namespace Application.Features.Employee.Command.EditEmployee
 
         public string PhoneNumber { get; set; } = default!;
         public bool? Gender { get; set; }
-        public string? ImageFile { get; set; }
+        public string? Image { get; set; }
         public long WorkShiftId { get; set; }
     }
 
@@ -78,7 +78,7 @@ namespace Application.Features.Employee.Command.EditEmployee
                 FullName = request.Name,
                 Email = request.Email,
                 Phone = request.PhoneNumber,
-                ImageFile = request.ImageFile,
+                ImageFile = request.Image,
             });
             return await Result<EditEmployeeCommand>.SuccessAsync(request);
         }
