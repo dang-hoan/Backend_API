@@ -54,7 +54,8 @@ namespace Infrastructure.Services.Identity
                 Email = user.Email,
                 EmployeeNo = user.UserName,
                 Role = roles.First(),
-                RefreshTokenExpiryTime = user.RefreshTokenExpiryTime
+                RefreshTokenExpiryTime = user.RefreshTokenExpiryTime,
+                UserId = user.UserId
             };
             return await Result<TokenResponse>.SuccessAsync(response);
         }
@@ -119,7 +120,6 @@ namespace Infrastructure.Services.Identity
                     (user.Email != null) ? new(ClaimTypes.Email, user.Email) : null,
                     new(ClaimTypes.Name, user.FullName),
                     new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty),
-                    new("UserId",user.UserId.ToString())
                 }
                 .Union(userClaims)
                 .Union(roleClaims);

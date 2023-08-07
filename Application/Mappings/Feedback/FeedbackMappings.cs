@@ -1,4 +1,4 @@
-﻿using Application.Features.Client.Command.AddFeedback;
+﻿using Application.Features.Feedback.Command.AddFeedback;
 using AutoMapper;
 
 namespace Application.Mappings.Feeback
