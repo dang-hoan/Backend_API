@@ -38,7 +38,7 @@ namespace Infrastructure.Extensions
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAuditService, AuditService>();
             services.AddScoped<IExcelService, ExcelService>();
-            services.AddScoped<IUploadService, UploadService>();
+            services.AddTransient<IUploadService, UploadService>();
             services.AddScoped<IRemoveImageService, RemoveImageService>();
             services.AddScoped<ICheckFileType, CheckFileType>();
             services.AddScoped<ICheckSizeFile, CheckFileSize>();

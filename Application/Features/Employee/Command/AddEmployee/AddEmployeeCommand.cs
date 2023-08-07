@@ -4,7 +4,6 @@ using Application.Interfaces.Services.Account;
 using Application.Interfaces.WorkShift;
 using AutoMapper;
 using Domain.Constants;
-using Domain.Constants.Enum;
 using Domain.Entities;
 using Domain.Wrappers;
 using MediatR;
@@ -24,7 +23,7 @@ namespace Application.Features.Employee.Command.AddEmployee
 
         public string? PhoneNumber { get; set; }
         public bool? Gender { get; set; }
-        public string? ImageFile { get; set; }
+        public string? Image { get; set; }
         public string Password { get; set; } = default!;
         public string Username { get; set; } = default!;
         public long WorkShiftId { get; set; }
@@ -73,22 +72,8 @@ namespace Application.Features.Employee.Command.AddEmployee
             var addEmployee = _mapper.Map<Domain.Entities.Employee.Employee>(request);
             await _employeeRepository.AddAsync(addEmployee);
             await _unitOfWork.Commit(cancellationToken);
-
             request.Id = addEmployee.Id;
-            var user = new AppUser()
-            {
-                FullName = request.Name,
-                Email = request.Email,
-                UserName = request.Username,
-                EmailConfirmed = true,
-                PhoneNumber = request.PhoneNumber,
-                PhoneNumberConfirmed = true,
-                CreatedOn = DateTime.Now,
-                IsActive = true,
-                TypeFlag = TypeFlagEnum.Employee,
-                UserId = (long)request.Id,
-                AvatarUrl = request.ImageFile,
-            };
+            var user = _mapper.Map<AppUser>(request);
             bool result = await _accountService.AddAcount(user, request.Password, RoleConstants.EmployeeRole);
             if (!result)
             {
