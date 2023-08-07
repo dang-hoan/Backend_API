@@ -9,5 +9,6 @@
         public string AvatarUrl { get; set; }
         public string Role { get; set; }
         public DateTime RefreshTokenExpiryTime { get; set; }
+        public long UserId { get; set; }
     }
 }

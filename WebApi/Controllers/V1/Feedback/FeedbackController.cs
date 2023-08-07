@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Domain.Wrappers;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Feedback.Queries.GetHistoryFeedback;
-using Application.Features.Client.Command.AddFeedback;
+using Application.Features.Feedback.Command.AddFeedback;
 using Microsoft.AspNetCore.Authorization;
 
 namespace WebApi.Controllers.V1.Feeback

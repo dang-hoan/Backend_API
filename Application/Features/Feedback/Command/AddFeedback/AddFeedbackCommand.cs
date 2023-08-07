@@ -18,11 +18,11 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Security.Claims;
 
-namespace Application.Features.Client.Command.AddFeedback
+namespace Application.Features.Feedback.Command.AddFeedback
 {
     public class AddFeedbackCommand : IRequest<Result<AddFeedbackCommand>>
     {
-        public string Rating { get; set; } = default!;
+        public int Rating { get; set; } = default!;
         public long BookingDetailId { get; set; } = default!;
         public string? StaffContent { get; set; }
         public string? ServiceContent { get; set; }
@@ -68,8 +68,14 @@ namespace Application.Features.Client.Command.AddFeedback
             var transaction = await _unitOfWork.BeginTransactionAsync();
             try
             {
-                var isExistInBookingDetail = await _bookingDetailRepository.FindAsync(x => x.Id == request.BookingDetailId && !x.IsDeleted) ?? throw new ApiException(StaticVariable.NOT_FOUND_BOOKING_DETAIL);
+                var isExistInBookingDetail = await _bookingDetailRepository.FindAsync(x => x.Id == request.BookingDetailId && !x.IsDeleted);
+
+                if(isExistInBookingDetail == null) return await Result<AddFeedbackCommand>.FailAsync(StaticVariable.NOT_FOUND_BOOKING_DETAIL);
                 var isExistBookingFeedback = await _feedbackRepository.FindAsync(x => x.BookingDetailId == request.BookingDetailId && !x.IsDeleted);
+                if (request.Rating < (int)Rating.OneStar || request.Rating > (int)Rating.FiveStars)
+                {
+                    return await Result<AddFeedbackCommand>.FailAsync("Rating must be from 1 to 5 star");
+                }
                 if (isExistBookingFeedback != null)
                 {
                     return await Result<AddFeedbackCommand>.FailAsync("You rated this feedback");
@@ -87,25 +93,44 @@ namespace Application.Features.Client.Command.AddFeedback
 
                     var isCustomerHasBooking = _bookingRepository.Entities.Where(x => x.CustomerId == currentLoginUser.UserId && x.Id == isExistInBookingDetail.BookingId && x.Status == BookingStatus.Done).Select(x => x.Id);
                     customerId = currentLoginUser.UserId;
-                    if (isCustomerHasBooking.Count() == 0)
+
+                    var isWaitingBooking = _bookingRepository.Entities.Where(x => x.CustomerId == currentLoginUser.UserId &&
+                                            x.Id == isExistInBookingDetail.BookingId &&
+                                            x.Status == BookingStatus.Waiting);
+
+                    if (isWaitingBooking.Any())
+                    {
+                        return await Result<AddFeedbackCommand>.FailAsync("You cannot leave feedback for waiting booking");
+                    }
+
+                    var isInProgressBooking = _bookingRepository.Entities.Where(x => x.CustomerId == currentLoginUser.UserId &&
+                     x.Id == isExistInBookingDetail.BookingId &&
+                     x.Status == BookingStatus.Inprogress);
+
+                    if (isInProgressBooking.Any())
+                    {
+                        return await Result<AddFeedbackCommand>.FailAsync("You cannot leave feedback for in progress booking");
+                    }
+
+                    if (!isCustomerHasBooking.Any())
                         return await Result<AddFeedbackCommand>.FailAsync("You cannot leave feedback of other customer");
                 }
                 else
                 {
                     return await Result<AddFeedbackCommand>.FailAsync(StaticVariable.IS_NOT_LOGIN);
                 }
-                _logger.LogInformation($"log: {JsonConvert.SerializeObject(customerId)}");
+
                 // Check Image is valid
                 addFeedback.CustomerId = customerId;
                 await _feedbackRepository.AddAsync(addFeedback);
-
+                await _unitOfWork.Commit(cancellationToken);
                 if (request.FeedbackImageRequests != null)
                 {
                     var addImage = _mapper.Map<List<FeedbackFileUpload>>(request.FeedbackImageRequests);
                     addImage.ForEach(x => x.FeedbackId = addFeedback.Id);
                     await _feedbackFileUploadRepository.AddRangeAsync(addImage);
                 }
-
+                await _unitOfWork.Commit(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
                 return await Result<AddFeedbackCommand>.SuccessAsync(request);
             }
