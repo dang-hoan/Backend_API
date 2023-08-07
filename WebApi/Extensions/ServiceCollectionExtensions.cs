@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
+using Domain.Entities.Service;
 using Hangfire;
 using Infrastructure.Contexts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -100,6 +101,7 @@ namespace WebApi.Extensions
 
         public static void AddCurrentUserService(this IServiceCollection service)
         {
+            service.AddHttpContextAccessor();
             service.AddScoped<ICurrentUserService, CurrentUserService>();
             service.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
