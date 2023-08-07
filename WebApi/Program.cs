@@ -3,6 +3,7 @@ using Domain.Entities.Employee;
 using Domain.Entities.Service;
 using Hangfire;
 using Infrastructure.Extensions;
+using Microsoft.Extensions.FileProviders;
 using Serilog;
 using Shared.Extensions;
 using WebApi.Extensions;
@@ -70,6 +71,11 @@ try
     app.UseRouting();
 
     app.UseStaticFiles();
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Files")),
+        RequestPath = new PathString("/Files")
+    });
 
     app.UseCors("CorsPolicy");
 
