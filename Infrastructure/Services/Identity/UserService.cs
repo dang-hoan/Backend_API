@@ -115,6 +115,7 @@ namespace Infrastructure.Services.Identity
             user.FullName = request.FullName;
             user.Email = request.Email;
             user.PhoneNumber = request.Phone;
+            user.AvatarUrl = request.ImageFile;
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {

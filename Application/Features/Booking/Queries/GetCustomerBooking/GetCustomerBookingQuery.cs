@@ -51,7 +51,7 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
                     CustomerId = s.CustomerId,
                     BookingDate = s.BookingDate,
                     FromTime = s.FromTime,
-                    Totime = s.Totime,
+                    ToTime = s.ToTime,
                     LastModifiedOn = s.LastModifiedOn,
                     Status = s.Status,
                     Note = s.Note,

@@ -77,9 +77,8 @@ namespace Application.Features.Service.Command.EditService
                         return x;
                     }).ToList();
                     await _serviceImageRepository.AddRangeAsync(requestImage);
-                    await _unitOfWork.Commit(cancellationToken);
                 }
-
+                await _unitOfWork.Commit(cancellationToken);
                 await transaction.CommitAsync();
                 return await Result<EditServiceCommand>.SuccessAsync(request);
             }

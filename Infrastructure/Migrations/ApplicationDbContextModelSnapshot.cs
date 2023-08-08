@@ -258,7 +258,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("smallInt")
                         .HasColumnName("status");
 
-                    b.Property<DateTime>("Totime")
+                    b.Property<DateTime>("ToTime")
                         .HasColumnType("datetime")
                         .HasColumnName("to_time");
 

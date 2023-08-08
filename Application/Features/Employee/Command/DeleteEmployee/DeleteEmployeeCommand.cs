@@ -34,7 +34,7 @@ namespace Application.Features.Employee.Command.DeleteEmployee
             var deleteEmployee = await _employeeRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
             if (deleteEmployee == null) return await Result<long>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             await _employeeRepository.DeleteAsync(deleteEmployee);
-            if (string.IsNullOrWhiteSpace(deleteEmployee.Image))
+            if (!string.IsNullOrWhiteSpace(deleteEmployee.Image))
             {
                 await _uploadService.DeleteAsync(deleteEmployee.Image);
             }

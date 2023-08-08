@@ -34,7 +34,7 @@ namespace WebApi.Controllers.V1.Booking
                 PageSize = query.PageSize,
                 BookingDate = query.BookingDate,
                 FromTime = query.FromTime,
-                Totime = query.Totime,
+                ToTime = query.ToTime,
                 Status = query.Status
             }));
         }

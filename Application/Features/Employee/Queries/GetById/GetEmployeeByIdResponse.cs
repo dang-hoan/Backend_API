@@ -12,7 +12,6 @@ namespace Application.Features.Employee.Queries.GetById
         public string? Image { get; set; }
         public string? ImageLink { get; set; }
         public string? UserName { get; set; }
-        public string? Password { get; set; }
         public long WorkShiftId { get; set; }
     }
 }

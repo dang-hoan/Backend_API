@@ -31,7 +31,7 @@ namespace Infrastructure.Services.Identity
 
             var identityResult = await this._userManager.ChangePasswordAsync(user, model.Password, model.NewPassword);
 
-            return identityResult.Succeeded ? await Result.SuccessAsync() : await Result.FailAsync("Failed to change password.");
+            return identityResult.Succeeded ? await Result.SuccessAsync() : await Result.FailAsync(identityResult.ToString());
         }
         public async Task<bool> IsExistUsername(string userName)
         {

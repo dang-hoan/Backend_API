@@ -41,8 +41,8 @@ namespace Application.Features.Booking.Queries.GetById
                     BookingDate = s.BookingDate,
                     Status = s.Status,
                     FromTime = s.FromTime,
-                    Totime = s.Totime,
-                    Note = s.Note,
+                    ToTime = s.ToTime,
+                    Note = s.Note,  
                     CustomerId = s.CustomerId,
                 }).FirstOrDefaultAsync();
             if(Booking == null)
@@ -62,7 +62,7 @@ namespace Application.Features.Booking.Queries.GetById
             {
                 return await Result<GetBookingByIdResponse>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             }
-            BookingDetailResponse.CutomerName = CustomerBooking.CustomerName;
+            BookingDetailResponse.CustomerName = CustomerBooking.CustomerName;
             BookingDetailResponse.PhoneNumber = CustomerBooking.PhoneNumber;
             var BookingDetails = await _bookingDetailRepository.Entities
                 .Where(_ => _.BookingId == Booking.Id && !_.IsDeleted)

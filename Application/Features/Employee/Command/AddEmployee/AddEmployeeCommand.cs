@@ -21,7 +21,7 @@ namespace Application.Features.Employee.Command.AddEmployee
         [EmailAddress(ErrorMessage = "Invalid email address")]
         public string Email { get; set; } = default!;
 
-        public string? PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
         public bool? Gender { get; set; }
         public string? Image { get; set; }
         public string Password { get; set; } = default!;

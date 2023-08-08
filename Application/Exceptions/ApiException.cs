@@ -10,7 +10,7 @@ namespace Application.Exceptions
         {
         }
 
-        public ApiException(string messageText) : base()
+        public ApiException(string messageText) : base(messageText)
         {
             this.MessageText = messageText;
         }

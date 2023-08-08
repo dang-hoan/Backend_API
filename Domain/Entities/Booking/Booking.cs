@@ -21,7 +21,7 @@ namespace Domain.Entities.Booking
 
         [Required]
         [Column("to_time", TypeName = "datetime")]
-        public DateTime Totime { get; set; }
+        public DateTime ToTime { get; set; }
 
         [Column("note", TypeName = "nvarchar(500)")]
         public string? Note { get; set; }
