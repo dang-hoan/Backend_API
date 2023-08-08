@@ -9,7 +9,7 @@ namespace Application.Features.Booking.Queries.GetAll
 
         public DateTime? FromTime { get; set; }
 
-        public DateTime? Totime { get; set; }
+        public DateTime? ToTime { get; set; }
 
         public BookingStatus? Status { get; set; }
 

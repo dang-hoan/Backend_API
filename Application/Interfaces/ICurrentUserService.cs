@@ -2,7 +2,7 @@
 {
     public interface ICurrentUserService
     {
-        string UserId { get; }
+        string UserName { get; }
         string HostServerName { get; }
         string OriginRequest { get; }
         string RoleName { get; }

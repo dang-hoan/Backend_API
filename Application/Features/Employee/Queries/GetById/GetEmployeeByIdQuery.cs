@@ -43,8 +43,7 @@ namespace Application.Features.Employee.Queries.GetById
                                       Image = e.Image,
                                       WorkShiftId = e.WorkShiftId,
                                       ImageLink = _uploadService.GetFullUrl(e.Image),
-                                      UserName = _userManager.Users.Where(e => e.UserId == request.Id && !e.IsDeleted).Select(e => e.UserName).FirstOrDefault(),
-                                      Password = _userManager.Users.Where(e => e.UserId == request.Id && !e.IsDeleted).Select(e => e.PasswordHash).FirstOrDefault()
+                                      UserName = _userManager.Users.Where(e => e.UserId == request.Id && !e.IsDeleted).Select(e => e.UserName).FirstOrDefault()
                                   }).FirstOrDefaultAsync(cancellationToken: cancellationToken);
             if (employee == null) return await Result<GetEmployeeByIdResponse>.FailAsync(StaticVariable.NOT_FOUND_MSG);
 

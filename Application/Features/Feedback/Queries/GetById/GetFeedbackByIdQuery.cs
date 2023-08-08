@@ -24,7 +24,7 @@ namespace Application.Features.Feedback.Queries.GetById
         public async Task<Result<GetFeedbackByIdResponse>> Handle(GetFeedbackByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await (from s in _viewCustomerFeedbackReplyRepository.Entities
-                                where s.FeedbackId == request.Id && !s.IsDeleted
+                                where s.FeedbackId == request.Id
                                 select new GetFeedbackByIdResponse()
                                 {
                                     FeedbackId = s.FeedbackId,

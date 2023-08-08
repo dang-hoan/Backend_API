@@ -38,7 +38,7 @@ namespace Application.Features.Feedback.Command.DeleteFeedback
                     await _replyRepository.DeleteAsync(deleteReply);
                 }
                 await _feedbackRepository.DeleteAsync(deleteFeedback);
-
+                await _unitOfWork.Commit(cancellationToken);
                 await transaction.CommitAsync();
                 return await Result<long>.SuccessAsync(request.Id, $"Delete feedback by id successfully!");
             }

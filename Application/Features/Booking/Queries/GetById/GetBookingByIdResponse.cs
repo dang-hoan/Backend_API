@@ -5,7 +5,7 @@ namespace Application.Features.Booking.Queries.GetById
     public class GetBookingByIdResponse
     {
         public long Id { get; set; }
-        public string CutomerName { get; set; }
+        public string CustomerName { get; set; }
         public string PhoneNumber { get; set; }
         public DateTime BookingDate { get; set; }
         public BookingStatus? Status { get; set; }

@@ -36,7 +36,7 @@ namespace Infrastructure.Services
             var result = new UploadResponse()
             {
                 FilePath = dbPath,
-                FileUrl = Path.Combine(_currentUserService.HostServerName, dbPath.Replace("\\", "/"))
+                FileUrl = Path.Combine(_currentUserService.HostServerName, dbPath).Replace("\\", "/")
             };
 
             return await Result<UploadResponse>.SuccessAsync(result);

@@ -35,14 +35,17 @@ namespace Application.Features.Employee.Command.EditEmployee
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly IUserService _userService;
         private readonly IWorkShiftRepository _workshiftRepository;
+        private readonly IUploadService _uploadService;
 
-        public EditEmployeeCommandHandler(IMapper mapper, IEmployeeRepository employeeRepository, IUnitOfWork<long> unitOfWork, IUserService userService, IWorkShiftRepository workshiftRepository)
+        public EditEmployeeCommandHandler(IMapper mapper, IEmployeeRepository employeeRepository, IUnitOfWork<long> unitOfWork, 
+            IUserService userService, IWorkShiftRepository workshiftRepository, IUploadService uploadService)
         {
             _mapper = mapper;
             _employeeRepository = employeeRepository;
             _unitOfWork = unitOfWork;
             _userService = userService;
             _workshiftRepository = workshiftRepository;
+            _uploadService = uploadService;
         }
 
         public async Task<Result<EditEmployeeCommand>> Handle(EditEmployeeCommand request, CancellationToken cancellationToken)
@@ -67,6 +70,11 @@ namespace Application.Features.Employee.Command.EditEmployee
             }
             var isExistedWorkshift = await _workshiftRepository.FindAsync(x => !x.IsDeleted && x.Id == request.WorkShiftId);
             if (isExistedWorkshift == null) return await Result<EditEmployeeCommand>.FailAsync(StaticVariable.NOT_FOUND_WORK_SHIFT);
+
+            if(editEmployee.Image != null)
+            {
+                await _uploadService.DeleteAsync(editEmployee.Image);
+            }
 
             _mapper.Map(request, editEmployee);
             await _employeeRepository.UpdateAsync(editEmployee);

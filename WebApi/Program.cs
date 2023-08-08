@@ -79,8 +79,6 @@ try
 
     app.UseCors("CorsPolicy");
 
-    app.UseFolderAsStatic(app.Services.GetRequiredService<IWebHostEnvironment>());
-
     app.UseSwaggerExtension();
 
     app.UseHangfireExtension();

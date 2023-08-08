@@ -36,7 +36,7 @@ namespace Application.Features.Booking.Queries.GetAll
                                 || customer.PhoneNumber.Contains(request.Keyword))
                                 && (!request.BookingDate.HasValue || booking.BookingDate.Equals(request.BookingDate))
                                 && (!request.FromTime.HasValue || booking.FromTime >= request.FromTime)
-                                && (!request.Totime.HasValue || booking.Totime <= request.Totime)
+                                && (!request.ToTime.HasValue || booking.ToTime <= request.ToTime)
                                 && (!request.Status.HasValue || booking.Status.Equals(request.Status))
                         select new GetAllBookingResponse
                         {
@@ -45,7 +45,7 @@ namespace Application.Features.Booking.Queries.GetAll
                             PhoneNumber = customer.PhoneNumber,
                             BookingDate = booking.BookingDate,
                             FromTime = booking.FromTime,
-                            Totime = booking.Totime,
+                            ToTime = booking.ToTime,
                             Status = booking.Status,
                             CreatedOn = booking.CreatedOn,
                             LastModifiedOn = booking.LastModifiedOn,

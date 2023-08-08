@@ -18,7 +18,7 @@ namespace Application.Features.Booking.Command.EditBooking
         public long Id { get; set; }
         public DateTime BookingDate { get; set; }
         public DateTime FromTime { get; set; }
-        public DateTime Totime { get; set; }
+        public DateTime ToTime { get; set; }
         public string? Note { get; set; }
         public List<long> ServiceId { get; set; }
     }
@@ -48,7 +48,7 @@ namespace Application.Features.Booking.Command.EditBooking
             try
             {
                 request.ServiceId = request.ServiceId.Distinct().ToList();
-                if (request.Totime.CompareTo(request.FromTime) < 0)
+                if (request.ToTime.CompareTo(request.FromTime) < 0)
                 {
                     return await Result<EditBookingCommand>.FailAsync(StaticVariable.NOT_LOGIC_DATE_ORDER);
                 }
