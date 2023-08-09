@@ -25,6 +25,7 @@ namespace WebApi.Controllers
         /// <exception cref="ApiException"></exception>
         [HttpPost]
         [Authorize]
+        [RequestSizeLimit(30 * 1024 * 1024)] //50MB Max upload request
         public async Task<IActionResult> UploadFile([FromForm] string filePath)
         {
             if (Request.Form.Files.Count != 0)
@@ -35,7 +36,7 @@ namespace WebApi.Controllers
                     FilePath = filePath,
                     File = file
                 });
-                return Ok(result);
+                return result.Succeeded ? Ok(result) : BadRequest(result) ;
             }
 
             throw new ApiException(ApplicationConstants.ErrorMessage.InvalidFile);
