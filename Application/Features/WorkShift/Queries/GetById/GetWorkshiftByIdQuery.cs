@@ -28,7 +28,7 @@ namespace Application.Features.WorkShift.Queries.GetById
                     Description = s.Description,
                     FromTime = s.WorkingFromTime.ToString(@"hh\:mm"),
                     ToTime = s.WorkingToTime.ToString(@"hh\:mm"),
-                    TimeWord = (s.WorkingToTime - s.WorkingFromTime).TotalHours,
+                    TimeWork = (s.WorkingToTime - s.WorkingFromTime).TotalHours,
                     IsDefault = s.IsDefault,
                     WorkDays = ConvertStringToList(s.WorkDays)
                 }).FirstOrDefault();

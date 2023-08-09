@@ -56,7 +56,11 @@ namespace WebApi.Middlewares
                         break;
                 }
                 await unitOfWork.Rollback();
-                var result = JsonSerializer.Serialize(responseModel);
+                var jsonSerializerOptions = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // Convert to camelCase
+                };
+                var result = JsonSerializer.Serialize(responseModel,jsonSerializerOptions);
                 await response.WriteAsync(result);
             }
         }

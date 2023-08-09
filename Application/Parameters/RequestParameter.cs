@@ -6,7 +6,6 @@
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
         public bool IsExport { get; set; }
-        public string SortBy { get; set; }
         public string OrderBy { get; set; }
 
         public RequestParameter()
@@ -14,7 +13,6 @@
             this.PageNumber = 1;
             this.PageSize = 10;
             this.IsExport = true;
-            this.SortBy = string.Empty;
             this.OrderBy = "CreatedOn desc";
         }
 
