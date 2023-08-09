@@ -1,11 +1,15 @@
-﻿using Application.Interfaces.Booking;
+﻿using Application.Features.Booking.Queries.GetCustomerBooking;
+using Application.Interfaces;
+using Application.Interfaces.Booking;
 using Application.Interfaces.BookingDetail;
 using Application.Interfaces.Customer;
 using Application.Interfaces.Service;
 using AutoMapper;
 using Domain.Constants;
+using Domain.Entities;
 using Domain.Wrappers;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Booking.Queries.GetById
@@ -21,15 +25,19 @@ namespace Application.Features.Booking.Queries.GetById
         private readonly IServiceRepository _serviceRepository;
         private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
-        
+        private readonly ICurrentUserService _currentUserService;
+        private readonly UserManager<AppUser> _userManager;
+
         public GetBookingByIdQueryHandler(IBookingRepository bookingRepository, IBookingDetailRepository bookingDetailRepository,
-            IServiceRepository serviceRepository, IMapper mapper, ICustomerRepository customerRepository)
+            IServiceRepository serviceRepository, IMapper mapper, ICustomerRepository customerRepository, ICurrentUserService currentUserService, UserManager<AppUser> userManager)
         {
             _bookingRepository = bookingRepository;
             _bookingDetailRepository = bookingDetailRepository;
             _serviceRepository = serviceRepository;
             _customerRepository = customerRepository;
             _mapper = mapper;
+            _currentUserService = currentUserService;
+            _userManager = userManager;
         }
         public async Task<Result<GetBookingByIdResponse>> Handle(GetBookingByIdQuery request, CancellationToken cancellationToken)
         {
@@ -49,6 +57,15 @@ namespace Application.Features.Booking.Queries.GetById
             {
                 return await Result<GetBookingByIdResponse>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             }
+
+            if (_currentUserService.RoleName.Equals(RoleConstants.CustomerRole))
+            {
+                long userId = _userManager.Users.Where(user => _currentUserService.UserName.Equals(user.UserName)).Select(user => user.UserId).FirstOrDefault();
+
+                if (userId != Booking.CustomerId)
+                    return await Result<GetBookingByIdResponse>.FailAsync(StaticVariable.NOT_HAVE_ACCESS);
+            }
+
             var BookingDetailResponse = _mapper.Map<GetBookingByIdResponse>(Booking);
             var CustomerBooking = await _customerRepository.Entities
                 .Where(_ => _.Id == Booking.CustomerId)

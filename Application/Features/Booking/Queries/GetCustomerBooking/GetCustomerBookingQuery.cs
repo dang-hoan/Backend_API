@@ -5,10 +5,12 @@ using Application.Interfaces.BookingDetail;
 using Application.Interfaces.Service;
 using Application.Interfaces.ServiceImage;
 using AutoMapper;
+using Domain.Constants;
+using Domain.Entities;
 using Domain.Helpers;
 using Domain.Wrappers;
 using MediatR;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
@@ -30,9 +32,11 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
         private readonly IServiceImageRepository _serviceImageRepository;
         private readonly IUploadService _uploadService;
         private readonly IMapper _mapper;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly UserManager<AppUser> _userManager;
 
         public GetCustomerBookingQueryHandler(IBookingRepository bookingRepository, IBookingDetailRepository bookingDetailRepository, IServiceRepository serviceRepository,
-            IServiceImageRepository serviceImageRepository, IMapper mapper, IUploadService uploadService)
+            IServiceImageRepository serviceImageRepository, IMapper mapper, IUploadService uploadService, ICurrentUserService currentUserService, UserManager<AppUser> userManager)
         {
             _bookingRepository = bookingRepository;
             _bookingDetailRepository = bookingDetailRepository;
@@ -40,10 +44,17 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
             _serviceImageRepository = serviceImageRepository;
             _uploadService = uploadService;
             _mapper = mapper;
+            _currentUserService = currentUserService;
+            _userManager = userManager;
         }
 
         public async Task<Result<List<GetCustomerBookingResponse>>> Handle(GetCustomerBookingQuery request, CancellationToken cancellationToken)
         {
+            long userId = _userManager.Users.Where(user => _currentUserService.UserName.Equals(user.UserName)).Select(user => user.UserId).FirstOrDefault();
+
+            if (userId != request.CustomerId)
+                return await Result<List<GetCustomerBookingResponse>>.FailAsync(StaticVariable.NOT_HAVE_ACCESS);
+
             var bookings = await _bookingRepository.Entities.Where(_ => !_.IsDeleted && _.CustomerId == request.CustomerId)
                 .Select(s => new Domain.Entities.Booking.Booking
                 {

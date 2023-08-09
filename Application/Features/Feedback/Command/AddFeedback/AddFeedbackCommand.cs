@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.Requests.Feedback;
 using Application.Exceptions;
+using Application.Interfaces;
 using Application.Interfaces.Booking;
 using Application.Interfaces.BookingDetail;
 using Application.Interfaces.Feedback;
@@ -12,11 +13,7 @@ using Domain.Entities;
 using Domain.Entities.FeedbackFileUpload;
 using Domain.Wrappers;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System.Security.Claims;
 
 namespace Application.Features.Feedback.Command.AddFeedback
 {
@@ -37,8 +34,7 @@ namespace Application.Features.Feedback.Command.AddFeedback
         private readonly IBookingDetailRepository _bookingDetailRepository;
         private readonly IBookingRepository _bookingRepository;
         private readonly IUnitOfWork<long> _unitOfWork;
-        private readonly ILogger<AddFeedbackCommand> _logger;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICurrentUserService _currentUserService;
         private readonly UserManager<AppUser> _userManager;
 
         public AddFeedbackCommandHandler(
@@ -47,8 +43,7 @@ namespace Application.Features.Feedback.Command.AddFeedback
             IBookingDetailRepository bookingDetailRepository,
             IBookingRepository bookingRepository,
             IUnitOfWork<long> unitOfWork,
-            IHttpContextAccessor httpContextAccessor,
-            ILogger<AddFeedbackCommand> logger,
+            ICurrentUserService currentUserService,
             UserManager<AppUser> userManager
          )
         {
@@ -58,8 +53,7 @@ namespace Application.Features.Feedback.Command.AddFeedback
             _bookingDetailRepository = bookingDetailRepository;
             _bookingRepository = bookingRepository;
             _unitOfWork = unitOfWork;
-            _logger = logger;
-            _httpContextAccessor = httpContextAccessor;
+            _currentUserService = currentUserService;
             _userManager = userManager;
         }
 
@@ -82,43 +76,30 @@ namespace Application.Features.Feedback.Command.AddFeedback
                 }
                 var addFeedback = _mapper.Map<Domain.Entities.Feedback.Feedback>(request);
 
-                var userName = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-                long customerId = 0;
-                var currentLoginUser = new AppUser();
-                if (userName != null)
+                long customerId = _userManager.Users.Where(user => _currentUserService.UserName.Equals(user.UserName)).Select(user => user.UserId).FirstOrDefault();
+
+                var isCustomerHasBooking = _bookingRepository.Entities.Where(x => x.CustomerId == customerId && x.Id == isExistInBookingDetail.BookingId && x.Status == BookingStatus.Done).Select(x => x.Id);
+
+                var isWaitingBooking = _bookingRepository.Entities.Where(x => x.CustomerId == customerId &&
+                                        x.Id == isExistInBookingDetail.BookingId &&
+                                        x.Status == BookingStatus.Waiting);
+
+                if (isWaitingBooking.Any())
                 {
-                    currentLoginUser = await _userManager.FindByNameAsync(userName);
-                    if (currentLoginUser.TypeFlag != TypeFlagEnum.Customer)
-                        return await Result<AddFeedbackCommand>.FailAsync("You are not customer");
-
-                    var isCustomerHasBooking = _bookingRepository.Entities.Where(x => x.CustomerId == currentLoginUser.UserId && x.Id == isExistInBookingDetail.BookingId && x.Status == BookingStatus.Done).Select(x => x.Id);
-                    customerId = currentLoginUser.UserId;
-
-                    var isWaitingBooking = _bookingRepository.Entities.Where(x => x.CustomerId == currentLoginUser.UserId &&
-                                            x.Id == isExistInBookingDetail.BookingId &&
-                                            x.Status == BookingStatus.Waiting);
-
-                    if (isWaitingBooking.Any())
-                    {
-                        return await Result<AddFeedbackCommand>.FailAsync("You cannot leave feedback for waiting booking");
-                    }
-
-                    var isInProgressBooking = _bookingRepository.Entities.Where(x => x.CustomerId == currentLoginUser.UserId &&
-                     x.Id == isExistInBookingDetail.BookingId &&
-                     x.Status == BookingStatus.Inprogress);
-
-                    if (isInProgressBooking.Any())
-                    {
-                        return await Result<AddFeedbackCommand>.FailAsync("You cannot leave feedback for in progress booking");
-                    }
-
-                    if (!isCustomerHasBooking.Any())
-                        return await Result<AddFeedbackCommand>.FailAsync("You cannot leave feedback of other customer");
+                    return await Result<AddFeedbackCommand>.FailAsync("You cannot leave feedback for waiting booking");
                 }
-                else
+
+                var isInProgressBooking = _bookingRepository.Entities.Where(x => x.CustomerId == customerId &&
+                    x.Id == isExistInBookingDetail.BookingId &&
+                    x.Status == BookingStatus.Inprogress);
+
+                if (isInProgressBooking.Any())
                 {
-                    return await Result<AddFeedbackCommand>.FailAsync(StaticVariable.IS_NOT_LOGIN);
+                    return await Result<AddFeedbackCommand>.FailAsync("You cannot leave feedback for in progress booking");
                 }
+
+                if (!isCustomerHasBooking.Any())
+                    return await Result<AddFeedbackCommand>.FailAsync("You cannot leave feedback of other customer");
 
                 // Check Image is valid
                 addFeedback.CustomerId = customerId;

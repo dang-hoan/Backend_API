@@ -1,10 +1,13 @@
 ﻿using Application.Exceptions;
+using Application.Interfaces;
 using Application.Interfaces.Feedback;
 using Application.Interfaces.Reply;
 using Application.Interfaces.Repositories;
 using Domain.Constants;
+using Domain.Entities;
 using Domain.Wrappers;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 
 namespace Application.Features.Feedback.Command.DeleteFeedback
 {
@@ -18,12 +21,16 @@ namespace Application.Features.Feedback.Command.DeleteFeedback
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly IFeedbackRepository _feedbackRepository;
         private readonly IReplyRepository _replyRepository;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly UserManager<AppUser> _userManager;
 
-        public DeleteFeedbackCommandHandler(IUnitOfWork<long> unitOfWork, IFeedbackRepository feedbackRepository, IReplyRepository replyRepository)
+        public DeleteFeedbackCommandHandler(IUnitOfWork<long> unitOfWork, IFeedbackRepository feedbackRepository, IReplyRepository replyRepository, ICurrentUserService currentUserService, UserManager<AppUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _feedbackRepository = feedbackRepository;
             _replyRepository = replyRepository;
+            _currentUserService = currentUserService;
+            _userManager = userManager;
         }
 
         public async Task<Result<long>> Handle(DeleteFeedbackCommand request, CancellationToken cancellationToken)
@@ -32,6 +39,15 @@ namespace Application.Features.Feedback.Command.DeleteFeedback
             try
             {
                 var deleteFeedback = await _feedbackRepository.FindAsync(_ => _.Id == request.Id && !_.IsDeleted) ?? throw new ApiException(StaticVariable.NOT_FOUND_MSG);
+                
+                if (_currentUserService.RoleName.Equals(RoleConstants.CustomerRole))
+                {
+                    long userId = _userManager.Users.Where(user => _currentUserService.UserName.Equals(user.UserName)).Select(user => user.UserId).FirstOrDefault();
+
+                    if (userId != deleteFeedback.CustomerId)
+                        return await Result<long>.FailAsync(StaticVariable.NOT_HAVE_ACCESS);
+                }
+
                 var deleteReply = await _replyRepository.FindAsync(_ => _.Id == deleteFeedback.ReplyId && !_.IsDeleted);
                 if (deleteReply != null)
                 {

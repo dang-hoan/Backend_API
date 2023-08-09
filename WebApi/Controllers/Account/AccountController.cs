@@ -5,7 +5,6 @@ using Application.Interfaces.Services.Account;
 using Application.Interfaces.Services.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.WebSockets;
 
 namespace WebApi.Controllers.Account
 {

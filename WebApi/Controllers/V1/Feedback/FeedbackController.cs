@@ -1,6 +1,4 @@
-﻿using Application.Features.Booking.Queries.GetCustomerBookingHistory;
-using Application.Features.Customer.Command.DeleteCustomer;
-using Application.Features.Feedback.Command.DeleteFeedback;
+﻿using Application.Features.Feedback.Command.DeleteFeedback;
 using Application.Features.Feedback.Queries.GetById;
 using Application.Features.Reply.Command.AddReplyAtFeeback;
 using Application.Features.Feedback.Queries.GetAll;

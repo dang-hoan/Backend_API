@@ -6,8 +6,11 @@ using Application.Interfaces.Reply;
 using Application.Interfaces.ServiceImage;
 using Application.Interfaces.View.ViewCustomerReviewHistory;
 using AutoMapper;
+using Domain.Constants;
+using Domain.Entities;
 using Domain.Wrappers;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 
@@ -26,10 +29,13 @@ namespace Application.Features.Feedback.Queries.GetHistoryFeedback
         private readonly IFeedbackFileUploadRepository _feedbackFileUploadRepository;
         private readonly IServiceImageRepository _serviceImageRepository;
         private readonly IUploadService _uploadService;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly UserManager<AppUser> _userManager;
 
         public GetFeedbackHistoryQueryHandler(IMapper mapper, IViewCustomerReviewHisotyRepository viewCustomerReviewHisotyRepository,
             IReplyRepository replyRepository, IFeedbackFileUploadRepository feedbackFileUploadRepository,
-            IServiceImageRepository serviceImageRepository, IUploadService uploadService)
+            IServiceImageRepository serviceImageRepository, IUploadService uploadService,
+            ICurrentUserService currentUserService, UserManager<AppUser> userManager)
         {
             _mapper = mapper;
             _viewCustomerReviewHisotyRepository = viewCustomerReviewHisotyRepository;
@@ -37,11 +43,13 @@ namespace Application.Features.Feedback.Queries.GetHistoryFeedback
             _feedbackFileUploadRepository = feedbackFileUploadRepository;
             _serviceImageRepository = serviceImageRepository;
             _uploadService = uploadService;
+            _currentUserService = currentUserService;
+            _userManager = userManager;
         }
 
         public async Task<Result<List<GetFeebackHistoryResponse>>> Handle(GetFeedbackHistoryQuery request, CancellationToken cancellationToken)
         {
-            var cusotmerReviewHistories = await _viewCustomerReviewHisotyRepository.Entities.Where(_ => _.BookingId == request.BookingId)
+            var customerReviewHistories = await _viewCustomerReviewHisotyRepository.Entities.Where(_ => _.BookingId == request.BookingId)
                  .Select(s => new Domain.Entities.View.ViewCustomerReviewHistory.ViewCustomerReviewHistory
                  {
                      BookingId = s.BookingId,
@@ -57,9 +65,14 @@ namespace Application.Features.Feedback.Queries.GetHistoryFeedback
                      CreateOnFeedback = s.CreateOnFeedback,
                  }).ToListAsync();
             List<GetFeebackHistoryResponse> response = new List<GetFeebackHistoryResponse>();
-            if (cusotmerReviewHistories != null)
+            if (customerReviewHistories != null)
             {
-                foreach (var history in cusotmerReviewHistories)
+                long userId = _userManager.Users.Where(user => _currentUserService.UserName.Equals(user.UserName)).Select(user => user.UserId).FirstOrDefault();
+
+                if (userId != customerReviewHistories.First().CustomerId)
+                    return await Result<List<GetFeebackHistoryResponse>>.FailAsync(StaticVariable.NOT_HAVE_ACCESS);
+
+                foreach (var history in customerReviewHistories)
                 {
                     var customerHistoryResponse = new GetFeebackHistoryResponse()
                     {

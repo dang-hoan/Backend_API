@@ -1,4 +1,5 @@
 ﻿using Application.Exceptions;
+using Application.Interfaces;
 using Application.Interfaces.Booking;
 using Application.Interfaces.BookingDetail;
 using Application.Interfaces.Customer;
@@ -6,9 +7,12 @@ using Application.Interfaces.Repositories;
 using Application.Interfaces.Service;
 using AutoMapper;
 using Domain.Constants;
+using Domain.Entities;
+using Domain.Entities.Booking;
 using Domain.Entities.BookingDetail;
 using Domain.Wrappers;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Booking.Command.EditBooking
@@ -31,8 +35,12 @@ namespace Application.Features.Booking.Command.EditBooking
         private readonly IServiceRepository _serviceRepository;
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly IBookingDetailRepository _bookingDetailRepository;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly UserManager<AppUser> _userManager;
 
-        public EditBookingCommandHandler(IMapper mapper, IBookingRepository bookingRepository, ICustomerRepository customerRepository, IServiceRepository serviceRepository, IUnitOfWork<long> unitOfWork, IBookingDetailRepository bookingDetailService)
+        public EditBookingCommandHandler(IMapper mapper, IBookingRepository bookingRepository, ICustomerRepository customerRepository, 
+            IServiceRepository serviceRepository, IUnitOfWork<long> unitOfWork, IBookingDetailRepository bookingDetailService,
+            ICurrentUserService currentUserService, UserManager<AppUser> userManager)
         {
             _mapper = mapper;
             _bookingRepository = bookingRepository;
@@ -40,6 +48,8 @@ namespace Application.Features.Booking.Command.EditBooking
             _customerRepository = customerRepository;
             _serviceRepository = serviceRepository;
             _bookingDetailRepository = bookingDetailService;
+            _currentUserService = currentUserService;
+            _userManager = userManager;
         }
 
         public async Task<Result<EditBookingCommand>> Handle(EditBookingCommand request, CancellationToken cancellationToken)
@@ -54,6 +64,15 @@ namespace Application.Features.Booking.Command.EditBooking
                 }
                 var isExistBooking = await _bookingRepository.FindAsync(_ => _.Id == request.Id && _.IsDeleted == false);
                 if (isExistBooking == null) return await Result<EditBookingCommand>.FailAsync(StaticVariable.NOT_FOUND_BOOKING);
+
+                if (_currentUserService.RoleName.Equals(RoleConstants.CustomerRole))
+                {
+                    long userId = _userManager.Users.Where(user => _currentUserService.UserName.Equals(user.UserName)).Select(user => user.UserId).FirstOrDefault();
+
+                    if (userId != isExistBooking.CustomerId)
+                        return await Result<EditBookingCommand>.FailAsync(StaticVariable.NOT_HAVE_ACCESS);
+                }
+
                 var customer = await _customerRepository.FindAsync(_ => _.Id == isExistBooking.CustomerId && !_.IsDeleted);
                 if (customer == null) return await Result<EditBookingCommand>.FailAsync(StaticVariable.NOT_FOUND_CUSTOMER);
 
