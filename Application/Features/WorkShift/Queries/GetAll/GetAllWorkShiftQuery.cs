@@ -37,7 +37,7 @@ namespace Application.Features.WorkShift.Queries.GetAll
                             IsDefault = x.IsDefault,
                             FromTime = x.WorkingFromTime.ToString(@"hh\:mm"),
                             ToTime = x.WorkingToTime.ToString(@"hh\:mm"),
-                            TimeWord = (x.WorkingToTime - x.WorkingFromTime).TotalHours,
+                            TimeWork = (x.WorkingToTime - x.WorkingFromTime).TotalHours,
                             NumberEmployee = _employeeRepository.Entities.Where(_ => _.WorkShiftId == x.Id && _.IsDeleted == false).Count(),
                             Description = x.Description,
                             //WorkDays = x.WorkDays.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList(),

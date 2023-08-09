@@ -59,7 +59,7 @@ namespace Infrastructure.Services.Identity
             var mailRequest = new EmailRequest()
             {
                 Body = passwordResetUrl,
-                Subject = "Reset Password - ERP",
+                Subject = "Reset Password",
                 To = request.Email
             };
             BackgroundJob.Enqueue(() => _mailService.SendAsync(mailRequest));
