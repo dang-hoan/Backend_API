@@ -60,10 +60,9 @@ namespace Infrastructure.Services
             if (File.Exists(fileToDelete))
             {
                 File.Delete(fileToDelete);
-                return Result<bool>.SuccessAsync(true, ApplicationConstants.SuccessMessage.DeletedSuccess);
             }
-
-            throw new ApiException(ApplicationConstants.ErrorMessage.NotFound);
+            return Result<bool>.SuccessAsync(true, ApplicationConstants.SuccessMessage.DeletedSuccess); ;
+            //throw new ApiException(ApplicationConstants.ErrorMessage.NotFound);
         }
     }
 }

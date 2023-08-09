@@ -1,9 +1,12 @@
-﻿using Application.Interfaces.Customer;
+﻿using Application.Interfaces;
+using Application.Interfaces.Customer;
 using Application.Interfaces.Repositories;
 using AutoMapper;
 using Domain.Constants;
+using Domain.Entities;
 using Domain.Wrappers;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 
@@ -26,13 +29,16 @@ namespace Application.Features.Customer.Command.EditCustomer
         private readonly IMapper _mapper;
         private readonly ICustomerRepository _customnerRepository;
         private readonly IUnitOfWork<long> _unitOfWork;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly UserManager<AppUser> _userManager;
 
-
-        public EditCustomerCommandHandler(IMapper mapper, ICustomerRepository customerRepository, IUnitOfWork<long> unitOfWork)
+        public EditCustomerCommandHandler(IMapper mapper, ICustomerRepository customerRepository, IUnitOfWork<long> unitOfWork, ICurrentUserService currentUserService, UserManager<AppUser> userManager)
         {
             _mapper = mapper;
             _customnerRepository = customerRepository;
             _unitOfWork = unitOfWork;
+            _currentUserService = currentUserService;
+            _userManager = userManager;
         }
 
         public async Task<Result<EditCustomerCommand>> Handle(EditCustomerCommand request, CancellationToken cancellationToken)
@@ -41,6 +47,15 @@ namespace Application.Features.Customer.Command.EditCustomer
             {
                 return await Result<EditCustomerCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             }
+
+            if (_currentUserService.RoleName.Equals(RoleConstants.CustomerRole))
+            {
+                long userId = _userManager.Users.Where(user => _currentUserService.UserName.Equals(user.UserName)).Select(user => user.UserId).FirstOrDefault();
+
+                if (userId != request.Id)
+                    return await Result<EditCustomerCommand>.FailAsync(StaticVariable.NOT_HAVE_ACCESS);
+            }
+
             var editCustomer = await _customnerRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
             if(editCustomer == null) return await Result<EditCustomerCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             _mapper.Map(request, editCustomer);

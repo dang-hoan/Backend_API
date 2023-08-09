@@ -1,4 +1,6 @@
 ﻿using Application.Exceptions;
+using Application.Features.Customer.Queries.GetById;
+using Application.Interfaces;
 using Application.Interfaces.Booking;
 using Application.Interfaces.BookingDetail;
 using Application.Interfaces.Customer;
@@ -7,8 +9,10 @@ using Application.Interfaces.Service;
 using AutoMapper;
 using Domain.Constants;
 using Domain.Constants.Enum;
+using Domain.Entities;
 using Domain.Wrappers;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Booking.Command.AddBooking
@@ -32,8 +36,11 @@ namespace Application.Features.Booking.Command.AddBooking
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly IBookingDetailRepository _bookingDetailService;
         private readonly ICustomerRepository _customerRepository;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly UserManager<AppUser> _userManager;
 
-        public AddBookingCommandHandler(IMapper mapper, IBookingRepository bookingRepository, IServiceRepository serviceRepository, IUnitOfWork<long> unitOfWork, IBookingDetailRepository bookingDetailService, ICustomerRepository customerRepository)
+        public AddBookingCommandHandler(IMapper mapper, IBookingRepository bookingRepository, IServiceRepository serviceRepository, IUnitOfWork<long> unitOfWork, 
+            IBookingDetailRepository bookingDetailService, ICustomerRepository customerRepository, ICurrentUserService currentUserService, UserManager<AppUser> userManager)
         {
             _mapper = mapper;
             _bookingRepository = bookingRepository;
@@ -41,10 +48,20 @@ namespace Application.Features.Booking.Command.AddBooking
             _serviceRepository = serviceRepository;
             _bookingDetailService = bookingDetailService;
             _customerRepository = customerRepository;
+            _currentUserService = currentUserService;
+            _userManager = userManager;
         }
 
         public async Task<Result<AddBookingCommand>> Handle(AddBookingCommand request, CancellationToken cancellationToken)
         {
+            if (_currentUserService.RoleName.Equals(RoleConstants.CustomerRole))
+            {
+                long userId = _userManager.Users.Where(user => _currentUserService.UserName.Equals(user.UserName)).Select(user => user.UserId).FirstOrDefault();
+
+                if (userId != request.Id)
+                    return await Result<AddBookingCommand>.FailAsync(StaticVariable.NOT_HAVE_ACCESS);
+            }
+
             //open transaction
             var transaction = await _unitOfWork.BeginTransactionAsync();
             try

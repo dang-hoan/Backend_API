@@ -1,14 +1,13 @@
-﻿using Application.Interfaces.Reply;
+﻿using Application.Features.Booking.Command.AddBooking;
+using Application.Interfaces;
+using Application.Interfaces.Reply;
 using Application.Interfaces.Repositories;
 using AutoMapper;
 using Domain.Constants;
+using Domain.Entities;
 using Domain.Wrappers;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 
 namespace Application.Features.Reply.Command.EditReply
 {
@@ -24,17 +23,28 @@ namespace Application.Features.Reply.Command.EditReply
         private readonly IMapper _mapper;
         private readonly IReplyRepository _replyRepository;
         private readonly IUnitOfWork<long> _unitOfWork;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly UserManager<AppUser> _userManager;
 
-        public EditReplyCommandHandler(IMapper mapper, IReplyRepository replyRepository, IUnitOfWork<long> unitOfWork)
+        public EditReplyCommandHandler(IMapper mapper, IReplyRepository replyRepository, IUnitOfWork<long> unitOfWork, ICurrentUserService currentUserService, UserManager<AppUser> userManager)
         {
             _mapper = mapper;
             _replyRepository = replyRepository;
             _unitOfWork = unitOfWork;
+            _currentUserService = currentUserService;
+            _userManager = userManager;
         }
         public async Task<Result<EditReplyCommand>> Handle(EditReplyCommand request, CancellationToken cancellationToken)
         {
             var editReply = await _replyRepository.FindAsync(_ => _.Id ==  request.Id && !_.IsDeleted);
             if (editReply == null) return await Result<EditReplyCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
+
+            if (_currentUserService.RoleName.Equals(RoleConstants.EmployeeRole))
+            {
+                if (!_currentUserService.UserName.Equals(editReply.CreatedBy))
+                    return await Result<EditReplyCommand>.FailAsync(StaticVariable.NOT_HAVE_ACCESS);
+            }
+
             editReply.Title = request.Title;
             editReply.Content = request.Content;
             await _replyRepository.UpdateAsync(editReply);

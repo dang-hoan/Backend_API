@@ -3,6 +3,9 @@ using Domain.Wrappers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Domain.Constants;
+using Application.Interfaces;
+using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace Application.Features.Customer.Queries.GetById
 {
@@ -12,16 +15,28 @@ namespace Application.Features.Customer.Queries.GetById
     }
     internal class GetCustomerByIdQueryHandler : IRequestHandler<GetCustomerByIdQuery, Result<GetCustomerByIdResponse>>
     {
-        private readonly ICustomerRepository _CustomerRepository;
+        private readonly ICustomerRepository _customerRepository;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly UserManager<AppUser> _userManager;
 
-        public GetCustomerByIdQueryHandler(ICustomerRepository CustomerRepository)
+        public GetCustomerByIdQueryHandler(ICustomerRepository customerRepository, ICurrentUserService currentUserService, UserManager<AppUser> userManager)
         {
-            _CustomerRepository = CustomerRepository;
+            _customerRepository = customerRepository;
+            _currentUserService = currentUserService;
+            _userManager = userManager;
         }
 
         public async Task<Result<GetCustomerByIdResponse>> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)
         {
-            var Customer = await (from e in _CustomerRepository.Entities
+            if (_currentUserService.RoleName.Equals(RoleConstants.CustomerRole))
+            {
+                long userId = _userManager.Users.Where(user => _currentUserService.UserName.Equals(user.UserName)).Select(user => user.UserId).FirstOrDefault();
+
+                if (userId != request.Id)
+                    return await Result<GetCustomerByIdResponse>.FailAsync(StaticVariable.NOT_HAVE_ACCESS);
+            }
+
+            var Customer = await (from e in _customerRepository.Entities
                                   where e.Id == request.Id && !e.IsDeleted
                                   select new GetCustomerByIdResponse()
                                   {
