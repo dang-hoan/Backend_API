@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Application.Features.Customer.Command.EditCustomer;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Customer.Command.DeleteCustomer;
+using Domain.Constants;
 
 namespace WebApi.Controllers.V1.Customer
 {
@@ -46,7 +47,7 @@ namespace WebApi.Controllers.V1.Customer
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin,Employee")]
+        [Authorize(Roles = RoleConstants.AdminAndEmployeeRole)]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllCustomerResponse>>> GetAllCustomer([FromQuery] GetAllCustomerQuery query)
         {
@@ -54,7 +55,6 @@ namespace WebApi.Controllers.V1.Customer
             {
                 IsExport = query.IsExport,
                 Keyword = query.Keyword,
-                SortBy = query.SortBy,
                 OrderBy = query.OrderBy,
                 PageNumber = query.PageNumber,
                 PageSize = query.PageSize
@@ -78,7 +78,7 @@ namespace WebApi.Controllers.V1.Customer
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        [Authorize(Roles ="Superadmin,Employee")]
+        [Authorize(Roles =RoleConstants.AdminAndEmployeeRole)]
         [HttpDelete]
         public async Task<IActionResult> DeleteCustomer(long Id)
         {

@@ -1,6 +1,7 @@
 ﻿using Application.Exceptions;
 using Application.Interfaces;
 using Application.Interfaces.Feedback;
+using Application.Interfaces.FeedbackFileUpload;
 using Application.Interfaces.Reply;
 using Application.Interfaces.Repositories;
 using Domain.Constants;
@@ -21,14 +22,19 @@ namespace Application.Features.Feedback.Command.DeleteFeedback
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly IFeedbackRepository _feedbackRepository;
         private readonly IReplyRepository _replyRepository;
+        private readonly IFeedbackFileUploadRepository _feedbackFileUploadRepository;
+        private readonly IUploadService _uploadService;
         private readonly ICurrentUserService _currentUserService;
         private readonly UserManager<AppUser> _userManager;
 
-        public DeleteFeedbackCommandHandler(IUnitOfWork<long> unitOfWork, IFeedbackRepository feedbackRepository, IReplyRepository replyRepository, ICurrentUserService currentUserService, UserManager<AppUser> userManager)
+        public DeleteFeedbackCommandHandler(IUnitOfWork<long> unitOfWork, IFeedbackRepository feedbackRepository, IReplyRepository replyRepository,IFeedbackFileUploadRepository feedbackFileUploadRepository,
+            IUploadService uploadService, ICurrentUserService currentUserService, UserManager<AppUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _feedbackRepository = feedbackRepository;
             _replyRepository = replyRepository;
+            _feedbackFileUploadRepository = feedbackFileUploadRepository;
+            _uploadService = uploadService;
             _currentUserService = currentUserService;
             _userManager = userManager;
         }
@@ -52,6 +58,14 @@ namespace Application.Features.Feedback.Command.DeleteFeedback
                 if (deleteReply != null)
                 {
                     await _replyRepository.DeleteAsync(deleteReply);
+                }
+                var feedbackFiles = await _feedbackFileUploadRepository.GetByCondition(_ => _.FeedbackId == request.Id);
+                if (feedbackFiles != null)
+                {
+                    foreach(var file in feedbackFiles)
+                    {
+                        await _uploadService.DeleteAsync(file.NameFile);
+                    }
                 }
                 await _feedbackRepository.DeleteAsync(deleteFeedback);
                 await _unitOfWork.Commit(cancellationToken);

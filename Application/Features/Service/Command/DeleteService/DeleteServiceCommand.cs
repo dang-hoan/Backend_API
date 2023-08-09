@@ -1,7 +1,9 @@
+using Application.Interfaces;
 using Application.Interfaces.Booking;
 using Application.Interfaces.BookingDetail;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Service;
+using Application.Interfaces.ServiceImage;
 using Domain.Constants;
 using Domain.Constants.Enum;
 using Domain.Wrappers;
@@ -21,17 +23,23 @@ namespace Application.Features.Service.Command.DeleteService
         private readonly IServiceRepository _serviceRepository;
         private readonly IBookingRepository _bookingRepository;
         private readonly IBookingDetailRepository _bookingDetailRepository;
+        private readonly IServiceImageRepository _serviceImageRepository;
+        private readonly IUploadService _uploadService;
 
         public DeleteServiceCommandHandler(
             IServiceRepository serviceRepository,
             IUnitOfWork<long> unitOfWork,
             IBookingRepository bookingRepository,
-            IBookingDetailRepository bookingDetailRepository)
+            IBookingDetailRepository bookingDetailRepository,
+            IServiceImageRepository serviceImageRepository,
+            IUploadService uploadService)
         {
             _serviceRepository = serviceRepository;
             _unitOfWork = unitOfWork;
             _bookingRepository = bookingRepository;
             _bookingDetailRepository = bookingDetailRepository;
+            _serviceImageRepository = serviceImageRepository;
+            _uploadService = uploadService;
         }
 
         public async Task<Result<long>> Handle(DeleteServiceCommand request, CancellationToken cancellationToken)
@@ -66,6 +74,12 @@ namespace Application.Features.Service.Command.DeleteService
                 if (canDelete)
                 {
                     var bookingDetail = await _bookingDetailRepository.GetByCondition(x => x.ServiceId == request.Id && !x.IsDeleted);
+                    var serviceImages = await _serviceImageRepository.GetByCondition(x => x.ServiceId == request.Id);
+                    foreach(var image in serviceImages)
+                    {
+                        await _uploadService.DeleteAsync(image.NameFile);
+                    }
+                    await _serviceImageRepository.DeleteRange(serviceImages.ToList());
                     if (bookingDetail == null) return await Result<long>.FailAsync(StaticVariable.NOT_FOUND_MSG);
 
                     await _serviceRepository.DeleteAsync(service);

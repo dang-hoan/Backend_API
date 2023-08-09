@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Application.Features.Employee.Command.EditEmployee;
 using Application.Features.Employee.Command.ResetPasswordEmployee;
 using Application.Features.Employee.Command.EditWorkShiftEmployee;
+using Domain.Constants;
 
 namespace WebApi.Controllers.V1.Employee
 {
@@ -21,7 +22,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpGet("{id}")]
         public async Task<ActionResult<Result<GetEmployeeByIdResponse>>> GetEmployeeById(long id)
         {
@@ -36,7 +37,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllEmployeeResponse>>> GetAllEmployee([FromQuery] GetAllEmployeeParameter parameter)
         {
@@ -56,7 +57,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpPost]
         public async Task<IActionResult> AddEmployee(AddEmployeeCommand command)
         {
@@ -70,7 +71,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpDelete]
         public async Task<IActionResult> DeleteEmployee(short id)
         {
@@ -85,7 +86,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpPut]
         public async Task<IActionResult> EditEmployee(EditEmployeeCommand command)
         {
@@ -97,7 +98,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="Username"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpPatch("{Username}/reset-password")]
         public async Task<IActionResult> ResetPasswordEmployee(string Username)
         {
@@ -113,7 +114,7 @@ namespace WebApi.Controllers.V1.Employee
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpPatch("change-workshift")]
         public async Task<IActionResult> EditWorkShiftEmployee(EditWorkShiftEmployeeCommand command)
         {

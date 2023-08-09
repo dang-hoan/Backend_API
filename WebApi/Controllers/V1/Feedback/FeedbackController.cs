@@ -8,6 +8,7 @@ using Domain.Wrappers;
 using Application.Features.Feedback.Queries.GetHistoryFeedback;
 using Application.Features.Feedback.Command.AddFeedback;
 using Microsoft.AspNetCore.Authorization;
+using Domain.Constants;
 
 namespace WebApi.Controllers.V1.Feeback
 {
@@ -20,7 +21,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin,Employee")]
+        [Authorize(Roles = RoleConstants.AdminAndEmployeeRole)]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllFeedbackResponse>>> GetAllFeedback([FromQuery] GetAllFeedbackParameter parameter)
         {
@@ -41,7 +42,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin,Employee")]
+        [Authorize(Roles = RoleConstants.AdminAndEmployeeRole)]
         [HttpPost("reply")]
         public async Task<IActionResult> AddReplyAtFeedback(AddReplyAtFeedbackCommand command)
         {
@@ -53,7 +54,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin,Employee")]
+        [Authorize(Roles = RoleConstants.AdminAndEmployeeRole)]
         [HttpPut("reply")]
         public async Task<IActionResult> EditReply(EditReplyCommand command)
         {
@@ -79,7 +80,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin,Employee")]
+        [Authorize(Roles = RoleConstants.AdminAndEmployeeRole)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFeedbackById(long id)
         {
@@ -93,7 +94,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = RoleConstants.CustomerRole)]
         [HttpGet("customer-booking/{id}")]
         public async Task<IActionResult> GetFeedbackHistory(long id)
         {
@@ -108,7 +109,7 @@ namespace WebApi.Controllers.V1.Feeback
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = RoleConstants.CustomerRole)]
         [HttpPost("mybooking")]
         [RequestSizeLimit(50 * 1024 * 1024)] //50MB
         public async Task<IActionResult> AddFeedback(AddFeedbackCommand command)
