@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Application.Features.WorkShift.Command.EditWorkShift;
 using Application.Features.WorkShift.Queries.GetById;
 using Microsoft.AspNetCore.Authorization;
+using Domain.Constants;
 
 namespace WebApi.Controllers.V1.WorkShift
 {
@@ -19,7 +20,7 @@ namespace WebApi.Controllers.V1.WorkShift
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        [Authorize("Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllWorkShiftResponse>>> GetAllWorkShift([FromQuery] RequestParameter parameter)
         {
@@ -38,7 +39,7 @@ namespace WebApi.Controllers.V1.WorkShift
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [Authorize("Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpPost]
         public async Task<IActionResult> AddWorkShift(AddWorkShiftCommand command)
         {
@@ -51,7 +52,7 @@ namespace WebApi.Controllers.V1.WorkShift
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [Authorize("Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpPut]
         public async Task<IActionResult> EditWorkShift(EditWorkShiftCommand command)
         {
@@ -64,7 +65,7 @@ namespace WebApi.Controllers.V1.WorkShift
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize("Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpDelete]
         public async Task<IActionResult> DeleteWorkShift(long id)
         {
@@ -79,7 +80,7 @@ namespace WebApi.Controllers.V1.WorkShift
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize("Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpGet("{id}")]
         public async Task<ActionResult<Result<GetWorkshiftByIdResponse>>> GetWorkshiftById(long id)
         {

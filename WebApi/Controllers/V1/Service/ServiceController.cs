@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Application.Features.Service.Command.EditService;
 using Microsoft.AspNetCore.Authorization;
 using Application.Features.Service.Command.DeleteService;
+using Domain.Constants;
 
 namespace WebApi.Controllers.V1.Service
 {
@@ -39,7 +40,7 @@ namespace WebApi.Controllers.V1.Service
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [Authorize("Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpPost]
         public async Task<IActionResult> AddService(AddServiceCommand command)
         {
@@ -47,7 +48,7 @@ namespace WebApi.Controllers.V1.Service
             return (result.Succeeded) ? Ok(result) : BadRequest(result);
         }
 
-        [Authorize("Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpPut]
         public async Task<IActionResult> EditService(EditServiceCommand command)
         {
@@ -60,7 +61,7 @@ namespace WebApi.Controllers.V1.Service
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize("Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpDelete]
         public async Task<IActionResult> DeleteService(short id)
         {

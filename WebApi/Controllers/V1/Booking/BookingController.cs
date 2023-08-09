@@ -5,6 +5,7 @@ using Application.Features.Booking.Queries.GetAll;
 using Application.Features.Booking.Queries.GetById;
 using Application.Features.Booking.Queries.GetCustomerBooking;
 using Application.Features.Booking.Queries.GetCustomerBookingHistory;
+using Domain.Constants;
 using Domain.Wrappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,7 @@ namespace WebApi.Controllers.V1.Booking
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin")]
+        [Authorize(Roles = RoleConstants.AdministratorRole)]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<GetAllBookingResponse>>> GetAllBookings([FromQuery] GetAllBookingQuery query)
         {
@@ -28,7 +29,6 @@ namespace WebApi.Controllers.V1.Booking
             {
                 IsExport = query.IsExport,
                 Keyword = query.Keyword,
-                SortBy = query.SortBy,
                 OrderBy = query.OrderBy,
                 PageNumber = query.PageNumber,
                 PageSize = query.PageSize,
@@ -102,7 +102,7 @@ namespace WebApi.Controllers.V1.Booking
         /// </summary>
         /// <param name="idCustomer"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Superadmin,Employee")]
+        [Authorize(Roles = RoleConstants.AdminAndEmployeeRole)]
         [HttpGet("customer/{idCustomer}")]
         public async Task<IActionResult> GetCustomerBookingHistory(long idCustomer)
         {
@@ -117,7 +117,7 @@ namespace WebApi.Controllers.V1.Booking
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = RoleConstants.CustomerRole)]
         [HttpGet("customer")]
         public async Task<IActionResult> GetCustomerBooking([FromQuery] GetCustomerBookingQuery query)
         {
