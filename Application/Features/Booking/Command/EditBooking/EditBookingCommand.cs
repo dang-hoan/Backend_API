@@ -102,10 +102,6 @@ namespace Application.Features.Booking.Command.EditBooking
                 await _bookingRepository.UpdateAsync(isExistBooking);
                 await _unitOfWork.Commit(cancellationToken);
 
-                customer.TotalMoney = _bookingRepository.GetAllTotalMoneyBookingByCustomerId(isExistBooking.CustomerId);
-                await _customerRepository.UpdateAsync(customer);
-                await _unitOfWork.Commit(cancellationToken);
-
                 await transaction.CommitAsync(cancellationToken);
                 return await Result<EditBookingCommand>.SuccessAsync(request);
             }

@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces.Booking;
 using Infrastructure.Contexts;
+using Domain.Constants.Enum;
 
 namespace Infrastructure.Repositories.Booking
 {
@@ -14,7 +15,7 @@ namespace Infrastructure.Repositories.Booking
 
         public decimal GetAllTotalMoneyBookingByCustomerId(long id)
         {
-            var totalMoney = _dbContext.Bookings.Where(b => b.CustomerId == id && !b.IsDeleted)
+            var totalMoney = _dbContext.Bookings.Where(b => b.CustomerId == id && !b.IsDeleted && b.Status == BookingStatus.Done)
                .Join(_dbContext.BookingDetails.Where(_ => !_.IsDeleted), b => b.Id, bd => bd.BookingId, (b, bd) => new { Booking = b, BookingDetail = bd })
              .Join(_dbContext.Services.Where(_ => !_.IsDeleted), bb => bb.BookingDetail.ServiceId, s => s.Id, (bb, s) => new { Booking = bb.Booking, Service = s })
              .GroupBy(bb => bb.Booking.CustomerId)
