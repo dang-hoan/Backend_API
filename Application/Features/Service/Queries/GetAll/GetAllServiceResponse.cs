@@ -12,5 +12,6 @@ namespace Application.Features.Service.Queries.GetAll
         public string? Description { get; set; }
         public DateTime? CreatedOn { get; set; }
         public int Review { get; set;}
+        public string? Image { get; set; }
     }
 }
