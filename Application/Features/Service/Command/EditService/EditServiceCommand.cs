@@ -58,13 +58,15 @@ namespace Application.Features.Service.Command.EditService
 
                 if (request.ServicesImageRequests != null)
                 {
+                    List<string?> listNewFiles = request.ServicesImageRequests.Select(x => x.NameFile).ToList();
                     //Remove and Add List Request Image
                     var requestImages = await _serviceImageRepository.Entities.Where(x => x.ServiceId == editService.Id && !x.IsDeleted).ToListAsync(cancellationToken);
                     if (requestImages.Any())
                     {
                         foreach (var item in requestImages)
                         {
-                            await _uploadService.DeleteAsync(item.NameFile);
+                            if(!listNewFiles.Contains(item.NameFile))
+                                await _uploadService.DeleteAsync(item.NameFile);
                         }
                         await _serviceImageRepository.RemoveRangeAsync(requestImages);
                         await _unitOfWork.Commit(cancellationToken);
