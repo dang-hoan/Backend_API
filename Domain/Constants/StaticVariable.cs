@@ -45,7 +45,7 @@
 
         public const string IS_NOT_LOGIN = "You must login to do this action";
 
-        public const string NOT_HAVE_ACCESS = "Not have access";
+        public const string NOT_HAVE_ACCESS = "You don't have permission to access";
 
     }
 }

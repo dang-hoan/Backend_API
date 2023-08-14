@@ -58,7 +58,7 @@ namespace Application.Features.Booking.Command.AddBooking
             {
                 long userId = _userManager.Users.Where(user => _currentUserService.UserName.Equals(user.UserName)).Select(user => user.UserId).FirstOrDefault();
 
-                if (userId != request.Id)
+                if (userId != request.CustomerId)
                     return await Result<AddBookingCommand>.FailAsync(StaticVariable.NOT_HAVE_ACCESS);
             }
 
@@ -92,9 +92,6 @@ namespace Application.Features.Booking.Command.AddBooking
                         Note = booking.Note
                     });
                 }
-                await _unitOfWork.Commit(cancellationToken);
-                ExistCustomer.TotalMoney = _bookingRepository.GetAllTotalMoneyBookingByCustomerId(ExistCustomer.Id);
-                await _customerRepository.UpdateAsync(ExistCustomer);
                 await _unitOfWork.Commit(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
                 return await Result<AddBookingCommand>.SuccessAsync(request);

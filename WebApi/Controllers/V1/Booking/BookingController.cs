@@ -1,6 +1,7 @@
 using Application.Features.Booking.Command.AddBooking;
 using Application.Features.Booking.Command.DeleteBooking;
 using Application.Features.Booking.Command.EditBooking;
+using Application.Features.Booking.Command.UpdateStatusBooking;
 using Application.Features.Booking.Queries.GetAll;
 using Application.Features.Booking.Queries.GetById;
 using Application.Features.Booking.Queries.GetCustomerBooking;
@@ -92,6 +93,19 @@ namespace WebApi.Controllers.V1.Booking
         [Authorize]
         [HttpPut]
         public async Task<IActionResult> EditBooking(EditBookingCommand command)
+        {
+            var result = await Mediator.Send(command);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
+        }
+
+        /// <summary>
+        /// Update Status Booking
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        [Authorize(Roles = RoleConstants.AdminAndEmployeeRole)]
+        [HttpPatch("update-status")]
+        public async Task<IActionResult> UpdateStatusBooking(UpdateStatusBookingCommand command)
         {
             var result = await Mediator.Send(command);
             return (result.Succeeded) ? Ok(result) : BadRequest(result);
