@@ -71,7 +71,7 @@ namespace Application.Features.Employee.Command.EditEmployee
             var isExistedWorkshift = await _workshiftRepository.FindAsync(x => !x.IsDeleted && x.Id == request.WorkShiftId);
             if (isExistedWorkshift == null) return await Result<EditEmployeeCommand>.FailAsync(StaticVariable.NOT_FOUND_WORK_SHIFT);
 
-            if(editEmployee.Image != null)
+            if(editEmployee.Image != null && editEmployee.Image != request.Image)
             {
                 await _uploadService.DeleteAsync(editEmployee.Image);
             }

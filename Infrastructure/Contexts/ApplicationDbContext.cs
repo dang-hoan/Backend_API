@@ -17,6 +17,7 @@ using Domain.Entities.View.ViewCustomerReviewHistory;
 using Domain.Entities.WorkShift;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Domain.Entities.EnumMasterData;
 
 namespace Infrastructure.Contexts
 {
@@ -48,6 +49,7 @@ namespace Infrastructure.Contexts
         public virtual DbSet<ViewCustomerBookingHistory> ViewCustomerBookingHistories { get; set; }
         public virtual DbSet<ViewCustomerFeedbackReply> ViewCustomerFeedbackReplies { get; set; }
         public virtual DbSet<ViewCustomerReviewHistory> ViewCustomerReviewHistories { get; set; }
+        public virtual DbSet<EnumMasterData> EnumMasterDatas { get; set; }
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
         {
             foreach (var entry in ChangeTracker.Entries<IAuditableEntity>().ToList())

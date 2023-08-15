@@ -18,7 +18,6 @@
         public const string RESET_PASSWORD = "Abc123!@#";
 
         //error message
-
         public const string NOT_FOUND_MSG = "Not found match data!";
         public const string SERVER_ERROR_MSG = "Internal server error!";
         public const string INVALID_PASSWORD = "Password must be at least 8 characters.";
@@ -46,6 +45,10 @@
         public const string IS_NOT_LOGIN = "You must login to do this action";
 
         public const string NOT_HAVE_ACCESS = "You don't have permission to access";
+
+        //Enum
+        public const string RATING_ENUM = "Rating enum";
+        public const string BOOKING_STATUS_ENUM = "Booking status enum";
 
     }
 }
