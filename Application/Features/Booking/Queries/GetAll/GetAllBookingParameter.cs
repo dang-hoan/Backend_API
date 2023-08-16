@@ -1,5 +1,4 @@
 ﻿using Application.Parameters;
-using Domain.Constants.Enum;
 
 namespace Application.Features.Booking.Queries.GetAll
 {
@@ -11,7 +10,7 @@ namespace Application.Features.Booking.Queries.GetAll
 
         public DateTime? ToTime { get; set; }
 
-        public BookingStatus? Status { get; set; }
+        public int? Status { get; set; }
 
     }
 }

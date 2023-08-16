@@ -1,5 +1,4 @@
-﻿using Domain.Constants.Enum;
-using Domain.Contracts;
+﻿using Domain.Contracts;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -20,8 +19,8 @@ namespace Domain.Entities.View.ViewCustomerBookingHistory
         public DateTime FromTime { get; set; }
         [Column("to_time", TypeName = "datetime")]
         public DateTime ToTime { get; set; }
-        [Column("status", TypeName = "smallInt")]
-        public BookingStatus? Status { get; set; }
+        [Column("status", TypeName = "int")]
+        public int? Status { get; set; }
         [Column("service_id", TypeName = "bigint")]
         public long ServiceId { get; set; }
         [Required]

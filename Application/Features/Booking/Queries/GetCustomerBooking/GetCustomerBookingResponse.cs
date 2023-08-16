@@ -1,5 +1,4 @@
 ﻿using Application.Dtos.Responses.ServiceImage;
-using Domain.Constants.Enum;
 
 namespace Application.Features.Booking.Queries.GetCustomerBooking
 {
@@ -7,7 +6,9 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
     {
         public long BookingId { get; set; }
         public DateTime BookingDate { get; set; }
-        public BookingStatus? BookingStatus { get; set; }
+        public DateTime FromTime { get; set; }
+        public DateTime ToTime { get; set; }
+        public int? BookingStatus { get; set; }
         public DateTime? LastModifiedOn { get; set; }
         public List<BookingDetailResponse> bookingDetailResponses { get; set; } = new List<BookingDetailResponse>();
     }

@@ -1,12 +1,10 @@
 using Application.Exceptions;
-using Application.Features.Booking.Queries.GetById;
 using Application.Interfaces;
 using Application.Interfaces.Booking;
 using Application.Interfaces.BookingDetail;
 using Application.Interfaces.Customer;
 using Application.Interfaces.Repositories;
 using Domain.Constants;
-using Domain.Constants.Enum;
 using Domain.Entities;
 using Domain.Wrappers;
 using MediatR;
@@ -25,6 +23,7 @@ namespace Application.Features.Booking.Command.DeleteBooking
         private readonly IBookingRepository _bookingRepository;
         private readonly IBookingDetailRepository _bookingDetailRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IEnumService _enumService;
         private readonly ICurrentUserService _currentUserService;
         private readonly UserManager<AppUser> _userManager;
 
@@ -32,12 +31,14 @@ namespace Application.Features.Booking.Command.DeleteBooking
             IUnitOfWork<long> unitOfWork,
             IBookingRepository bookingRepository,
             ICustomerRepository customerRepository,
+            IEnumService enumService,
             IBookingDetailRepository bookingDetailRepository, ICurrentUserService currentUserService, UserManager<AppUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _bookingRepository = bookingRepository;
             _bookingDetailRepository = bookingDetailRepository;
             _customerRepository = customerRepository;
+            _enumService = enumService;
             _currentUserService = currentUserService;
             _userManager = userManager;
         }
@@ -57,7 +58,7 @@ namespace Application.Features.Booking.Command.DeleteBooking
                         return await Result<long>.FailAsync(StaticVariable.NOT_HAVE_ACCESS);
                 }
 
-                if (!(booking.Status == BookingStatus.Inprogress))
+                if (!(booking.Status == _enumService.GetEnumIdByValue(StaticVariable.INPROGRESSING, StaticVariable.BOOKING_STATUS_ENUM)))
                 {
                     var bookingDetail = await _bookingDetailRepository.GetByCondition(x => x.BookingId == request.Id && !x.IsDeleted);
                     if (bookingDetail == null) return await Result<long>.FailAsync(StaticVariable.NOT_FOUND_MSG);

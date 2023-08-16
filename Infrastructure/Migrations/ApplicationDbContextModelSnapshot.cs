@@ -254,8 +254,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(500)")
                         .HasColumnName("note");
 
-                    b.Property<short?>("Status")
-                        .HasColumnType("smallInt")
+                    b.Property<int?>("Status")
+                        .HasColumnType("int")
                         .HasColumnName("status");
 
                     b.Property<DateTime>("ToTime")
@@ -462,11 +462,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.EnumMasterData.EnumMasterData", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -490,7 +490,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("nvarchar(30)")
+                        .HasColumnType("nvarchar(50)")
                         .HasColumnName("value");
 
                     b.HasKey("Id");
@@ -771,8 +771,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("service_name");
 
-                    b.Property<short?>("Status")
-                        .HasColumnType("smallInt")
+                    b.Property<int?>("Status")
+                        .HasColumnType("int")
                         .HasColumnName("status");
 
                     b.Property<DateTime>("ToTime")

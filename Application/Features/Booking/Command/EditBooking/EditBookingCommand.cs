@@ -8,7 +8,6 @@ using Application.Interfaces.Service;
 using AutoMapper;
 using Domain.Constants;
 using Domain.Entities;
-using Domain.Entities.Booking;
 using Domain.Entities.BookingDetail;
 using Domain.Wrappers;
 using MediatR;

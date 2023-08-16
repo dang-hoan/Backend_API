@@ -5,10 +5,10 @@ using Domain.Contracts;
 namespace Domain.Entities.EnumMasterData
 {
     [Table("enum_master_data")]
-    public class EnumMasterData : AuditableBaseEntity<long>
+    public class EnumMasterData : AuditableBaseEntity<int>
     {
         [Required]
-        [Column("value", TypeName = "nvarchar(30)")]
+        [Column("value", TypeName = "nvarchar(50)")]
         public string Value { get; set; }
 
         [Required]
