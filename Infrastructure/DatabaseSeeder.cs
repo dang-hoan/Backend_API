@@ -1,6 +1,9 @@
-﻿using Application.Interfaces.Services;
+﻿using Application.Interfaces;
+using Application.Interfaces.EnumMasterData;
+using Application.Interfaces.Services;
 using Domain.Constants;
 using Domain.Entities;
+using Domain.Entities.EnumMasterData;
 using Infrastructure.Contexts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -13,13 +16,23 @@ namespace Infrastructure
         private readonly ApplicationDbContext _context;
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<AppRole> _roleManager;
+        private readonly IEnumMasterDataRepository _enumMasterDataRepository;
+        private readonly IDateTimeService _dateTimeService;
 
-        public DatabaseSeeder(ILogger<DatabaseSeeder> logger, ApplicationDbContext context, UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
+        public DatabaseSeeder(
+            ILogger<DatabaseSeeder> logger, 
+            ApplicationDbContext context, 
+            UserManager<AppUser> userManager, 
+            RoleManager<AppRole> roleManager,
+            IEnumMasterDataRepository enumMasterDataRepository,
+            IDateTimeService dateTimeService)
         {
             _logger = logger;
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
+            _enumMasterDataRepository = enumMasterDataRepository;
+            _dateTimeService = dateTimeService;
         }
 
         public void Initialize()
@@ -96,6 +109,47 @@ namespace Infrastructure
                         }
                     }
                 }
+
+                var existWaitingEnum = _enumMasterDataRepository.Entities
+                                        .Where(x => x.Value.Equals(StaticVariable.WAITING) && !x.IsDeleted).FirstOrDefault() != null;
+                var existInprogressingEnum = _enumMasterDataRepository.Entities
+                                        .Where(x => x.Value.Equals(StaticVariable.INPROGRESSING) && !x.IsDeleted).FirstOrDefault() != null;
+                var existDoneEnum = _enumMasterDataRepository.Entities
+                                        .Where(x => x.Value.Equals(StaticVariable.DONE) && !x.IsDeleted).FirstOrDefault() != null;
+
+                if(!existWaitingEnum)
+                    await _enumMasterDataRepository.AddAsync(
+                        new EnumMasterData
+                        {
+                            Value = StaticVariable.WAITING,
+                            EnumType = StaticVariable.BOOKING_STATUS_ENUM,
+                            CreatedBy = "System",
+                            CreatedOn = _dateTimeService.NowUtc
+                        });
+
+                if(!existInprogressingEnum)
+                    await _enumMasterDataRepository.AddAsync(
+                        new EnumMasterData
+                        {
+                            Value = StaticVariable.INPROGRESSING,
+                            EnumType = StaticVariable.BOOKING_STATUS_ENUM,
+                            CreatedBy = "System",
+                            CreatedOn = _dateTimeService.NowUtc
+                        });
+
+                if(!existDoneEnum)
+                    await _enumMasterDataRepository.AddAsync(
+                        new EnumMasterData
+                        {
+                            Value = StaticVariable.DONE,
+                            EnumType = StaticVariable.BOOKING_STATUS_ENUM,
+                            CreatedBy = "System",
+                            CreatedOn = _dateTimeService.NowUtc
+                        });
+
+                if(!(existWaitingEnum && existInprogressingEnum && existDoneEnum))
+                    _logger.LogInformation("Seeded Booking Status basic enum.");
+
             }).GetAwaiter().GetResult();
         }
     }

@@ -1,3 +1,4 @@
+using Application.Interfaces;
 using Application.Interfaces.Booking;
 using Application.Interfaces.Customer;
 using Application.Interfaces.Repositories;
@@ -18,11 +19,16 @@ namespace Application.Features.Customer.Command.DeleteCustomer
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly ICustomerRepository _customerRepository;
         private readonly IBookingRepository _bookingRepository;
+        private readonly IEnumService _enumService;
 
-        public DeleteCustomerCommandHandler(ICustomerRepository customerRepository, IUnitOfWork<long> unitOfWork, IBookingRepository bookingRepository)
+        public DeleteCustomerCommandHandler(
+            ICustomerRepository customerRepository,
+            IEnumService enumService,
+            IUnitOfWork<long> unitOfWork, IBookingRepository bookingRepository)
         {
             _customerRepository = customerRepository;
             _bookingRepository = bookingRepository;
+            _enumService = enumService;
             _unitOfWork = unitOfWork;
         }
 
@@ -37,11 +43,11 @@ namespace Application.Features.Customer.Command.DeleteCustomer
                         {
                             b.Status
                         };
-
             bool canDelete = true;
+
             foreach (var q in query)
             {
-                if (q.Status == Domain.Constants.Enum.BookingStatus.Inprogress)
+                if (q.Status == _enumService.GetEnumIdByValue(StaticVariable.INPROGRESSING, StaticVariable.BOOKING_STATUS_ENUM))
                 {
                     canDelete = false;
                     break;

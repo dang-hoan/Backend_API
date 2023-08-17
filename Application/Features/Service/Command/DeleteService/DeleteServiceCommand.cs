@@ -5,10 +5,8 @@ using Application.Interfaces.Repositories;
 using Application.Interfaces.Service;
 using Application.Interfaces.ServiceImage;
 using Domain.Constants;
-using Domain.Constants.Enum;
 using Domain.Wrappers;
 using MediatR;
-using Microsoft.VisualBasic;
 
 namespace Application.Features.Service.Command.DeleteService
 {
@@ -24,6 +22,7 @@ namespace Application.Features.Service.Command.DeleteService
         private readonly IBookingRepository _bookingRepository;
         private readonly IBookingDetailRepository _bookingDetailRepository;
         private readonly IServiceImageRepository _serviceImageRepository;
+        private readonly IEnumService _enumService;
         private readonly IUploadService _uploadService;
 
         public DeleteServiceCommandHandler(
@@ -32,6 +31,7 @@ namespace Application.Features.Service.Command.DeleteService
             IBookingRepository bookingRepository,
             IBookingDetailRepository bookingDetailRepository,
             IServiceImageRepository serviceImageRepository,
+            IEnumService enumService,
             IUploadService uploadService)
         {
             _serviceRepository = serviceRepository;
@@ -39,6 +39,7 @@ namespace Application.Features.Service.Command.DeleteService
             _bookingRepository = bookingRepository;
             _bookingDetailRepository = bookingDetailRepository;
             _serviceImageRepository = serviceImageRepository;
+            _enumService = enumService;
             _uploadService = uploadService;
         }
 
@@ -64,7 +65,7 @@ namespace Application.Features.Service.Command.DeleteService
                 bool canDelete = true;
                 foreach (var q in query)
                 {
-                    if (q.Status == BookingStatus.Inprogress)
+                    if (q.Status == _enumService.GetEnumIdByValue(StaticVariable.INPROGRESSING, StaticVariable.BOOKING_STATUS_ENUM))
                     {
                         canDelete = false;
                         break;

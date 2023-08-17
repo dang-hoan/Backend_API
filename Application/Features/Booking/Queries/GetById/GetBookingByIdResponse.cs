@@ -1,6 +1,4 @@
-﻿using Domain.Constants.Enum;
-
-namespace Application.Features.Booking.Queries.GetById
+﻿namespace Application.Features.Booking.Queries.GetById
 {
     public class GetBookingByIdResponse
     {
@@ -8,7 +6,7 @@ namespace Application.Features.Booking.Queries.GetById
         public string CustomerName { get; set; }
         public string PhoneNumber { get; set; }
         public DateTime BookingDate { get; set; }
-        public BookingStatus? Status { get; set; }
+        public int? Status { get; set; }
         public DateTime FromTime { get; set; }
         public DateTime ToTime { get; set; }
         public string? Note { get; set; }

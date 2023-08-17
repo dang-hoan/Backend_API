@@ -1,5 +1,4 @@
 ﻿using Application.Exceptions;
-using Application.Features.Customer.Queries.GetById;
 using Application.Interfaces;
 using Application.Interfaces.Booking;
 using Application.Interfaces.BookingDetail;
@@ -8,7 +7,6 @@ using Application.Interfaces.Repositories;
 using Application.Interfaces.Service;
 using AutoMapper;
 using Domain.Constants;
-using Domain.Constants.Enum;
 using Domain.Entities;
 using Domain.Wrappers;
 using MediatR;
@@ -33,17 +31,19 @@ namespace Application.Features.Booking.Command.AddBooking
         private readonly IMapper _mapper;
         private readonly IBookingRepository _bookingRepository;
         private readonly IServiceRepository _serviceRepository;
+        private readonly IEnumService _enumService;
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly IBookingDetailRepository _bookingDetailService;
         private readonly ICustomerRepository _customerRepository;
         private readonly ICurrentUserService _currentUserService;
         private readonly UserManager<AppUser> _userManager;
 
-        public AddBookingCommandHandler(IMapper mapper, IBookingRepository bookingRepository, IServiceRepository serviceRepository, IUnitOfWork<long> unitOfWork, 
+        public AddBookingCommandHandler(IMapper mapper, IBookingRepository bookingRepository, IServiceRepository serviceRepository, IEnumService enumService, IUnitOfWork<long> unitOfWork, 
             IBookingDetailRepository bookingDetailService, ICustomerRepository customerRepository, ICurrentUserService currentUserService, UserManager<AppUser> userManager)
         {
             _mapper = mapper;
             _bookingRepository = bookingRepository;
+            _enumService = enumService;
             _unitOfWork = unitOfWork;
             _serviceRepository = serviceRepository;
             _bookingDetailService = bookingDetailService;
@@ -79,7 +79,7 @@ namespace Application.Features.Booking.Command.AddBooking
                 if (request.ServiceId.Except(listExistServiceId).ToList().Any()) return await Result<AddBookingCommand>.FailAsync(StaticVariable.NOT_FOUND_SERVICE);
 
                 var booking = _mapper.Map<Domain.Entities.Booking.Booking>(request);
-                booking.Status = BookingStatus.Waiting;
+                booking.Status = _enumService.GetEnumIdByValue(StaticVariable.WAITING, StaticVariable.BOOKING_STATUS_ENUM);
                 await _bookingRepository.AddAsync(booking);
                 await _unitOfWork.Commit(cancellationToken);
                 request.Id = booking.Id;

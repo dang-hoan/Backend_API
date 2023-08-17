@@ -1,5 +1,4 @@
-﻿using Application.Features.Booking.Queries.GetCustomerBooking;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Application.Interfaces.Booking;
 using Application.Interfaces.BookingDetail;
 using Application.Interfaces.Customer;
@@ -51,7 +50,7 @@ namespace Application.Features.Booking.Queries.GetById
                     FromTime = s.FromTime,
                     ToTime = s.ToTime,
                     Note = s.Note,  
-                    CustomerId = s.CustomerId,
+                    CustomerId = s.CustomerId
                 }).FirstOrDefaultAsync();
             if(Booking == null)
             {

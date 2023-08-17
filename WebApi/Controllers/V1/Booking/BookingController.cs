@@ -138,7 +138,8 @@ namespace WebApi.Controllers.V1.Booking
             return Ok(await Mediator.Send(new GetCustomerBookingQuery
             {
                 CustomerId = query.CustomerId,
-                KeyWord = query.KeyWord
+                KeyWord = query.KeyWord,
+                BookingStatus = query.BookingStatus
             }));
         }
     }

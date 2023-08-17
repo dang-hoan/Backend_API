@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddEnumMasterDataTable : Migration
+    public partial class AddEnumMasterDataTableToDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,13 +20,22 @@ namespace Infrastructure.Migrations
                 oldType: "nvarchar(200)",
                 oldNullable: true);
 
+            migrationBuilder.AlterColumn<int>(
+                name: "status",
+                table: "booking",
+                type: "int",
+                nullable: true,
+                oldClrType: typeof(short),
+                oldType: "smallInt",
+                oldNullable: true);
+
             migrationBuilder.CreateTable(
                 name: "enum_master_data",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    value = table.Column<string>(type: "nvarchar(30)", nullable: false),
+                    value = table.Column<string>(type: "nvarchar(50)", nullable: false),
                     enumtype = table.Column<string>(name: "enum_type", type: "varchar(50)", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -53,6 +62,15 @@ namespace Infrastructure.Migrations
                 nullable: true,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(MAX)",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<short>(
+                name: "status",
+                table: "booking",
+                type: "smallInt",
+                nullable: true,
+                oldClrType: typeof(int),
+                oldType: "int",
                 oldNullable: true);
         }
     }

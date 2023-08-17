@@ -32,7 +32,7 @@ namespace Application.Features.Reply.Command.AddReplyAtFeeback
         public async Task<Result<AddReplyAtFeedbackCommand>> Handle(AddReplyAtFeedbackCommand request, CancellationToken cancellationToken)
         {
             request.Id = null;
-            if(request.FeedbackId == null)
+            if(request.FeedbackId == 0)
             {
                 return await Result<AddReplyAtFeedbackCommand>.FailAsync("The field FeedbackId is required.");
             }

@@ -42,6 +42,7 @@ namespace Infrastructure.Extensions
             services.AddScoped<IRemoveImageService, RemoveImageService>();
             services.AddScoped<ICheckFileType, CheckFileType>();
             services.AddScoped<ICheckSizeFile, CheckFileSize>();
+            services.AddScoped<IEnumService, EnumService>();
         }
 
         public static void AddRepositories(this IServiceCollection services)
@@ -59,6 +60,7 @@ namespace Infrastructure.Extensions
             services.AddWorkShiftRepository();
             services.AddViewCustomerReviewHistoryRepository();
             services.AddFeedbackFileUploadRepository();
+            services.AddEnumMasterDataRepository();
         }
 
     }

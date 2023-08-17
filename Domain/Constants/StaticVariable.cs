@@ -46,7 +46,13 @@
 
         public const string NOT_HAVE_ACCESS = "You don't have permission to access";
 
+        public const string STATUS_NOT_EXIST = "Status is not exist";
+
         //Enum
+        public const string WAITING = "waiting";
+        public const string INPROGRESSING = "inprogressing";
+        public const string DONE = "done";
+
         public const string RATING_ENUM = "Rating enum";
         public const string BOOKING_STATUS_ENUM = "Booking status enum";
 

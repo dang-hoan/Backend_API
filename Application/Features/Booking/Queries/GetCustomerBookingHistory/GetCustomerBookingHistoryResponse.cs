@@ -1,6 +1,4 @@
-﻿using Domain.Constants.Enum;
-
-namespace Application.Features.Booking.Queries.GetCustomerBookingHistory
+﻿namespace Application.Features.Booking.Queries.GetCustomerBookingHistory
 {
     public class GetCustomerBookingHistoryResponse
     {
@@ -9,7 +7,7 @@ namespace Application.Features.Booking.Queries.GetCustomerBookingHistory
         public DateTime BookingDate { get; set; }
         public DateTime FromTime { get; set; }
         public DateTime ToTime { get; set; }
-        public BookingStatus? Status { get; set; }
+        public int? Status { get; set; }
         public long ServiceId { get; set; }
         public string ServiceName { get; set; }
         public decimal price { get; set; }

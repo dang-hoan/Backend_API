@@ -2,6 +2,7 @@
 using Application.Interfaces.BookingDetail;
 using Application.Interfaces.Customer;
 using Application.Interfaces.Employee;
+using Application.Interfaces.EnumMasterData;
 using Application.Interfaces.Feedback;
 using Application.Interfaces.FeedbackFileUpload;
 using Application.Interfaces.Reply;
@@ -15,6 +16,7 @@ using Infrastructure.Repositories.Booking;
 using Infrastructure.Repositories.BookingDetail;
 using Infrastructure.Repositories.Customer;
 using Infrastructure.Repositories.Employee;
+using Infrastructure.Repositories.EnumMasterData;
 using Infrastructure.Repositories.Feedback;
 using Infrastructure.Repositories.FeedbackFileUpload;
 using Infrastructure.Repositories.Reply;
@@ -81,6 +83,10 @@ namespace Infrastructure.Extensions
         public static void AddFeedbackFileUploadRepository(this IServiceCollection services)
         {
             services.AddScoped<IFeedbackFileUploadRepository, FeedbackFileUploadRepository>();
+        }
+        public static void AddEnumMasterDataRepository(this IServiceCollection services)
+        {
+            services.AddScoped<IEnumMasterDataRepository, EnumMasterDataRepository>();
         }
     }
 }

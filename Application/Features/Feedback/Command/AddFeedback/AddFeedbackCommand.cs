@@ -33,6 +33,7 @@ namespace Application.Features.Feedback.Command.AddFeedback
         private readonly IFeedbackFileUploadRepository _feedbackFileUploadRepository;
         private readonly IBookingDetailRepository _bookingDetailRepository;
         private readonly IBookingRepository _bookingRepository;
+        private readonly IEnumService _enumService;
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly ICurrentUserService _currentUserService;
         private readonly UserManager<AppUser> _userManager;
@@ -42,6 +43,7 @@ namespace Application.Features.Feedback.Command.AddFeedback
             IFeedbackFileUploadRepository feedbackFileUploadRepository,
             IBookingDetailRepository bookingDetailRepository,
             IBookingRepository bookingRepository,
+            IEnumService enumService,
             IUnitOfWork<long> unitOfWork,
             ICurrentUserService currentUserService,
             UserManager<AppUser> userManager
@@ -53,6 +55,7 @@ namespace Application.Features.Feedback.Command.AddFeedback
             _bookingDetailRepository = bookingDetailRepository;
             _bookingRepository = bookingRepository;
             _unitOfWork = unitOfWork;
+            _enumService = enumService;
             _currentUserService = currentUserService;
             _userManager = userManager;
         }
@@ -78,11 +81,11 @@ namespace Application.Features.Feedback.Command.AddFeedback
 
                 long customerId = _userManager.Users.Where(user => _currentUserService.UserName.Equals(user.UserName)).Select(user => user.UserId).FirstOrDefault();
 
-                var isCustomerHasBooking = _bookingRepository.Entities.Where(x => x.CustomerId == customerId && x.Id == isExistInBookingDetail.BookingId && x.Status == BookingStatus.Done).Select(x => x.Id);
+                var isCustomerHasBooking = _bookingRepository.Entities.Where(x => x.CustomerId == customerId && x.Id == isExistInBookingDetail.BookingId && x.Status == _enumService.GetEnumIdByValue(StaticVariable.DONE, StaticVariable.BOOKING_STATUS_ENUM)).Select(x => x.Id);
 
                 var isWaitingBooking = _bookingRepository.Entities.Where(x => x.CustomerId == customerId &&
                                         x.Id == isExistInBookingDetail.BookingId &&
-                                        x.Status == BookingStatus.Waiting);
+                                        x.Status == _enumService.GetEnumIdByValue(StaticVariable.WAITING, StaticVariable.BOOKING_STATUS_ENUM));
 
                 if (isWaitingBooking.Any())
                 {
@@ -91,7 +94,7 @@ namespace Application.Features.Feedback.Command.AddFeedback
 
                 var isInProgressBooking = _bookingRepository.Entities.Where(x => x.CustomerId == customerId &&
                     x.Id == isExistInBookingDetail.BookingId &&
-                    x.Status == BookingStatus.Inprogress);
+                    x.Status == _enumService.GetEnumIdByValue(StaticVariable.INPROGRESSING, StaticVariable.BOOKING_STATUS_ENUM));
 
                 if (isInProgressBooking.Any())
                 {
@@ -103,6 +106,7 @@ namespace Application.Features.Feedback.Command.AddFeedback
 
                 // Check Image is valid
                 addFeedback.CustomerId = customerId;
+                addFeedback.ServiceId = isExistInBookingDetail.ServiceId;
                 await _feedbackRepository.AddAsync(addFeedback);
                 await _unitOfWork.Commit(cancellationToken);
                 if (request.FeedbackImageRequests != null)
