@@ -4,10 +4,8 @@ using Domain.Wrappers;
 using MediatR;
 using System.Linq.Dynamic.Core;
 using Domain.Helpers;
-using GemBox.Spreadsheet;
 using Application.Interfaces.ServiceImage;
 using Application.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Service.Queries.GetAll
 {

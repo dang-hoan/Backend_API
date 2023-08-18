@@ -1,6 +1,4 @@
 using Application.Parameters;
-using Domain.Constants.Enum;
-using Domain.Entities.Feedback;
 
 namespace Application.Features.Service.Queries.GetAll
 {
