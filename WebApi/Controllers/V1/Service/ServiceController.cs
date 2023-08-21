@@ -7,6 +7,7 @@ using Application.Features.Service.Command.EditService;
 using Microsoft.AspNetCore.Authorization;
 using Application.Features.Service.Command.DeleteService;
 using Domain.Constants;
+using Application.Features.Service.Queries.GetDropDown;
 
 namespace WebApi.Controllers.V1.Service
 {
@@ -33,6 +34,17 @@ namespace WebApi.Controllers.V1.Service
                 Time = parameter.Time,
                 Review = parameter.Review,
             }));
+        }
+
+        /// <summary>
+        /// Get Serivce DropDown, filter
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        [HttpGet("dropdown")]
+        public async Task<ActionResult<PaginatedResult<GetServiceDropDownResponse>>> GetServiceDropDown()
+        {
+            return Ok(await Mediator.Send(new GetServiceDropDownQuery()));
         }
 
         /// <summary>

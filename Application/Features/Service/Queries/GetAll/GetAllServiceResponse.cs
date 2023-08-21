@@ -1,6 +1,3 @@
-using Domain.Constants.Enum;
-using Domain.Entities.Feedback;
-
 namespace Application.Features.Service.Queries.GetAll
 {
     public class GetAllServiceResponse
