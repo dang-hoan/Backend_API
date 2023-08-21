@@ -21,7 +21,8 @@ namespace Application.Features.Employee.Command.EditEmployee
 
         [EmailAddress(ErrorMessage = "Invalid email address")]
         public string Email { get; set; } = default!;
-
+        [Required(ErrorMessage = "Phone number is required.")]
+        [RegularExpression(@"(\+84|84|0)+(3|5|7|8|9|1[2|6|8|9])+([0-9]{7,8})\b", ErrorMessage = "Phone number is invalid")]
         public string PhoneNumber { get; set; } = default!;
         public bool? Gender { get; set; }
         public string? Image { get; set; }
@@ -37,7 +38,7 @@ namespace Application.Features.Employee.Command.EditEmployee
         private readonly IWorkShiftRepository _workshiftRepository;
         private readonly IUploadService _uploadService;
 
-        public EditEmployeeCommandHandler(IMapper mapper, IEmployeeRepository employeeRepository, IUnitOfWork<long> unitOfWork, 
+        public EditEmployeeCommandHandler(IMapper mapper, IEmployeeRepository employeeRepository, IUnitOfWork<long> unitOfWork,
             IUserService userService, IWorkShiftRepository workshiftRepository, IUploadService uploadService)
         {
             _mapper = mapper;
@@ -64,6 +65,11 @@ namespace Application.Features.Employee.Command.EditEmployee
                     return await Result<EditEmployeeCommand>.FailAsync(StaticVariable.EMAIL_EXISTS_MSG);
                 }
             }
+            bool isPhoneNumberExists = _employeeRepository.Entities.Any(x => x.PhoneNumber.Equals(request.PhoneNumber) && x.Id != request.Id && !x.IsDeleted);
+            if (isPhoneNumberExists)
+            {
+                return await Result<EditEmployeeCommand>.FailAsync(StaticVariable.PHONE_NUMBER_EXISTS_MSG);
+            }
             if (request.PhoneNumber.Length < 8 || request.PhoneNumber.Length > 10)
             {
                 return await Result<EditEmployeeCommand>.FailAsync(StaticVariable.PHONE_ERROR_MSG);
@@ -71,7 +77,7 @@ namespace Application.Features.Employee.Command.EditEmployee
             var isExistedWorkshift = await _workshiftRepository.FindAsync(x => !x.IsDeleted && x.Id == request.WorkShiftId);
             if (isExistedWorkshift == null) return await Result<EditEmployeeCommand>.FailAsync(StaticVariable.NOT_FOUND_WORK_SHIFT);
 
-            if(editEmployee.Image != null && editEmployee.Image != request.Image)
+            if (editEmployee.Image != null && editEmployee.Image != request.Image)
             {
                 await _uploadService.DeleteAsync(editEmployee.Image);
             }
