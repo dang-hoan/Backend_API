@@ -9,6 +9,7 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
         public DateTime FromTime { get; set; }
         public DateTime ToTime { get; set; }
         public int? BookingStatus { get; set; }
+        public DateTime? CreatedOn { get; set; }
         public DateTime? LastModifiedOn { get; set; }
         public List<BookingDetailResponse> bookingDetailResponses { get; set; } = new List<BookingDetailResponse>();
     }
