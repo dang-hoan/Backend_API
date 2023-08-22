@@ -14,7 +14,7 @@ namespace Infrastructure.Services
 
         public int GetEnumIdByValue(string value, string enumType)
         {
-            var enumVar = _enumMasterDataRepository.Entities.Where(x => x.Value.Equals(value) && x.EnumType.Equals(enumType))
+            var enumVar = _enumMasterDataRepository.Entities.Where(x => x.Value.Equals(value) && x.EnumType.Equals(enumType) && !x.IsDeleted)
                                                             .FirstOrDefault();                 
             if(enumVar == null)             
                 throw new Exception($"Database missing '{value}' value for {enumType.ToLower()}!");
@@ -22,9 +22,9 @@ namespace Infrastructure.Services
             return enumVar.Id;
         }
 
-        public bool CheckEnumExistsById(int id, string enumType)
+        public bool CheckEnumExistsById(int id)
         {
-            var enumVar = _enumMasterDataRepository.Entities.Where(x => x.Id == id && x.EnumType.Equals(enumType))
+            var enumVar = _enumMasterDataRepository.Entities.Where(x => x.Id == id && !x.IsDeleted)
                                                             .FirstOrDefault();                 
             if(enumVar == null)
                 return false;

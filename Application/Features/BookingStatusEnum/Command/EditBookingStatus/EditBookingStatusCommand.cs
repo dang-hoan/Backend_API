@@ -34,7 +34,6 @@ namespace Application.Features.BookingStatusEnum.Command.EditBookingStatus
             try
             {
                 bookingStatus.Value = request.Value;
-                bookingStatus.EnumType = StaticVariable.BOOKING_STATUS_ENUM;
 
                 await _enumMasterDataRepository.UpdateAsync(bookingStatus);
                 await _unitOfWork.Commit(cancellationToken);

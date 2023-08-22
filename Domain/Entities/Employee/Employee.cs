@@ -18,7 +18,7 @@ namespace Domain.Entities.Employee
         public DateTime? Birthday { get; set; }
 
         [Required]
-        [Column("phone_number", TypeName = "varchar(10)")]
+        [Column("phone_number", TypeName = "varchar(15)")]
         public string PhoneNumber { get; set; }
 
         [Column("address", TypeName = "nvarchar(500)")]

@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.Customer;
+﻿using System.Xml;
+using Application.Interfaces.Customer;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services.Account;
 using AutoMapper;
@@ -8,6 +9,9 @@ using Domain.Entities;
 using Domain.Wrappers;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace Application.Features.Customer.Command.AddCustomer
 {
@@ -19,10 +23,15 @@ namespace Application.Features.Customer.Command.AddCustomer
         public DateTime? DateOfBirth { get; set; }
 
         [Required(ErrorMessage = "Phone number is required.")]
-        [RegularExpression(@"^[0-9]\d{7,9}$", ErrorMessage = "Phone number must be between 8 and 10 digits.")]
+        
+        [RegularExpression(@"(\+84|84|0)+(3|5|7|8|9|1[2|6|8|9])+([0-9]{7,8})\b", ErrorMessage = "Phone number is invalid")]
         public string PhoneNumber { get; set; }
-        public string? Username { get; set; }
-        public string? Password { get; set; }
+        [Required(ErrorMessage = "User name is required.")]
+        [RegularExpression(@"^[a-zA-Z0-9]+$",  ErrorMessage = "User name is invalid" )]
+        public string Username { get; set; }
+        [Required(ErrorMessage = "Password is required.")]
+        [RegularExpression(@"^[a-zA-Z0-9!@#$%^&*()-_=+[\]{}|;:',.<>\/?~]{8,}$", ErrorMessage = "Password is invalid")]
+        public string Password { get; set; }
         public decimal? TotalMoney { get; set; }
     }
 
@@ -32,7 +41,6 @@ namespace Application.Features.Customer.Command.AddCustomer
         private readonly ICustomerRepository _customnerRepository;
         private readonly IUnitOfWork<long> _unitOfWork;
         private readonly IAccountService _accountService;
-
 
         public AddCustomerCommandHandler(IMapper mapper, ICustomerRepository customerRepository, IUnitOfWork<long> unitOfWork, IAccountService accountService)
         {
@@ -50,6 +58,10 @@ namespace Application.Features.Customer.Command.AddCustomer
                 if (request.Password.Length < 8)
                 {
                     return await Result<AddCustomerCommand>.FailAsync(StaticVariable.INVALID_PASSWORD);
+                }
+                bool isPhoneNumberExists = _customnerRepository.Entities.Any(x => x.PhoneNumber.Equals(request.PhoneNumber) && !x.IsDeleted);
+                if(isPhoneNumberExists) {
+                    return await Result<AddCustomerCommand>.FailAsync(StaticVariable.PHONE_NUMBER_EXISTS_MSG);
                 }
                 bool isUsernameExists = await _accountService.IsExistUsername(request.Username);
                 if (isUsernameExists)

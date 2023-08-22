@@ -59,7 +59,7 @@ namespace Application.Features.Booking.Queries.GetCustomerBooking
             if (userId != request.CustomerId)
                 return await Result<List<GetCustomerBookingResponse>>.FailAsync(StaticVariable.NOT_HAVE_ACCESS);
 
-            if (request.BookingStatus != null && !_enumService.CheckEnumExistsById((int)request.BookingStatus, StaticVariable.BOOKING_STATUS_ENUM))
+            if (request.BookingStatus != null && !_enumService.CheckEnumExistsById((int)request.BookingStatus))
                 return await Result<List<GetCustomerBookingResponse>>.FailAsync(StaticVariable.STATUS_NOT_EXIST);
 
             var bookings = await _bookingRepository.Entities.Where(_ => !_.IsDeleted && _.CustomerId == request.CustomerId)

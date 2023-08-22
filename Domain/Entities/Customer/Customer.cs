@@ -13,7 +13,7 @@ namespace Domain.Entities.Customer
         public string CustomerName { get; set; }
 
         [Required]
-        [Column("phone_number", TypeName = "varchar(10)")]
+        [Column("phone_number", TypeName = "varchar(15)")]
         public string PhoneNumber { get; set; }
 
         [Column("address", TypeName = "nvarchar(500)")]

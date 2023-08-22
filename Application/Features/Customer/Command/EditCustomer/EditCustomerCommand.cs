@@ -18,9 +18,8 @@ namespace Application.Features.Customer.Command.EditCustomer
         public string CustomerName { get; set; } = default!;
         public string? Address { get; set; }
         public DateTime? DateOfBirth { get; set; }
-
         [Required(ErrorMessage = "Phone number is required.")]
-        [RegularExpression(@"^[0-9]\d{7,9}$", ErrorMessage = "Phone number must be between 8 and 10 digits.")]
+        [RegularExpression(@"(\+84|84|0)+(3|5|7|8|9|1[2|6|8|9])+([0-9]{7,8})\b", ErrorMessage = "Phone number is invalid")]
         public string PhoneNumber { get; set; }
     }
 
@@ -43,7 +42,7 @@ namespace Application.Features.Customer.Command.EditCustomer
 
         public async Task<Result<EditCustomerCommand>> Handle(EditCustomerCommand request, CancellationToken cancellationToken)
         {
-            if(request.Id == 0)
+            if (request.Id == 0)
             {
                 return await Result<EditCustomerCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             }
@@ -57,8 +56,13 @@ namespace Application.Features.Customer.Command.EditCustomer
             }
 
             var editCustomer = await _customnerRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
-            if(editCustomer == null) return await Result<EditCustomerCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
+            if (editCustomer == null) return await Result<EditCustomerCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             _mapper.Map(request, editCustomer);
+            bool isPhoneNumberExists = _customnerRepository.Entities.Any(x => x.PhoneNumber.Equals(request.PhoneNumber) && x.Id != request.Id && !x.IsDeleted);
+            if (isPhoneNumberExists)
+            {
+                return await Result<EditCustomerCommand>.FailAsync(StaticVariable.PHONE_NUMBER_EXISTS_MSG);
+            }
             await _customnerRepository.UpdateAsync(editCustomer);
             await _unitOfWork.Commit(cancellationToken);
             request.Id = editCustomer.Id;

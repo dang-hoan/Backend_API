@@ -41,7 +41,7 @@ namespace Application.Features.Booking.Command.UpdateStatusBooking
         {
             var ExistBooking = await _bookingRepository.FindAsync(x => !x.IsDeleted && x.Id == request.Id) ?? throw new KeyNotFoundException(StaticVariable.NOT_FOUND_BOOKING);
 
-            if (!_enumService.CheckEnumExistsById(request.BookingStatus, StaticVariable.BOOKING_STATUS_ENUM)) return await Result<UpdateStatusBookingCommand>.FailAsync(StaticVariable.STATUS_NOT_EXIST);
+            if (!_enumService.CheckEnumExistsById(request.BookingStatus)) return await Result<UpdateStatusBookingCommand>.FailAsync(StaticVariable.STATUS_NOT_EXIST);
 
             if (ExistBooking.Status == request.BookingStatus) return await Result<UpdateStatusBookingCommand>.SuccessAsync(StaticVariable.SUCCESS);
             var temp = ExistBooking.Status;
