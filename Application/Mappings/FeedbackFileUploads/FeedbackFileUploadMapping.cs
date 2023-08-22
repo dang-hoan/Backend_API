@@ -9,7 +9,7 @@ namespace Application.Mappings.FeedbackFileUploads
     {
         public FeedbackFileUploadMapping()
         {
-            CreateMap<Domain.Entities.FeedbackFileUpload.FeedbackFileUpload, FeedbackFileUploadResponse>().ReverseMap();
+            CreateMap<FeedbackFileUpload, FeedbackFileUploadResponse>().ReverseMap();
             CreateMap<ImageRequest, FeedbackFileUpload>().ReverseMap();
         }
     }

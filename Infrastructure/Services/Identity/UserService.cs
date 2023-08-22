@@ -73,7 +73,7 @@ namespace Infrastructure.Services.Identity
             if (user == null)
             {
                 // Don't reveal that the user does not exist
-                return await Result.FailAsync("System Error");
+                return await Result.FailAsync("Email no exist");
             }
 
             var token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
@@ -91,7 +91,7 @@ namespace Infrastructure.Services.Identity
             if (user == null)
             {
                 // Don't reveal that the user does not exist
-                return await Result.FailAsync("System Error");
+                return await Result.FailAsync("This user does not exist in the database");
             }
 
             user.IsActive = false;

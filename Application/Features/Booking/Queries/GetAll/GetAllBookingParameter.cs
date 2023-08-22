@@ -6,9 +6,7 @@ namespace Application.Features.Booking.Queries.GetAll
     {
         public DateTime? BookingDate { get; set; }
 
-        public DateTime? FromTime { get; set; }
-
-        public DateTime? ToTime { get; set; }
+        public DateTime? UseTime { get; set; }
 
         public int? Status { get; set; }
 

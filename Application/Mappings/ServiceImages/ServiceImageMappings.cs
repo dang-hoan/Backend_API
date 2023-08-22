@@ -1,5 +1,4 @@
 ﻿using Application.Dtos.Requests.Feedback;
-using Application.Dtos.Responses.ServiceImage;
 using AutoMapper;
 using Domain.Entities.ServiceImage;
 
@@ -9,7 +8,6 @@ namespace Application.Mappings.ServiceImages
     {
         public ServiceImageMappings()
         {
-            CreateMap<ServiceImage, ServiceImageResponse>().ReverseMap();
             CreateMap<ServiceImage, ImageRequest>().ReverseMap();
         }
     }

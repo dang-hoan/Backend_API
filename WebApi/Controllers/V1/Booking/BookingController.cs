@@ -34,8 +34,7 @@ namespace WebApi.Controllers.V1.Booking
                 PageNumber = query.PageNumber,
                 PageSize = query.PageSize,
                 BookingDate = query.BookingDate,
-                FromTime = query.FromTime,
-                ToTime = query.ToTime,
+                UseTime = query.UseTime,
                 Status = query.Status
             }));
         }
@@ -137,8 +136,12 @@ namespace WebApi.Controllers.V1.Booking
         {
             return Ok(await Mediator.Send(new GetCustomerBookingQuery
             {
+                IsExport = query.IsExport,
+                Keyword = query.Keyword,
+                OrderBy = query.OrderBy,
+                PageNumber = query.PageNumber,
+                PageSize = query.PageSize,
                 CustomerId = query.CustomerId,
-                KeyWord = query.KeyWord,
                 BookingStatus = query.BookingStatus
             }));
         }

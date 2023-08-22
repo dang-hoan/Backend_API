@@ -1,9 +1,11 @@
 ﻿using Application.Dtos.Responses.ServiceImage;
+using Application.Exceptions;
 using Application.Interfaces;
 using Application.Interfaces.Booking;
 using Application.Interfaces.BookingDetail;
 using Application.Interfaces.Service;
 using Application.Interfaces.ServiceImage;
+using Application.Parameters;
 using AutoMapper;
 using Domain.Constants;
 using Domain.Entities;
@@ -11,140 +13,102 @@ using Domain.Helpers;
 using Domain.Wrappers;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.Linq.Dynamic.Core;
 
 namespace Application.Features.Booking.Queries.GetCustomerBooking
 {
-    public class GetCustomerBookingQuery : IRequest<Result<List<GetCustomerBookingResponse>>>
+    public class GetCustomerBookingQuery : RequestParameter, IRequest<PaginatedResult<GetCustomerBookingResponse>>
     {
         [Required]
         public long CustomerId { get; set; }
 
-        public string? KeyWord { get; set; }
-
         public int? BookingStatus { get; set; }
     }
 
-    internal class GetCustomerBookingQueryHandler : IRequestHandler<GetCustomerBookingQuery, Result<List<GetCustomerBookingResponse>>>
+    internal class GetCustomerBookingQueryHandler : IRequestHandler<GetCustomerBookingQuery, PaginatedResult<GetCustomerBookingResponse>>
     {
         private readonly IBookingRepository _bookingRepository;
         private readonly IBookingDetailRepository _bookingDetailRepository;
         private readonly IServiceRepository _serviceRepository;
         private readonly IServiceImageRepository _serviceImageRepository;
         private readonly IEnumService _enumService;
-        private readonly IUploadService _uploadService;
         private readonly IMapper _mapper;
         private readonly ICurrentUserService _currentUserService;
         private readonly UserManager<AppUser> _userManager;
 
         public GetCustomerBookingQueryHandler(IBookingRepository bookingRepository, IBookingDetailRepository bookingDetailRepository, IServiceRepository serviceRepository,
-            IServiceImageRepository serviceImageRepository, IMapper mapper, IEnumService enumService, IUploadService uploadService, ICurrentUserService currentUserService, UserManager<AppUser> userManager)
+            IServiceImageRepository serviceImageRepository, IMapper mapper, IEnumService enumService, ICurrentUserService currentUserService, UserManager<AppUser> userManager)
         {
             _bookingRepository = bookingRepository;
             _bookingDetailRepository = bookingDetailRepository;
             _serviceRepository = serviceRepository;
             _serviceImageRepository = serviceImageRepository;
             _enumService = enumService;
-            _uploadService = uploadService;
             _mapper = mapper;
             _currentUserService = currentUserService;
             _userManager = userManager;
         }
 
-        public async Task<Result<List<GetCustomerBookingResponse>>> Handle(GetCustomerBookingQuery request, CancellationToken cancellationToken)
+        public async Task<PaginatedResult<GetCustomerBookingResponse>> Handle(GetCustomerBookingQuery request, CancellationToken cancellationToken)
         {
             long userId = _userManager.Users.Where(user => _currentUserService.UserName.Equals(user.UserName)).Select(user => user.UserId).FirstOrDefault();
 
             if (userId != request.CustomerId)
-                return await Result<List<GetCustomerBookingResponse>>.FailAsync(StaticVariable.NOT_HAVE_ACCESS);
+                throw new ApiException(StaticVariable.NOT_HAVE_ACCESS);
 
             if (request.BookingStatus != null && !_enumService.CheckEnumExistsById((int)request.BookingStatus))
-                return await Result<List<GetCustomerBookingResponse>>.FailAsync(StaticVariable.STATUS_NOT_EXIST);
+                throw new ApiException(StaticVariable.STATUS_NOT_EXIST);
 
-            var bookings = await _bookingRepository.Entities.Where(_ => !_.IsDeleted && _.CustomerId == request.CustomerId)
-                .Select(s => new Domain.Entities.Booking.Booking
-                {
-                    Id = s.Id,
-                    CustomerId = s.CustomerId,
-                    BookingDate = s.BookingDate,
-                    FromTime = s.FromTime,
-                    ToTime = s.ToTime,
-                    LastModifiedOn = s.LastModifiedOn,
-                    Status = s.Status,
-                    Note = s.Note,
-                }).ToListAsync();
-            List<GetCustomerBookingResponse> response = new List<GetCustomerBookingResponse>();
-            foreach (var booking in bookings)
-            {
-                var bookingResponse = new GetCustomerBookingResponse
-                {
-                    BookingId = booking.Id,
-                    BookingDate = booking.BookingDate,
-                    FromTime = booking.FromTime,
-                    ToTime = booking.ToTime,
-                    BookingStatus = booking.Status,
-                    LastModifiedOn = booking.LastModifiedOn,
-                };
+            DateTime findedDate;
 
-                bool matchWithRequiredStatus = request.BookingStatus == null ? true : false;
+            if (request.Keyword != null)
+                request.Keyword = request.Keyword.Trim();
 
-                if (bookingResponse.BookingStatus == request.BookingStatus)
-                    matchWithRequiredStatus = true;
+            var customerBooking = from booking in _bookingRepository.Entities.AsEnumerable()
+                                  let check = 0
+                                  where !booking.IsDeleted && booking.CustomerId == request.CustomerId
+                                        && (request.BookingStatus == null || booking.Status == request.BookingStatus)
+                                  select new GetCustomerBookingResponse
+                                  {
+                                      BookingId = booking.Id,
+                                      BookingDate = booking.BookingDate,
+                                      FromTime = booking.FromTime,
+                                      ToTime = booking.ToTime,
+                                      BookingStatus = booking.Status,
+                                      CreatedOn = booking.CreatedOn,
+                                      LastModifiedOn = booking.LastModifiedOn,
+                                      bookingDetailResponses = (from bookingDetail in _bookingDetailRepository.Entities.AsEnumerable()
+                                                                join service in _serviceRepository.Entities.AsEnumerable() on bookingDetail.ServiceId equals service.Id
+                                                                where booking.Id == bookingDetail.BookingId && !bookingDetail.IsDeleted && !service.IsDeleted
+                                                                select new BookingDetailResponse
+                                                                {
+                                                                    BookingDetailId = bookingDetail.Id,
+                                                                    ServiceId = bookingDetail.ServiceId,
+                                                                    ServiceDescription = service.Description,
+                                                                    ServiceImages = _mapper.Map<List<ServiceImageResponse>>(_serviceImageRepository.Entities.Where(_ => _.ServiceId == service.Id && _.IsDeleted == false).ToList()),
+                                                                    ServiceName = service.Name,
+                                                                    ServicePrice = service.Price
+                                                                }).ToList()
+                                  };
 
-                if (matchWithRequiredStatus)
-                {
-                    var bookingDetails = await _bookingDetailRepository.Entities.Where(_ => !_.IsDeleted && _.BookingId == booking.Id)
-                    .Select(s => new Domain.Entities.BookingDetail.BookingDetail
-                    {
-                        Id = s.Id,
-                        BookingId = booking.Id,
-                        ServiceId = s.ServiceId,
-                        Note = s.Note,
-                    }).ToListAsync();
+            if(!string.IsNullOrEmpty(request.Keyword))
+                customerBooking = customerBooking.Where(
+                    x => x.BookingId.ToString().Contains(request.Keyword)
+                            || DateTime.TryParse(request.Keyword, out findedDate) && x.BookingDate.ToString("yyyy-MM-dd").Equals(findedDate.ToString("yyyy-MM-dd"))          
+                            || x.bookingDetailResponses.Where(x => StringHelper.Contains(x.ServiceName, request.Keyword)).Any());
 
-                    bool checkServiceName = false;
-                    List<BookingDetailResponse> bookingDetailResponses = new List<BookingDetailResponse>();
-                    foreach (var bookingDetail in bookingDetails)
-                    {
-                        var service = await _serviceRepository.FindAsync(_ => !_.IsDeleted && _.Id == bookingDetail.ServiceId);
-                        if (service != null)
-                        {
-                            var bookingDetailResponse = new BookingDetailResponse
-                            {
-                                BookingDetailId = bookingDetail.Id,
-                                ServiceId = bookingDetail.ServiceId,
-                                ServiceDescription = service.Description,
-                                ServiceImages = _mapper.Map<List<ServiceImageResponse>>(_serviceImageRepository.Entities.Where(_ => _.ServiceId == service.Id && _.IsDeleted == false).ToList()),
-                                ServiceName = service.Name,
-                                ServicePrice = service.Price,
-                            };
-                            foreach (ServiceImageResponse imageResponse in bookingDetailResponse.ServiceImages)
-                            {
-                                imageResponse.NameFile = _uploadService.GetFullUrl(imageResponse.NameFile);
-                            }
-                            bookingDetailResponses.Add(bookingDetailResponse);
+            var data = customerBooking.AsQueryable().OrderBy(request.OrderBy);
+            var totalRecord = data.Count();
+            List<GetCustomerBookingResponse> result;
 
-                            if (request.KeyWord != null)
-                                request.KeyWord = request.KeyWord.Trim();
+            //Pagination
+            if (!request.IsExport)
+                result = data.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToList();
+            else
+                result = data.ToList();
+            return PaginatedResult<GetCustomerBookingResponse>.Success(result, totalRecord, request.PageNumber, request.PageSize);
 
-                            if (string.IsNullOrEmpty(request.KeyWord) || StringHelper.Contains(service.Name, request.KeyWord)
-                                || booking.Id.ToString().Contains(request.KeyWord) || booking.BookingDate.ToString("dd/MM/yyyy").Contains(request.KeyWord)
-                                || booking.BookingDate.ToString("dd-MM-yyyy").Contains(request.KeyWord))
-                            {
-                                checkServiceName = true;
-                            }
-                        }
-                    }
-
-                    if (checkServiceName)
-                    {
-                        bookingResponse.bookingDetailResponses.AddRange(bookingDetailResponses);
-                        response.Add(bookingResponse);
-                    }
-                }
-            }
-            return await Result<List<GetCustomerBookingResponse>>.SuccessAsync(response);
         }
     }
 }

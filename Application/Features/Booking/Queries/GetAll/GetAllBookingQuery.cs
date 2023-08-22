@@ -34,9 +34,8 @@ namespace Application.Features.Booking.Queries.GetAll
                                 || StringHelper.Contains(customer.CustomerName, request.Keyword)
                                 || booking.Id.ToString().Contains(request.Keyword)
                                 || customer.PhoneNumber.Contains(request.Keyword))
-                                && (!request.BookingDate.HasValue || booking.BookingDate.Equals(request.BookingDate))
-                                && (!request.FromTime.HasValue || booking.FromTime >= request.FromTime)
-                                && (!request.ToTime.HasValue || booking.ToTime <= request.ToTime)
+                                && (!request.BookingDate.HasValue || booking.BookingDate.ToString("yyyy-MM-dd").Equals(((DateTime)request.BookingDate).ToString("yyyy-MM-dd")))
+                                && (!request.UseTime.HasValue || booking.FromTime.ToString("yyyy-MM-dd").Equals(((DateTime)request.UseTime).ToString("yyyy-MM-dd")))
                                 && (!request.Status.HasValue || booking.Status.Equals(request.Status))
                         select new GetAllBookingResponse
                         {
