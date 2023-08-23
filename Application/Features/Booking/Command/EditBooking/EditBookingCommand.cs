@@ -56,6 +56,13 @@ namespace Application.Features.Booking.Command.EditBooking
             var transaction = await _unitOfWork.BeginTransactionAsync();
             try
             {
+                if (request.Note != null)
+                {
+                    if (request.Note.Length > 500)
+                    {
+                        return await Result<EditBookingCommand>.FailAsync(StaticVariable.LIMIT_NOTE);
+                    }
+                }
                 request.ServiceId = request.ServiceId.Distinct().ToList();
                 if (request.ToTime.CompareTo(request.FromTime) < 0)
                 {

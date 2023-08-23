@@ -57,5 +57,14 @@
         public const string RATING_ENUM = "Rating enum";
         public const string BOOKING_STATUS_ENUM = "Booking status enum";
 
+        //Limit character
+        public const string LIMIT_NAME = "The name should not exceed 100 characters.";
+        public const string LIMIT_ADDRESS = "The address should not exceed 500 characters.";
+        public const string LIMIT_EMAIL = "The email should not exceed 100 characters.";
+        public const string LIMIT_USERNAME = "The username should not exceed 50 characters.";
+        public const string LIMIT_PASSWORD = "The password should not exceed 100 characters.";
+        public const string LIMIT_IMAGE = "The image should not exceed 200 characters.";
+        public const string LIMIT_DESCRIPTION = "The description should not exceed 500 characters.";
+        public const string LIMIT_NOTE = "The note should not exceed 500 characters.";
     }
 }

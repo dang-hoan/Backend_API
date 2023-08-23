@@ -6,6 +6,7 @@ using Application.Interfaces.WorkShift;
 using Domain.Constants;
 using System.Text.Json.Serialization;
 using Application.Interfaces;
+using Domain.Helpers;
 
 namespace Application.Features.WorkShift.Command.EditWorkShift
 {
@@ -85,7 +86,11 @@ namespace Application.Features.WorkShift.Command.EditWorkShift
             }
             
             var workShift = _mapper.Map(request, editWorkShift);
-
+            var errorLimitCharacter = StringHelper.CheckLimitWorkShift(workShift);
+            if (!errorLimitCharacter.Equals(""))
+            {
+                return await Result<EditWorkShiftCommand>.FailAsync(errorLimitCharacter);
+            }
             request.WorkDays = request.WorkDays.Distinct().ToList();
             foreach (int i in request.WorkDays)
             {
