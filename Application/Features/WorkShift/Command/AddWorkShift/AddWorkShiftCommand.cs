@@ -6,6 +6,7 @@ using Application.Interfaces.WorkShift;
 using Domain.Constants;
 using System.Text.Json.Serialization;
 using Application.Interfaces;
+using Domain.Helpers;
 
 namespace Application.Features.WorkShift.Command.AddWorkShift
 {
@@ -51,7 +52,7 @@ namespace Application.Features.WorkShift.Command.AddWorkShift
         public async Task<Result<AddWorkShiftCommand>> Handle(AddWorkShiftCommand request, CancellationToken cancellationToken)
         {
             request.Id = null;
-
+            
             if (request.IsDefault != null && request.IsDefault == true)
             {
                 request.WorkingFromTime = new TimeSpan(hours: 8, minutes: 0, seconds: 0);
@@ -79,7 +80,11 @@ namespace Application.Features.WorkShift.Command.AddWorkShift
             }
             
             var workShift = _mapper.Map<Domain.Entities.WorkShift.WorkShift>(request);
-
+            var errorLimitCharacter = StringHelper.CheckLimitWorkShift(workShift);
+            if (!errorLimitCharacter.Equals(""))
+            {
+                return await Result<AddWorkShiftCommand>.FailAsync(errorLimitCharacter);
+            }
             request.WorkDays = request.WorkDays.Distinct().ToList();
             foreach (int i in request.WorkDays)
             {

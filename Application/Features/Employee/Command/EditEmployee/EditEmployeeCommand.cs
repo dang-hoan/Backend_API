@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Features.Employee.Command.AddEmployee;
+using Application.Interfaces;
 using Application.Interfaces.Employee;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services.Identity;
@@ -6,6 +7,7 @@ using Application.Interfaces.WorkShift;
 using AutoMapper;
 using Domain.Constants;
 using Domain.Constants.Enum;
+using Domain.Helpers;
 using Domain.Wrappers;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
@@ -76,13 +78,22 @@ namespace Application.Features.Employee.Command.EditEmployee
             }
             var isExistedWorkshift = await _workshiftRepository.FindAsync(x => !x.IsDeleted && x.Id == request.WorkShiftId);
             if (isExistedWorkshift == null) return await Result<EditEmployeeCommand>.FailAsync(StaticVariable.NOT_FOUND_WORK_SHIFT);
-
+            string deleleImagePath = "";
             if (editEmployee.Image != null && editEmployee.Image != request.Image)
             {
-                await _uploadService.DeleteAsync(editEmployee.Image);
+                deleleImagePath = editEmployee.Image;
             }
 
             _mapper.Map(request, editEmployee);
+            var errorLimitCharacter = StringHelper.CheckLimitEmployee(editEmployee);
+            if(!errorLimitCharacter.Equals(""))
+            {
+                return await Result<EditEmployeeCommand>.FailAsync(errorLimitCharacter);
+            }
+            if (!deleleImagePath.Equals(""))
+            {
+                await _uploadService.DeleteAsync(deleleImagePath);
+            }
             await _employeeRepository.UpdateAsync(editEmployee);
             await _unitOfWork.Commit(cancellationToken);
             await _userService.EditUser(new Dtos.Requests.Identity.EditUserRequest

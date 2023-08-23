@@ -4,6 +4,7 @@ using Application.Interfaces.Repositories;
 using AutoMapper;
 using Domain.Constants;
 using Domain.Entities;
+using Domain.Helpers;
 using Domain.Wrappers;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -58,6 +59,11 @@ namespace Application.Features.Customer.Command.EditCustomer
             var editCustomer = await _customnerRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
             if (editCustomer == null) return await Result<EditCustomerCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
             _mapper.Map(request, editCustomer);
+            var errorLimitCharacter = StringHelper.CheckLimitCustomer(editCustomer);
+            if (!errorLimitCharacter.Equals(""))
+            {
+                return await Result<EditCustomerCommand>.FailAsync(errorLimitCharacter);
+            }
             bool isPhoneNumberExists = _customnerRepository.Entities.Any(x => x.PhoneNumber.Equals(request.PhoneNumber) && x.Id != request.Id && !x.IsDeleted);
             if (isPhoneNumberExists)
             {

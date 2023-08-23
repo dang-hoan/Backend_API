@@ -1,10 +1,12 @@
 ﻿using Application.Dtos.Requests.Feedback;
 using Application.Exceptions;
+using Application.Features.WorkShift.Command.AddWorkShift;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Service;
 using Application.Interfaces.ServiceImage;
 using AutoMapper;
 using Domain.Entities.ServiceImage;
+using Domain.Helpers;
 using Domain.Wrappers;
 using MediatR;
 
@@ -41,6 +43,11 @@ namespace Application.Features.Service.Command.AddService
             try
             {
                 var addService = _mapper.Map<Domain.Entities.Service.Service>(request);
+                var errorLimitCharacter = StringHelper.CheckLimitService(addService);
+                if (!errorLimitCharacter.Equals(""))
+                {
+                    return await Result<AddServiceCommand>.FailAsync(errorLimitCharacter);
+                }
                 await _serviceRepository.AddAsync(addService);
                 await _unitOfWork.Commit(cancellationToken);
                 request.Id = addService.Id;

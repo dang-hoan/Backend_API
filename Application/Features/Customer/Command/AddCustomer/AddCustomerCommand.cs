@@ -9,9 +9,8 @@ using Domain.Entities;
 using Domain.Wrappers;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.Logging;
-using System.Text.Json;
 using Newtonsoft.Json;
+using Domain.Helpers;
 
 namespace Application.Features.Customer.Command.AddCustomer
 {
@@ -53,7 +52,20 @@ namespace Application.Features.Customer.Command.AddCustomer
         public async Task<Result<AddCustomerCommand>> Handle(AddCustomerCommand request, CancellationToken cancellationToken)
         {
             var addCustomer = _mapper.Map<Domain.Entities.Customer.Customer>(request);
-            if((request.Username != null && request.Password != null) && (request.Username != "" && request.Password != ""))
+            var errorLimitCharacter = StringHelper.CheckLimitCustomer(addCustomer);
+            if (!errorLimitCharacter.Equals(""))
+            {
+                return await Result<AddCustomerCommand>.FailAsync(errorLimitCharacter);
+            }
+            if(request.Username.Length > 50)
+            {
+                return await Result<AddCustomerCommand>.FailAsync(StaticVariable.LIMIT_USERNAME);
+            }
+            if (request.Password.Length > 100)
+            {
+                return await Result<AddCustomerCommand>.FailAsync(StaticVariable.LIMIT_PASSWORD);
+            }
+            if ((request.Username != null && request.Password != null) && (request.Username != "" && request.Password != ""))
             {
                 if (request.Password.Length < 8)
                 {

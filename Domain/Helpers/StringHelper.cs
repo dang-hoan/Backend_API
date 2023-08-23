@@ -1,4 +1,8 @@
-﻿namespace Domain.Helpers
+﻿using Domain.Constants;
+using Domain.Entities.Employee;
+using Domain.Wrappers;
+
+namespace Domain.Helpers
 {
     public class StringHelper
     {
@@ -51,6 +55,47 @@
             }
 
             return false;
+        }
+        public static string CheckLimitEmployee(Domain.Entities.Employee.Employee employee)
+        {
+            if (employee.Name.Length > 100) return StaticVariable.LIMIT_NAME;
+            if (employee.Email.Length > 100) return StaticVariable.LIMIT_EMAIL;
+            if (employee.Address != null)
+            {
+                if (employee.Address.Length > 500) return StaticVariable.LIMIT_ADDRESS;
+            }
+            if (employee.Image != null)
+            {
+                if (employee.Image.Length > 200) return StaticVariable.LIMIT_IMAGE;
+            }
+            return "";
+        }
+        public static string CheckLimitWorkShift(Domain.Entities.WorkShift.WorkShift workShift)
+        {
+            if (workShift.Name.Length > 100) return StaticVariable.LIMIT_NAME;
+            if (workShift.Description != null)
+            {
+                if (workShift.Description.Length > 500) return StaticVariable.LIMIT_DESCRIPTION;
+            }
+            return "";
+        }
+        public static string CheckLimitService(Domain.Entities.Service.Service service)
+        {
+            if (service.Name.Length > 100) return StaticVariable.LIMIT_NAME;
+            if(service.Description != null)
+            {
+                if (service.Description.Length > 500) return StaticVariable.LIMIT_DESCRIPTION;
+            }
+            return "";
+        }
+        public static string CheckLimitCustomer(Domain.Entities.Customer.Customer customer)
+        {
+            if (customer.CustomerName.Length > 100) return StaticVariable.LIMIT_NAME;
+            if (customer.Address != null)
+            {
+                if (customer.Address.Length > 500) return StaticVariable.LIMIT_ADDRESS;
+            }
+            return "";
         }
     }
 }

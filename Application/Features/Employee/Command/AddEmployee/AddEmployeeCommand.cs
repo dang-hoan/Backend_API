@@ -5,6 +5,7 @@ using Application.Interfaces.WorkShift;
 using AutoMapper;
 using Domain.Constants;
 using Domain.Entities;
+using Domain.Helpers;
 using Domain.Wrappers;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
@@ -59,6 +60,14 @@ namespace Application.Features.Employee.Command.AddEmployee
             {
                 return await Result<AddEmployeeCommand>.FailAsync(StaticVariable.USERNAME_EXISTS_MSG);
             }
+            if (request.Username.Length > 50)
+            {
+                return await Result<AddEmployeeCommand>.FailAsync(StaticVariable.LIMIT_USERNAME);
+            }
+            if (request.Password.Length > 100)
+            {
+                return await Result<AddEmployeeCommand>.FailAsync(StaticVariable.LIMIT_PASSWORD);
+            }
             var existEmail = _employeeRepository.Entities.FirstOrDefault(x => x.Email == request.Email && !x.IsDeleted);
             if (existEmail != null)
             {
@@ -80,6 +89,11 @@ namespace Application.Features.Employee.Command.AddEmployee
             var isExistedWorkshift = await _workshiftRepository.FindAsync(x => !x.IsDeleted && x.Id == request.WorkShiftId);
             if (isExistedWorkshift == null) return await Result<AddEmployeeCommand>.FailAsync(StaticVariable.NOT_FOUND_WORK_SHIFT);
             var addEmployee = _mapper.Map<Domain.Entities.Employee.Employee>(request);
+            var errorLimitCharacter = StringHelper.CheckLimitEmployee(addEmployee);
+            if (!errorLimitCharacter.Equals(""))
+            {
+                return await Result<AddEmployeeCommand>.FailAsync(errorLimitCharacter);
+            }
             await _employeeRepository.AddAsync(addEmployee);
             await _unitOfWork.Commit(cancellationToken);
             request.Id = addEmployee.Id;

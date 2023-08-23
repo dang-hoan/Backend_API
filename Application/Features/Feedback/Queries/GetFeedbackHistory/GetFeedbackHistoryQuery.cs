@@ -63,6 +63,7 @@ namespace Application.Features.Feedback.Queries.GetHistoryFeedback
                      FeedbackStaffContent = s.FeedbackStaffContent,
                      ReplyId = s.ReplyId,
                      CreateOnFeedback = s.CreateOnFeedback,
+                     Rating = s.Rating
                  }).ToListAsync();
             List<GetFeebackHistoryResponse> response = new List<GetFeebackHistoryResponse>();
             if (customerReviewHistories != null)

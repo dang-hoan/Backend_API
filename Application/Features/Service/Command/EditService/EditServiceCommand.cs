@@ -7,6 +7,7 @@ using Application.Interfaces.ServiceImage;
 using AutoMapper;
 using Domain.Constants;
 using Domain.Entities.ServiceImage;
+using Domain.Helpers;
 using Domain.Wrappers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -54,6 +55,11 @@ namespace Application.Features.Service.Command.EditService
                 if (editService == null) return await Result<EditServiceCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
 
                 _mapper.Map(request, editService);
+                var errorLimitCharacter = StringHelper.CheckLimitService(editService);
+                if (!errorLimitCharacter.Equals(""))
+                {
+                    return await Result<EditServiceCommand>.FailAsync(errorLimitCharacter);
+                }
                 await _serviceRepository.UpdateAsync(editService);
 
                 if (request.ServicesImageRequests != null)
