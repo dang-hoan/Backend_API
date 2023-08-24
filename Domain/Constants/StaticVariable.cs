@@ -35,6 +35,7 @@
         public const string NOT_FOUND_BOOKING = "This booking does not exist in the database.";
         public const string NOT_FOUND_WORK_SHIFT = "This work shift does not exist in the database.";
         public const string NOT_FOUND_BOOKING_DETAIL = "This booking detail does not exist in the database.";
+        public const string NOT_FOUND_FEEDBACK = "This feedback does not exist in the database.";
         public const string SUCCESS = "Success";
 
         public const string WORK_SHIFT_ASSIGNED = "This work shift has assigned to employees! Please change employee's work shift before delete this work shift!";
@@ -48,6 +49,10 @@
         public const string NOT_HAVE_ACCESS = "You don't have permission to access";
 
         public const string STATUS_NOT_EXIST = "Status is not exist";
+
+        public const string ENUM_MUST_NOT_BE_EDITTED = "You must not edit this enum because it is basic enum!";
+        
+        public const string ENUM_MUST_NOT_BE_DELETED = "You must not delete this enum because it is basic enum!";
 
         //Enum
         public const string WAITING = "waiting";

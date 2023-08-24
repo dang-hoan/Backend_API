@@ -28,7 +28,9 @@ namespace Application.Features.BookingStatusEnum.Command.EditBookingStatus
         {
             var bookingStatus = await _enumMasterDataRepository.FindAsync(_ => _.Id == request.Id && _.IsDeleted == false);
             if (bookingStatus == null) return await Result<EditBookingStatusCommand>.FailAsync(StaticVariable.NOT_FOUND_MSG);
-
+            if (bookingStatus.Id == 1 || bookingStatus.Id == 2 || bookingStatus.Id == 3)
+                return await Result<EditBookingStatusCommand>.FailAsync(StaticVariable.ENUM_MUST_NOT_BE_EDITTED);
+                
             //open transaction
             var transaction = await _unitOfWork.BeginTransactionAsync();
             try
