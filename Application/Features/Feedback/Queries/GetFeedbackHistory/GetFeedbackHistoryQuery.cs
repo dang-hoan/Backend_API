@@ -66,7 +66,7 @@ namespace Application.Features.Feedback.Queries.GetHistoryFeedback
                      Rating = s.Rating
                  }).ToListAsync();
             List<GetFeebackHistoryResponse> response = new List<GetFeebackHistoryResponse>();
-            if (customerReviewHistories != null)
+            if (customerReviewHistories.Any())
             {
                 long userId = _userManager.Users.Where(user => _currentUserService.UserName.Equals(user.UserName)).Select(user => user.UserId).FirstOrDefault();
 

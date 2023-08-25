@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Domain.Wrappers;
 using Application.Features.Feedback.Queries.GetHistoryFeedback;
 using Application.Features.Feedback.Command.AddFeedback;
+using Application.Features.Feedback.Command.EditFeedback;
 using Microsoft.AspNetCore.Authorization;
 using Domain.Constants;
 
@@ -113,6 +114,20 @@ namespace WebApi.Controllers.V1.Feeback
         [HttpPost("mybooking")]
         [RequestSizeLimit(50 * 1024 * 1024)] //50MB
         public async Task<IActionResult> AddFeedback(AddFeedbackCommand command)
+        {
+            var result = await Mediator.Send(command);
+            return (result.Succeeded) ? Ok(result) : BadRequest(result);
+        }
+
+        /// <summary>
+        /// Edit feedback from customer
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        [Authorize(Roles = RoleConstants.CustomerRole)]
+        [HttpPut("mybooking/edit")]
+        [RequestSizeLimit(50 * 1024 * 1024)] //50MB
+        public async Task<IActionResult> AddFeedback(EditFeedbackCommand command)
         {
             var result = await Mediator.Send(command);
             return (result.Succeeded) ? Ok(result) : BadRequest(result);

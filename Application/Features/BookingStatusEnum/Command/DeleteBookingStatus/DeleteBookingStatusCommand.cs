@@ -31,6 +31,9 @@ namespace Application.Features.BookingStatusEnum.Command.DeleteBookingStatus
                 var bookingStatus = await _enumMasterDataRepository.FindAsync(x => x.Id == request.Id && !x.IsDeleted);
                 if (bookingStatus == null) return await Result<long>.FailAsync(StaticVariable.NOT_FOUND_MSG);
 
+                if (bookingStatus.Id == 1 || bookingStatus.Id == 2 || bookingStatus.Id == 3)
+                    return await Result<long>.FailAsync(StaticVariable.ENUM_MUST_NOT_BE_DELETED);
+    
                 await _enumMasterDataRepository.DeleteAsync(bookingStatus);
                 await _unitOfWork.Commit(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
