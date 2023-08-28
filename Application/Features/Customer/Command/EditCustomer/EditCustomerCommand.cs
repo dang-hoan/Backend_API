@@ -19,8 +19,8 @@ namespace Application.Features.Customer.Command.EditCustomer
         public string CustomerName { get; set; } = default!;
         public string? Address { get; set; }
         public DateTime? DateOfBirth { get; set; }
-        [Required(ErrorMessage = "Phone number is required.")]
-        [RegularExpression(@"(\+84|84|0)+(3|5|7|8|9|1[2|6|8|9])+([0-9]{7,8})\b", ErrorMessage = "Phone number is invalid")]
+ 
+        [RegularExpression(@"(\+84|84|0)+(3|5|7|8|9|1[2|6|8|9])+([0-9]{7,8})\b", ErrorMessage = StaticVariable.INVALID_PHONE_NUMBER)]
         public string PhoneNumber { get; set; }
     }
 

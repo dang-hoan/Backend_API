@@ -1,7 +1,4 @@
 using Application.Extensions;
-using Domain.Entities.Employee;
-using Domain.Entities.Service;
-using Hangfire;
 using Infrastructure.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
@@ -40,7 +37,10 @@ try
 
     builder.Services.AddCurrentUserService();
 
-    builder.Services.AddControllers();
+    builder.Services.AddControllers(options =>
+    {
+        options.Filters.Add<CustomValidationFilter>(int.MinValue);
+    });
 
     builder.Services.AddEndpointsApiExplorer();
 

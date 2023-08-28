@@ -19,19 +19,21 @@ namespace Application.Features.Employee.Command.AddEmployee
         public string? Address { get; set; }
         public DateTime? Birthday { get; set; }
 
-        [EmailAddress(ErrorMessage = "Invalid email address")]
+        [EmailAddress(ErrorMessage = StaticVariable.INVALID_EMAIL)]
         public string Email { get; set; } = default!;
-        [Required(ErrorMessage = "Phone number is required.")]
-        [RegularExpression(@"(\+84|84|0)+(3|5|7|8|9|1[2|6|8|9])+([0-9]{7,8})\b", ErrorMessage = "Phone number is invalid")]
+
+        [RegularExpression(@"(\+84|84|0)+(3|5|7|8|9|1[2|6|8|9])+([0-9]{7,8})\b", ErrorMessage = StaticVariable.INVALID_PHONE_NUMBER)]
         public string PhoneNumber { get; set; }
+
         public bool? Gender { get; set; }
         public string? Image { get; set; }
-        [Required(ErrorMessage = "Password is required.")]
-        [RegularExpression(@"^[a-zA-Z0-9!@#$%^&*()-_=+[\]{}|;:',.<>\/?~]{8,}$", ErrorMessage = "Password is invalid")]
+
+        [RegularExpression(@"^[a-zA-Z0-9!@#$%^&*()-_=+[\]{}|;:',.<>\/?~]{8,}$", ErrorMessage = StaticVariable.INVALID_PASSWORD)]
         public string Password { get; set; } = default!;
-        [Required(ErrorMessage = "User name is required.")]
-        [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "User name is invalid")]
+
+        [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = StaticVariable.INVALID_USER_NAME)]
         public string Username { get; set; } = default!;
+
         public long WorkShiftId { get; set; }
     }
 

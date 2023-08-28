@@ -1,5 +1,4 @@
-﻿using Application.Features.Employee.Command.AddEmployee;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Application.Interfaces.Employee;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services.Identity;
@@ -21,11 +20,12 @@ namespace Application.Features.Employee.Command.EditEmployee
         public string? Address { get; set; }
         public DateTime? Birthday { get; set; }
 
-        [EmailAddress(ErrorMessage = "Invalid email address")]
+        [EmailAddress(ErrorMessage = StaticVariable.INVALID_EMAIL)]
         public string Email { get; set; } = default!;
-        [Required(ErrorMessage = "Phone number is required.")]
-        [RegularExpression(@"(\+84|84|0)+(3|5|7|8|9|1[2|6|8|9])+([0-9]{7,8})\b", ErrorMessage = "Phone number is invalid")]
+
+        [RegularExpression(@"(\+84|84|0)+(3|5|7|8|9|1[2|6|8|9])+([0-9]{7,8})\b", ErrorMessage = StaticVariable.INVALID_PHONE_NUMBER)]
         public string PhoneNumber { get; set; } = default!;
+
         public bool? Gender { get; set; }
         public string? Image { get; set; }
         public long WorkShiftId { get; set; }
