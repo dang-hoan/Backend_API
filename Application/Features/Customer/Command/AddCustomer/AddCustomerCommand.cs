@@ -1,5 +1,4 @@
-﻿using System.Xml;
-using Application.Interfaces.Customer;
+﻿using Application.Interfaces.Customer;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services.Account;
 using AutoMapper;
@@ -9,7 +8,6 @@ using Domain.Entities;
 using Domain.Wrappers;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
 using Domain.Helpers;
 
 namespace Application.Features.Customer.Command.AddCustomer
@@ -21,16 +19,15 @@ namespace Application.Features.Customer.Command.AddCustomer
         public string? Address { get; set; }
         public DateTime? DateOfBirth { get; set; }
 
-        [Required(ErrorMessage = "Phone number is required.")]
-        
-        [RegularExpression(@"(\+84|84|0)+(3|5|7|8|9|1[2|6|8|9])+([0-9]{7,8})\b", ErrorMessage = "Phone number is invalid")]
+        [RegularExpression(@"(\+84|84|0)+(3|5|7|8|9|1[2|6|8|9])+([0-9]{7,8})\b", ErrorMessage = StaticVariable.INVALID_PHONE_NUMBER)]
         public string PhoneNumber { get; set; }
-        [Required(ErrorMessage = "User name is required.")]
-        [RegularExpression(@"^[a-zA-Z0-9]+$",  ErrorMessage = "User name is invalid" )]
-        public string Username { get; set; }
-        [Required(ErrorMessage = "Password is required.")]
-        [RegularExpression(@"^[a-zA-Z0-9!@#$%^&*()-_=+[\]{}|;:',.<>\/?~]{8,}$", ErrorMessage = "Password is invalid")]
-        public string Password { get; set; }
+
+        [RegularExpression(@"^[a-zA-Z0-9]+$",  ErrorMessage = StaticVariable.INVALID_USER_NAME )]
+        public string? Username { get; set; }
+
+        [RegularExpression(@"^[a-zA-Z0-9!@#$%^&*()-_=+[\]{}|;:',.<>\/?~]{8,}$", ErrorMessage = StaticVariable.INVALID_PASSWORD)]
+        public string? Password { get; set; }
+
         public decimal? TotalMoney { get; set; }
     }
 
@@ -51,30 +48,35 @@ namespace Application.Features.Customer.Command.AddCustomer
 
         public async Task<Result<AddCustomerCommand>> Handle(AddCustomerCommand request, CancellationToken cancellationToken)
         {
+            bool isPhoneNumberExists = _customnerRepository.Entities.Any(x => x.PhoneNumber.Equals(request.PhoneNumber) && !x.IsDeleted);
+            if (isPhoneNumberExists)
+            {
+                return await Result<AddCustomerCommand>.FailAsync(StaticVariable.PHONE_NUMBER_EXISTS_MSG);
+            }
             var addCustomer = _mapper.Map<Domain.Entities.Customer.Customer>(request);
             var errorLimitCharacter = StringHelper.CheckLimitCustomer(addCustomer);
             if (!errorLimitCharacter.Equals(""))
             {
                 return await Result<AddCustomerCommand>.FailAsync(errorLimitCharacter);
             }
-            if(request.Username.Length > 50)
+            if (request.Username != null && request.Username.Length > 50)
             {
                 return await Result<AddCustomerCommand>.FailAsync(StaticVariable.LIMIT_USERNAME);
             }
-            if (request.Password.Length > 100)
+            if (request.Password != null && request.Password.Length > 100)
             {
                 return await Result<AddCustomerCommand>.FailAsync(StaticVariable.LIMIT_PASSWORD);
             }
-            if ((request.Username != null && request.Password != null) && (request.Username != "" && request.Password != ""))
+            if(request.Username != null && string.IsNullOrWhiteSpace(request.Password))
             {
-                if (request.Password.Length < 8)
-                {
-                    return await Result<AddCustomerCommand>.FailAsync(StaticVariable.INVALID_PASSWORD);
-                }
-                bool isPhoneNumberExists = _customnerRepository.Entities.Any(x => x.PhoneNumber.Equals(request.PhoneNumber) && !x.IsDeleted);
-                if(isPhoneNumberExists) {
-                    return await Result<AddCustomerCommand>.FailAsync(StaticVariable.PHONE_NUMBER_EXISTS_MSG);
-                }
+                return await Result<AddCustomerCommand>.FailAsync(StaticVariable.REQUIRED_PASSWORD);
+            }
+            if(string.IsNullOrWhiteSpace(request.Username) && request.Password != null)
+            {
+                return await Result<AddCustomerCommand>.FailAsync(StaticVariable.REQUIRED_USER_NAME);
+            }
+            if (!string.IsNullOrWhiteSpace(request.Username) && !string.IsNullOrWhiteSpace(request.Password))
+            {
                 bool isUsernameExists = await _accountService.IsExistUsername(request.Username);
                 if (isUsernameExists)
                 {

@@ -74,9 +74,21 @@ namespace Application.Features.Booking.Command.AddBooking
                     }
                 }
                 request.ServiceId = request.ServiceId.Distinct().ToList();
+                if(request.ToTime.Date != request.FromTime.Date)
+                {
+                    return await Result<AddBookingCommand>.FailAsync(StaticVariable.NOT_SAME_DAY);
+                }
                 if (request.ToTime.CompareTo(request.FromTime) < 0)
                 {
                     return await Result<AddBookingCommand>.FailAsync(StaticVariable.NOT_LOGIC_DATE_ORDER);
+                }
+                if (request.BookingDate.CompareTo(request.FromTime) > 0)
+                {
+                    return await Result<AddBookingCommand>.FailAsync(StaticVariable.NOT_LOGIC_BOOKING_DATE);
+                }
+                if (request.BookingDate.CompareTo(DateTime.UtcNow) < 0)
+                {
+                    return await Result<AddBookingCommand>.FailAsync(StaticVariable.DATETIME_LESS_THAN_CURRENT);
                 }
                 var ExistCustomer = await _customerRepository.FindAsync(x => x.Id == request.CustomerId && !x.IsDeleted);
                 if (ExistCustomer == null) return await Result<AddBookingCommand>.FailAsync(StaticVariable.NOT_FOUND_CUSTOMER);
