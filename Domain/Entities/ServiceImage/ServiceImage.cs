@@ -12,7 +12,7 @@ namespace Domain.Entities.ServiceImage
         public long ServiceId { get; set; }
 
         [Required]
-        [Column("name_file", TypeName = "nvarchar(MAX)")]
+        [Column("name_file", TypeName = "nvarchar(500)")]
         public string NameFile { get; set; }
 
     }

@@ -12,10 +12,10 @@ namespace Domain.Entities.Reply
         [Column("feedback_id", TypeName = "bigInt")]
         public long FeedbackId { get; set; }
 
-        [Column("title", TypeName = "nvarchar(max)")]
+        [Column("title", TypeName = "nvarchar(200)")]
         public string? Title { get; set; }
 
-        [Column("content", TypeName = "nvarchar(max)")]
+        [Column("content", TypeName = "nvarchar(2000)")]
         public string? Content { get; set; }
 
     }

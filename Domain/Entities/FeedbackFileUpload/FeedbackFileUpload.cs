@@ -12,11 +12,11 @@ namespace Domain.Entities.FeedbackFileUpload
         public long FeedbackId { get; set; }
 
         [Required]
-        [Column("name_file", TypeName = "nvarchar(MAX)")]
+        [Column("name_file", TypeName = "nvarchar(500)")]
         public string NameFile { get; set; }
 
         [Required]
-        [Column("type_file", TypeName = "nvarchar(MAX)")]
+        [Column("type_file", TypeName = "nvarchar(50)")]
         public string TypeFile { get; set; }
     }
 }

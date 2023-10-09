@@ -16,13 +16,13 @@ namespace Domain.Entities.Feedback
         [Column("service_id", TypeName = "bigInt")]
         public long ServiceId { get; set; }
 
-        [Column("title", TypeName = "nvarchar(max)")]
+        [Column("title", TypeName = "nvarchar(200)")]
         public string? Title { get; set; }
 
-        [Column("staff_content", TypeName = "nvarchar(max)")]
+        [Column("staff_content", TypeName = "nvarchar(2000)")]
         public string? StaffContent { get; set; }
 
-        [Column("service_content", TypeName = "nvarchar(max)")]
+        [Column("service_content", TypeName = "nvarchar(2000)")]
         public string? ServiceContent { get; set; }
 
         [Column("reply_id", TypeName = "bigInt")]
