@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace Infrastructure.Extensions
 {
@@ -18,14 +20,26 @@ namespace Infrastructure.Extensions
     {
         public static void AddPersistenceInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-            {
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), o =>
-                {
-                    o.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
-                });
-                //options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-            });
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            //{
+            //    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), o =>
+            //    {
+            //        o.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
+            //    });
+            //    //options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            //});
+
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            var serverVersion = new MySqlServerVersion(new Version(0, 0, 34));
+            services.AddDbContext<ApplicationDbContext>(
+                dbContextOptions => dbContextOptions
+                    .UseMySql(connectionString, serverVersion, mySqlOptions =>
+                                mySqlOptions.SchemaBehavior(MySqlSchemaBehavior.Ignore)
+                    .EnableRetryOnFailure())
+                    .LogTo(Console.WriteLine, LogLevel.Information)
+                    .EnableSensitiveDataLogging()
+                    .EnableDetailedErrors()
+            );
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
 

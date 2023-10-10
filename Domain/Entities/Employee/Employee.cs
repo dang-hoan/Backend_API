@@ -28,7 +28,7 @@ namespace Domain.Entities.Employee
         [Column("email", TypeName = "nvarchar(100)")]
         public string Email { get; set; }
 
-        [Column("image", TypeName = "nvarchar(MAX)")]
+        [Column("image", TypeName = "nvarchar(500))")]
         public string? Image { get; set; }
 
         [Required]
