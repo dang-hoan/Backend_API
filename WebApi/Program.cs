@@ -70,12 +70,7 @@ try
 
     app.UseRouting();
 
-    app.UseStaticFiles();
-    app.UseStaticFiles(new StaticFileOptions
-    {
-        FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Files")),
-        RequestPath = new PathString("/Files")
-    });
+    app.UseFolderAsStatic();
 
     app.UseCors("CorsPolicy");
 

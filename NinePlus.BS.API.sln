@@ -13,13 +13,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApi", "WebApi", "{F3BB11
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{8CE02629-37F0-4222-9DDB-D37197E63FB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{6689DE51-6E09-49CF-B4A8-1CEE95042210}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{6689DE51-6E09-49CF-B4A8-1CEE95042210}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{05697F21-50EA-4563-8F48-931A1986065E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{05697F21-50EA-4563-8F48-931A1986065E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{A8BE3C93-5E82-450B-B0D1-547CA6CF8622}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{A8BE3C93-5E82-450B-B0D1-547CA6CF8622}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csproj", "{6FAB541B-2C1E-43BA-9A21-10849A826E29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "WebApi\WebApi.csproj", "{6FAB541B-2C1E-43BA-9A21-10849A826E29}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{3157CA1F-8023-421A-AA35-5FF3F3B8B9F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{6FAB541B-2C1E-43BA-9A21-10849A826E29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FAB541B-2C1E-43BA-9A21-10849A826E29}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6FAB541B-2C1E-43BA-9A21-10849A826E29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3157CA1F-8023-421A-AA35-5FF3F3B8B9F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3157CA1F-8023-421A-AA35-5FF3F3B8B9F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3157CA1F-8023-421A-AA35-5FF3F3B8B9F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3157CA1F-8023-421A-AA35-5FF3F3B8B9F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

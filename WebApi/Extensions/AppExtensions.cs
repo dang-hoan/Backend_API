@@ -17,6 +17,24 @@ namespace WebApi.Extensions
             });
         }
 
+        public static void UseFolderAsStatic(this IApplicationBuilder app)
+        {
+            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), @"Files");
+
+            bool exists = Directory.Exists(folderPath);
+            if (!exists)
+                Directory.CreateDirectory(folderPath);
+
+            app.UseStaticFiles();  // Enables the serving of static files
+
+            // Map the directory where your images are saved
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(folderPath),
+                RequestPath = new PathString("/Files")
+            });
+        }
+
         public static void UseErrorHandlingMiddleware(this IApplicationBuilder app)
         {
             app.UseMiddleware<ErrorHandlerMiddleware>();
